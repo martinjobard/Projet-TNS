@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Site Interne TNS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <nav>
+        <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo">
+        <a href="/">Accueil</a> | <a href="/Clients">Clients</a> | <a href="/Import-Export">Import-Export</a> | <a href="/Intervenants">Intervenants</a> | <a href="/Missions_réalisées">Missions_réalisées</a> | <a href="/Projets">Projets</a> | <a href="/Stats">Stats</a> | <a href="/tinder_like">tinder_like</a> | <a href="/Wiki-Docs">Wiki-Docs</a>
+    </nav>
+
+    <hr>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <hr>
+
+    <footer>
+        <p>Copyright 2025 - Site Interne TNS  |  <a href="/Contact">Contact</a>  |  <a href="/Partenaires">Partenaires</a></p>
+    </footer>
+
+</body>
+</html>
