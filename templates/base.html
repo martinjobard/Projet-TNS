@@ -8,8 +8,25 @@
 <body>
 
     <nav>
-        <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo">
-        <a href="/">Accueil</a> | <a href="/Clients">Clients</a> | <a href="/Import-Export">Import-Export</a> | <a href="/Intervenants">Intervenants</a> | <a href="/Missions_réalisées">Missions_réalisées</a> | <a href="/Projets">Projets</a> | <a href="/Stats">Stats</a> | <a href="/tinder_like">tinder_like</a> | <a href="/Wiki-Docs">Wiki-Docs</a>
+        <div class="left">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo">
+        </div>
+        <div class="hamburger" onclick="toggleMenu()">
+            ☰
+        </div>
+        <div class="nav-links">
+            <ul>
+                <li><a href="/">Accueil</a></li>
+                <li><a href="/Clients">Clients</a></li>
+                <li><a href="/Import-Export">Import-Export</a></li>
+                <li><a href="/Intervenants">Intervenants</a></li>
+                <li><a href="/Missions_réalisées">Missions réalisées</a></li>
+                <li><a href="/Projets">Projets</a></li>
+                <li><a href="/Stats">Stats</a></li>
+                <li><a href="/tinder_like">Tinder Like</a></li>
+                <li><a href="/Wiki-Docs">Wiki-Docs</a></li>
+            </ul>
+        </div>
     </nav>
 
     <hr>
