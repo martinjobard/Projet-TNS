@@ -46,6 +46,15 @@ nav a:hover {
     width: auto;
 }
 
+.hamburger {
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.nav-links {
+    
+}
+
 /* --- 3. CONTENU PRINCIPAL --- */
 main {
     max-width: 800px; /* Largeur maximale du contenu */
