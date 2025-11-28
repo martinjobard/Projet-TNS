@@ -14,47 +14,57 @@ html = template.render(h1="Tableau de bord",
 @app.route('/')
 def Accueil():
     titre_site = "Site interne TNS"
-    return render_template('Accueil.html',titre = titre_site)
+    return render_template('Accueil.html', titre=titre_site)
 
 @app.route('/Clients')
 def Clients():
-    return 'Hello, World!'
+    titre_site = "Site interne TNS"
+    return render_template('Clients.html', titre=titre_site)
 
 @app.route('/Projets')
 def Projets():
-    return 'Hello, World!'
+    titre_site = "Site interne TNS"
+    return render_template('Projets.html', titre=titre_site)
 
 @app.route('/Intervenants')
 def Intervenants():
-    return 'Hello, World!'
+    titre_site = "Site interne TNS"
+    return render_template('Intervenants.html', titre=titre_site)
 
 @app.route('/Import-Export')
 def Import_Export():
-    return 'Hello, World!'
+    titre_site = "Site interne TNS"
+    return render_template('Import_Export.html', titre=titre_site)
 
 @app.route('/Wiki-Docs')
 def Wiki_Docs():
-    return 'Hello, World!'
+    titre_site = "Site interne TNS"
+    return render_template('Wiki_Docs.html', titre=titre_site)
 
 @app.route('/tinder_like')
 def tinder_like():
-    return 'Hello, World!'
+    titre_site = "Site interne TNS"
+    return render_template('tinder_like.html', titre=titre_site)
 
 @app.route('/Stats')
 def Stats():
-    return 'Hello, World!'
+    titre_site = "Site interne TNS"
+    return render_template('Stats.html', titre=titre_site)
 
 @app.route('/Missions_réalisées')
 def Missions_réalisées():
-    return 'Hello, World!'
+    titre_site = "Site interne TNS"
+    return render_template('Missions_réalisées.html', titre=titre_site)
 
 @app.route('/Partenaires')
 def Partenaires():
-    return 'Hello, World!'
+    titre_site = "Site interne TNS"
+    return render_template('Partenaires.html', titre=titre_site)
 
 @app.route('/Contact')
 def Contact():
-    return 'Hello, World!'
+    titre_site = "Site interne TNS"
+    return render_template('Contact.html', titre=titre_site)
 
 if __name__ == '__main__':
     app.run(debug=True)
