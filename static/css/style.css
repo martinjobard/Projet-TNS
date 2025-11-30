@@ -1,5 +1,26 @@
+/* --- LE MENU DÉROULANT (À mettre en haut du fichier CSS) --- */
+
+/* 1. ON FORCE LE MASQUAGE PAR DÉFAUT */
+.dropdown-content {
+    display: none !important; /* Le !important force le navigateur à obéir */
+    position: absolute;
+    background-color: #ffffff;
+    min-width: 180px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1000;
+    top: 100%;
+    left: 0;
+    flex-direction: column;
+    border-radius: 0 0 4px 4px;
+}
+
+/* 2. ON FORCE L'AFFICHAGE QUAND JS AJOUTE LA CLASSE */
+.dropdown-content.afficher {
+    display: flex !important; /* Force l'affichage quand la classe est là */
+}
+
+/* ... La suite de votre CSS (Nav, Body, etc.) ... */
 /* --- 1. RESET & BASES --- */
-/* On retire les marges par défaut du navigateur pour tout contrôler */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -7,77 +28,137 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Police moderne */
-    background-color: #f4f4f9; /* Gris très clair pour le fond */
-    color: #333; /* Gris foncé pour le texte (plus doux que le noir pur) */
-    line-height: 1.6; /* Espace entre les lignes pour la lisibilité */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Force le corps à prendre toute la hauteur de l'écran */
+    min-height: 100vh;
 }
 
 /* --- 2. BARRE DE NAVIGATION (NAVBAR) --- */
 nav {
     background-color: #2c3e50; /* Bleu nuit */
-    padding: 1rem 2rem; /* 1rem = taille de police par défaut (souvent 16px) */
-    text-align: center;
+    padding: 0 2rem; /* Ajustement du padding */
+    height: 70px; /* Hauteur fixe pour centrer verticalement */
+    display: flex;
+    align-items: center; /* Centre verticalement */
+    justify-content: center; 
     position: relative;
 }
 
-nav a {
-    color: white;
-    text-decoration: none; /* Enlève le soulignement */
-    font-weight: bold;
-    margin: 0 15px; /* Espacement entre les liens */
-    font-size: 1.1rem;
-    transition: color 0.3s; /* Animation douce au survol */
-}
-
-nav a:hover {
-    color: #1abc9c; /* Change de couleur quand la souris passe dessus (Vert turquoise) */
+.left {
+    position: absolute; /* Sort du flux pour ne pas gêner le centrage du menu */
+    left: 20px;         /* Collé à gauche */
+    top: 50%;           /* Centré verticalement */
+    transform: translateY(-50%); /* Ajustement fin du centrage vertical */
+    display: flex;      /* Pour bien gérer l'image dedans */
 }
 
 .logo {
-    position: absolute; /* Permet de le placer librement */
-    left: 20px;         /* À 20px du bord gauche */
-    top: 50%;           /* Au milieu verticalement */
-    transform: translateY(-50%); /* Astuce pour centrer parfaitement en hauteur */
-    height: 40px;       /* Ajustez la taille du logo ici */
+    height: 40px;
     width: auto;
 }
 
+/* --- LIENS PRINCIPAUX --- */
+.nav-links ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.nav-links li {
+    position: relative; /* Indispensable pour l'ancrage du sous-menu */
+}
+
+/* Style des liens DE BASE (Menu principal) */
+.nav-links > ul > li > a {
+    text-decoration: none;
+    padding: 15px 20px;
+    display: block;
+    color: white; /* BLANC pour être visible sur le bleu nuit */
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+
+.nav-links > ul > li > a:hover {
+    color: #1abc9c; /* Vert turquoise au survol */
+}
+
+/* --- MENU DÉROULANT (DROPDOWN) --- */
+
+/* Le conteneur du sous-menu (CACHÉ par défaut) */
+.dropdown-content {
+    display: none; /* CACHÉ DE BASE */
+    position: absolute;
+    background-color: #ffffff; /* Fond blanc */
+    min-width: 180px; /* Un peu plus large pour le confort */
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1000;
+    top: 100%; /* Juste en dessous du parent */
+    left: 0;
+    flex-direction: column;
+    border-radius: 0 0 4px 4px; /* Petits arrondis en bas */
+}
+
+/* Quand le JS ajoute cette classe, le menu s'affiche */
+.dropdown-content.afficher {
+    display: flex;
+}
+
+/* Style des liens DU SOUS-MENU */
+.dropdown-content a {
+    text-decoration: none;
+    padding: 12px 16px;
+    text-align: left;
+    display: block;
+    color: #333 !important; /* GRIS FONCÉ (force le contraste sur fond blanc) */
+    font-weight: normal;
+    font-size: 1rem;
+    border-bottom: 1px solid #eee; /* Petite séparation */
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1; /* Gris très clair au survol */
+    color: #1abc9c !important;
+}
+
+/* --- HAMBURGER (Mobile) --- */
 .hamburger {
     font-size: 30px;
     cursor: pointer;
-}
-
-.nav-links {
-    
+    color: white;
+    display: none; /* Caché sur PC par défaut */
 }
 
 /* --- 3. CONTENU PRINCIPAL --- */
 main {
-    max-width: 800px; /* Largeur maximale du contenu */
-    margin: 40px auto; /* Centre le bloc horizontalement */
+    max-width: 800px;
+    width: 90%; /* Responsive */
+    margin: 40px auto;
     padding: 20px;
     background-color: white;
-    border-radius: 8px; /* Coins arrondis */
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Légère ombre portée */
-    flex: 1; /* Prend l'espace disponible pour pousser le footer en bas */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    flex: 1;
 }
 
 h1 {
     color: #2c3e50;
     margin-bottom: 20px;
-    border-bottom: 2px solid #1abc9c; /* Petite ligne décorative sous le titre */
+    border-bottom: 2px solid #1abc9c;
     padding-bottom: 10px;
 }
 
-/* --- 4. FORMULAIRES (Pour votre page Contact) --- */
+/* --- 4. FORMULAIRES --- */
 form {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Espace entre les éléments du formulaire */
+    gap: 15px;
 }
 
 label {
@@ -90,6 +171,7 @@ input[type="email"], textarea {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
+    font-family: inherit;
 }
 
 button {
@@ -104,27 +186,25 @@ button {
 }
 
 button:hover {
-    background-color: #16a085; /* Foncit légèrement au survol */
+    background-color: #16a085;
 }
 
-/* --- 5. PIED DE PAGE (FOOTER) --- */
+/* --- 5. PIED DE PAGE --- */
 footer {
     background-color: #333;
     color: white;
     text-align: center;
     padding: 1rem;
-    margin-top: auto; /* Sécurité pour rester en bas */
+    margin-top: auto;
 }
 
 footer a {
     color: white;
-    text-decoration: none; /* Enlève le soulignement */
+    text-decoration: none;
     font-weight: bold;
-    margin: 0 15px; /* Espacement entre les liens */
-    font-size: 1.1rem;
-    transition: color 0.3s; /* Animation douce au survol */
+    margin: 0 10px;
 }
 
 footer a:hover {
-    color: #1abc9c; /* Change de couleur quand la souris passe dessus (Vert turquoise) */
+    color: #1abc9c;
 }
