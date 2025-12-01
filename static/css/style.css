@@ -1,291 +1,279 @@
-/* --- LE MENU DÉROULANT (À mettre en haut du fichier CSS) --- */
-
-/* 1. ON FORCE LE MASQUAGE PAR DÉFAUT */
-.dropdown-content {
-    display: none !important; /* Le !important force le navigateur à obéir */
-    position: absolute;
-    background-color: #ffffff;
-    min-width: 180px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1000;
-    top: 100%;
-    left: 0;
-    flex-direction: column;
-    border-radius: 0 0 4px 4px;
+/* --- 0. LOGIQUE D'OUVERTURE (Le Cerveau) --- */
+#toggle-sidebar {
+    display: none; /* On cache la case à cocher */
 }
 
-/* 2. ON FORCE L'AFFICHAGE QUAND JS AJOUTE LA CLASSE */
-.dropdown-content.afficher {
-    display: flex !important; /* Force l'affichage quand la classe est là */
-}
+/* --- 1. HEADER (BARRE DU HAUT) --- */
 
-/* ... La suite de votre CSS (Nav, Body, etc.) ... */
-/* --- 1. RESET & BASES --- */
 * {
-    box-sizing: border-box;
+    box-sizing: border-box; 
     margin: 0;
     padding: 0;
 }
 
+html {
+    /* Empêche le défilement horizontal causé par des petits dépassements */
+    overflow-x: hidden; 
+    height: 100%;
+}
+
+header {
+    background-color: #2c3e50;
+    height: 70px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    /* C'est ici qu'on corrige : on s'assure que le padding est bien géré */
+    padding: 0 30px; /* Plus d'espace sur les côtés */
+    box-sizing: border-box; /* INDISPENSABLE : empêche le padding d'agrandir la largeur totale */
+    
+    z-index: 2000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+/* Ajustement pour que le contenu ne soit pas caché sous le header fixe */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f4f9;
     color: #333;
-    line-height: 1.6;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    
+    /* GESTION DE LA HAUTEUR */
+    min-height: 100vh;      /* Prend toute la hauteur de l'écran */
+    display: flex;          /* Pour le Sticky Footer */
+    flex-direction: column; /* Vertical */
+    
+    /* GESTION DU HEADER FIXE */
+    /* On utilise margin-top sur le main plutôt que padding-top ici 
+       pour éviter les soucis de scrollbar verticale inutile */
+    padding: 0; 
+    
+    /* Sécurité supplémentaire contre le scroll horizontal */
+    overflow-x: hidden; 
+    width: 100%;
 }
 
-/* --- 2. BARRE DE NAVIGATION (NAVBAR) --- */
-nav {
-    background-color: #2c3e50; /* Bleu nuit */
-    padding: 0 2rem; /* Ajustement du padding */
-    height: 70px; /* Hauteur fixe pour centrer verticalement */
+main {
+    /* C'est ici qu'on pousse le contenu vers le bas pour compenser le header fixe */
+    margin-top: 90px; /* 70px header + 20px espace */
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    
+    max-width: 1000px;
+    width: 90%;
+    padding: 30px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    
+    flex: 1; /* Pousse le footer en bas */
+}
+
+/* GAUCHE */
+.header-left {
     display: flex;
-    align-items: center; /* Centre verticalement */
-    justify-content: center; 
+    align-items: center;
+    gap: 20px;
+    width: 250px;
+}
+
+.logo { height: 40px; width: auto; }
+
+/* HAMBURGER (Design des barres) */
+.hamburger-btn {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 30px;
+}
+.hamburger-btn span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background-color: white;
+    border-radius: 3px;
+    transition: 0.3s;
+}
+
+/* Animation Hamburger -> Croix quand coché */
+#toggle-sidebar:checked ~ header .hamburger-btn span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+#toggle-sidebar:checked ~ header .hamburger-btn span:nth-child(2) { opacity: 0; }
+#toggle-sidebar:checked ~ header .hamburger-btn span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+/* CENTRE (Recherche) */
+.search-box {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+.search-box input {
+    padding: 8px 15px;
+    border-radius: 20px 0 0 20px;
+    border: none;
+    outline: none;
+    width: 300px;
+}
+.search-box button {
+    padding: 8px 15px;
+    border-radius: 0 20px 20px 0;
+    border: none;
+    background: #1abc9c;
+    color: white;
+    cursor: pointer;
+}
+
+/* --- PARTIE DROITE DU HEADER --- */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Espace entre le bouton connexion et la photo */
     position: relative;
 }
 
-.left {
-    position: absolute; /* Sort du flux pour ne pas gêner le centrage du menu */
-    left: 20px;         /* Collé à gauche */
-    top: 50%;           /* Centré verticalement */
-    transform: translateY(-50%); /* Ajustement fin du centrage vertical */
-    display: flex;      /* Pour bien gérer l'image dedans */
+/* 1. Style du bouton Connexion */
+.btn-connexion {
+    color: white;
+    text-decoration: none;
+    border: 1px solid white; /* Bordure blanche fine */
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
 }
 
-.logo {
-    height: 40px;
-    width: auto;
+.btn-connexion:hover {
+    background-color: white; /* Devient blanc au survol */
+    color: #2c3e50; /* Le texte devient bleu */
 }
 
-/* --- LIENS PRINCIPAUX --- */
-.nav-links ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+/* 2. Conteneur Profil (pour ancrer le menu déroulant) */
+.profile-container {
+    position: relative; /* Indispensable pour que le menu se place par rapport à ça */
     display: flex;
     align-items: center;
 }
 
-.nav-links li {
-    position: relative; /* Indispensable pour l'ancrage du sous-menu */
-}
-
-/* Style des liens DE BASE (Menu principal) */
-.nav-links > ul > li > a {
-    text-decoration: none;
-    padding: 15px 20px;
-    display: block;
-    color: white; /* BLANC pour être visible sur le bleu nuit */
-    font-weight: bold;
-    font-size: 1.1rem;
-    transition: color 0.3s;
-}
-
-.nav-links > ul > li > a:hover {
-    color: #1abc9c; /* Vert turquoise au survol */
-}
-
-/* --- MENU DÉROULANT (DROPDOWN) --- */
-
-/* Le conteneur du sous-menu (CACHÉ par défaut) */
-.dropdown-content {
-    display: none; /* CACHÉ DE BASE */
-    position: absolute;
-    background-color: #ffffff; /* Fond blanc */
-    min-width: 180px; /* Un peu plus large pour le confort */
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1000;
-    top: 100%; /* Juste en dessous du parent */
-    left: 0;
-    flex-direction: column;
-    border-radius: 0 0 4px 4px; /* Petits arrondis en bas */
-}
-
-/* --- MENU DÉROULANT (à gauche) --- */
-
-:root {
-    --bar-width: 50px;
-    --bar-height: 3px;
-    --hamburger-gap: 4px;
-    --foreground: white;
-    --background: #2c3e50;
-    --hamburger-margin-top: 27px;
-    --hamburger-margin-left: 110px;
-    --animation-timing: 200ms ease-in-out;
-}
-
-.hamburger-menu input{
-    appearance: none;
-    padding: 0;
-    margin: 0;
-    outline: none;
-    pointer-events: none;
-}
-
-.hamburger-menu {
-    display: flex;
-    flex-direction: column;
-    gap: var(--hamburger-gap);
-    width: max-content;
-    position: absolute;
-    top: var(--hamburger-margin-top);
-    left: var(--hamburger-margin-left);
-    z-index: 1;
+.avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
     cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.2);
+    transition: transform 0.2s;
 }
 
-.hamburger-menu span {
-    display: block;
-    width: var(--bar-width);
-    height: var(--bar-height);
-    background: var(--foreground);
-    border-radius: 9999px;
-    transition: opacity var(--animation-timing),
-                transform var(--animation-timing);
+.avatar:hover {
+    transform: scale(1.05);
+    border-color: white;
 }
 
-.hamburger-menu:has(input:checked) span {
-    opacity: 0;
-    transform: scaleX(0);
-}
-
-.sidebar {
-    position: fixed; 
-    top: 0;
-    left: 0; /* Important pour le positionnement initial */
-    translate: -100%; 
-    transition: translate var(--animation-timing);
-    padding: 1rem;
-    background-color: var(--foreground);
-    color: var(--background);
-    max-width: 12rem;
-    min-height: 100vh; 
-    z-index: 1; 
-}
-
-.sidebar ul {
-    list-style: none; /* Retire les puces */
-    margin: 30px 0 0 0; /* Ajoute une marge pour décaler les liens du haut */
-    padding: 0;
-}
-
-.sidebar li a {
-    /* Hérite de la police et taille du body */
-    text-decoration: none;
-    padding: 15px 20px; 
-    display: block;
-    color: var(--background); /* Bleu nuit */
-    font-weight: bold; /* Pour correspondre au font-weight des liens principaux */
-    font-size: 1.1rem; /* Pour correspondre au font-size des liens principaux */
-    transition: color var(--animation-timing); 
-}
-
-.sidebar a:hover {
-    color: #1abc9c; 
-}
-
-.hamburger-menu:has(input:checked) + .sidebar {
-    translate: 0;
-}
-
-/* Quand le JS ajoute cette classe, le menu s'affiche */
-.dropdown-content.afficher {
-    display: flex;
-}
-
-/* Style des liens DU SOUS-MENU */
-.dropdown-content a {
-    text-decoration: none;
-    padding: 12px 16px;
-    text-align: left;
-    display: block;
-    color: #333 !important; /* GRIS FONCÉ (force le contraste sur fond blanc) */
-    font-weight: normal;
-    font-size: 1rem;
-    border-bottom: 1px solid #eee; /* Petite séparation */
-}
-
-.dropdown-content a:hover {
-    background-color: #f1f1f1; /* Gris très clair au survol */
-    color: #1abc9c !important;
-}
-
-
-
-/* --- 3. CONTENU PRINCIPAL --- */
-main {
-    max-width: 800px;
-    width: 90%; /* Responsive */
-    margin: 40px auto;
-    padding: 20px;
+/* 3. Le Menu Déroulant Profil */
+.profile-dropdown {
+    display: none; /* Caché par défaut */
+    position: absolute;
+    top: 55px; /* Juste en dessous de l'image */
+    right: 0; /* Aligné à droite */
     background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    flex: 1;
+    min-width: 150px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 6px;
+    overflow: hidden;
+    z-index: 2500;
 }
 
-h1 {
-    color: #2c3e50;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #1abc9c;
-    padding-bottom: 10px;
+/* Classe ajoutée par le JS pour afficher le menu */
+.profile-dropdown.active {
+    display: block;
 }
 
-/* --- 4. FORMULAIRES --- */
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.profile-dropdown a {
+    display: block;
+    padding: 12px 20px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background 0.2s;
 }
 
-label {
-    font-weight: bold;
-    margin-bottom: 5px;
+.profile-dropdown a:hover {
+    background-color: #f4f4f9;
+    color: #1abc9c;
 }
 
-input[type="email"], textarea {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-family: inherit;
+/* --- 2. SIDEBAR (MENU DE GAUCHE) --- */
+.sidebar {
+    position: fixed;
+    top: 70px; /* Commence sous le header */
+    left: 0;
+    width: 250px;
+    height: calc(100vh - 70px); /* Prend tout le reste de la hauteur */
+    background-color: #34495e; /* Un peu plus clair que le header */
+    transform: translateX(-100%); /* Caché par défaut à gauche */
+    transition: transform 0.3s ease-in-out;
+    z-index: 1900;
+    overflow-y: auto; /* Scroll si menu trop long */
+    padding-top: 20px;
 }
 
-button {
-    background-color: #1abc9c;
+/* MAGIE : Quand la checkbox est cochée, la sidebar rentre */
+#toggle-sidebar:checked ~ .sidebar {
+    transform: translateX(0);
+}
+
+/* Style des liens Sidebar */
+.sidebar ul { list-style: none; padding: 0; margin: 0; }
+.sidebar a {
+    text-decoration: none;
     color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
+    display: block;
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: 0.2s;
 }
+.sidebar a:hover { background-color: #2c3e50; border-left: 4px solid #1abc9c; }
 
-button:hover {
-    background-color: #16a085;
+/* Sous-menu (Style "Tiroir") */
+.sidebar-submenu {
+    display: none; /* Caché par JS au début */
+    background-color: #233342; /* Fond foncé pour l'intérieur */
 }
+.sidebar-submenu a {
+    padding-left: 50px;
+    font-size: 0.9em;
+    color: #bdc3c7;
+}
+.sidebar-submenu a:hover { color: white; }
 
-/* --- 5. PIED DE PAGE --- */
+/* --- PIED DE PAGE (FOOTER) --- */
 footer {
-    background-color: #333;
+    background-color: #333; /* Gris foncé */
     color: white;
     text-align: center;
-    padding: 1rem;
-    margin-top: auto;
+    padding: 20px;
+    width: 100%;
+    margin-top: 40px; /* Espace pour ne pas coller au contenu */
+    border-top: 4px solid #2c3e50; /* Petite bordure décorative rappelant le header */
+}
+
+footer p {
+    margin: 0; /* Enlève les marges par défaut pour que ce soit bien centré */
+    font-size: 0.95rem;
 }
 
 footer a {
-    color: white;
+    color: #bdc3c7; /* Gris clair pour les liens */
     text-decoration: none;
     font-weight: bold;
     margin: 0 10px;
+    transition: color 0.3s;
 }
 
 footer a:hover {
-    color: #1abc9c;
+    color: #1abc9c; /* Vert turquoise au survol */
 }
