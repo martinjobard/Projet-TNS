@@ -66,6 +66,16 @@ def Contact():
     titre_site = "Site interne TNS"
     return render_template('Contact.html', titre=titre_site)
 
+@app.route('/Connexion')
+def Connexion():
+    titre_site = "Site interne TNS"
+    return render_template('Connexion.html', titre=titre_site)
+
+@app.route('/Mon_compte')
+def Mon_compte():
+    titre_site = "Site interne TNS"
+    return render_template('Mon_compte.html', titre=titre_site)
+
 if __name__ == '__main__':
     app.run(debug=True)
 
