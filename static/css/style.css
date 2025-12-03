@@ -250,6 +250,62 @@ main {
 }
 .sidebar-submenu a:hover { color: white; }
 
+/* --- Page tinder-like --- */
+.centering-wrapper {
+    flex-grow: 1; 
+    
+    /* Active Flexbox sur cet élément */
+    display: flex; 
+    
+    /* Organise les éléments (h1 et card-container) en colonne */
+    flex-direction: column; 
+    
+    /* Centre les éléments verticalement (le long de l'axe de la colonne) */
+    justify-content: center; 
+    
+    /* Centre les éléments horizontalement (perpendiculaire à l'axe de la colonne) */
+    align-items: center; 
+    
+    /* Assure qu'il prend toute la largeur disponible pour centrer */
+    width: 100%;
+    
+    /* Hauteur minimale de 100% de la vue si le main le permet,
+       mais flex-grow: 1 est souvent suffisant dans un main flex */
+    min-height: 100%; 
+}
+/* STYLE DU CONTENEUR DES CARTES */
+.card-container {
+    position: relative;
+    margin-top: 20px;
+    width: 275px;
+    height: 350px;
+}
+
+.card {
+    /* Style et positionnement absolu */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 130px;
+    color: rgba(255, 255, 255, 0.9);
+    user-select: none;
+    cursor: grab;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.card:not(:last-child) {
+    top: 5px;
+    transform: scale(0.95);
+}
+
 /* --- PIED DE PAGE (FOOTER) --- */
 footer {
     background-color: #333; /* Gris foncé */
