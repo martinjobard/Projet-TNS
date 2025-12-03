@@ -29,6 +29,18 @@ def allowed_file(filename):
 
 # --- Fonctions de Routes Protégées ---
 
+DATABASE= "ppii.db"
+
+
+def get_db(): # cette fonction permet de créer une connexion à la base 
+              # ou de récupérer la connexion existante 
+    if 'db' not in g:  # plus propre que getattr()
+        g.db = sqlite3.connect(DATABASE)
+        g.db.row_factory = sqlite3.Row  # très important !
+    return g.db
+
+
+
 @app.route('/')
 def Accueil():
     redirect_if_needed = require_login()
@@ -219,3 +231,15 @@ def upload_profile_pic():
 if __name__ == '__main__':
     app.run(debug=True)
 
+
+@app.route('/Intervenants/<nomcomplet>')
+def Inter_profil(nomcomplet=None):
+    db = get_db()
+    c = db.cursor()
+    [name, surname]=nomcomplet.split('.')
+    sql = "SELECT Nom, Prénom FROM Intervenants WHERE nom=? AND prénom=?"
+    c.execute(sql, (name, surname))
+    selected_students = c.fetchone() #plus trouver les compétences 
+    if selected_students is None:
+       return render_template("error_intervenants.html", message="Intervenant non trouvé")
+    return render_template('Intervenant_profil.html', nom=selected_students['nom'], prénom=selected_students['prénom'] )
