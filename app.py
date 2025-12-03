@@ -237,7 +237,7 @@ def Inter_profil(nomcomplet=None):
     db = get_db()
     c = db.cursor()
     [name, surname]=nomcomplet.split('.')
-    sql = "SELECT nom, prénom FROM Clients nom=? AND prénom=?"
+    sql = "SELECT nom, prénom FROM Clients WHERE nom=? AND prénom=?"
     c.execute(sql, (name, surname))
     selected_students = c.fetchone() #plus trouver les compétences 
     if selected_students is None:
