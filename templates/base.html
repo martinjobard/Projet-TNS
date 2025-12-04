@@ -30,7 +30,7 @@
         </div>
 
         <div class="header-right">
-            <a href="/Connexion" class="btn-connexion">Connexion</a>
+            {% if 'logged_in' in session %}
             <div class="profile-container">
                 <img src="{{ url_for('static', filename='images/default-avatar.png') }}" 
                     class="avatar" 
@@ -38,8 +38,10 @@
                     alt="Profil">
                 <div class="profile-dropdown" id="monProfilDropdown">
                     <a href="/Mon_compte">Mon compte</a>
-                    </div>
+                    <a href="{{ url_for('logout') }}">Déconnexion</a> ⬅️ Lien fonctionnel
+                </div>
             </div>
+            {% endif %}
         </div>
     </header>
 
