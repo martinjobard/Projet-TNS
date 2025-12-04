@@ -2,17 +2,30 @@ from jinja2 import Environment, FileSystemLoader
 from flask import Flask, render_template, request, url_for, session, redirect, g
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
+import os
 app = Flask(__name__)
 
 
 # Vous avez besoin d'une clé secrète pour les sessions (TRÈS IMPORTANT !)
 app.config['SECRET_KEY'] = 'ma_cle_secrete_tres_sure_a_changer'
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+UPLOAD_FOLDER = 'static/images/profiles'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 # --- Définition du Gardien ---
 def require_login():
     if 'logged_in' not in session:
         return redirect(url_for('Connexion')) 
     return None
+
+def allowed_file(filename):
+    # 1. Vérifie si le nom de fichier contient un point
+    # 2. Sépare le nom au dernier point (rsplit('.', 1)) et met l'extension en minuscules
+    # 3. Vérifie si cette extension fait partie de notre ensemble ALLOWED_EXTENSIONS
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 # --- Fonctions de Routes Protégées ---
 
@@ -131,15 +144,22 @@ def login():
         
         db = sqlite3.connect('ppii.db')
         c = db.cursor()
-        sql = "SELECT mdp_haché FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+        sql = "SELECT mdp_haché, pdp_url FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
         c.execute(sql, (username,))
         result = c.fetchone()
         db.close()
-        mdp_hash = result[0] if result else None
+        if result:
+            mdp_hash = result[0]
+            pdp_url = result[1]
+        else:
+            mdp_hash = None
+            pdp_url = None
+        
         if mdp_hash and check_password_hash(mdp_hash, password):
-            # 3. Si les informations sont correctes, créer une session utilisateur
+            # Succès ! Stocker les informations
             session['logged_in'] = True
             session['username'] = username
+            session['pdp_url'] = pdp_url # ⬅️ NOUVEAU : On stocke l'URL dans la session !
             return redirect(url_for('Accueil'))
         else:
             # 4. Si les informations sont incorrectes, afficher un message d'erreur
@@ -154,8 +174,47 @@ def logout():
     session.clear() # ⬅️ Efface toutes les clés de la session
     return redirect(url_for('Connexion')) # Redirige vers la page de connexion
 
-hach = generate_password_hash("12345")
-print(hach)
+
+@app.route('/upload_profile_pic', methods=['POST'])
+def upload_profile_pic():
+    file = request.files.get('pdp_file')
+
+    # Vérification unique et complète (existence + sécurité de l'extension)
+    if file and file.filename != '' and allowed_file(file.filename):
+        try:
+            # 1. Préparation du nom sécurisé (ex: admin.jpg)
+            extension = file.filename.rsplit('.', 1)[1].lower()
+            username = session['username']
+            secure_filename = f"{username}.{extension}"
+            
+            # 2. Sauvegarde du fichier sur le disque
+            full_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename)
+            file.save(full_path)
+            
+            # 3. Mise à jour de la BDD
+            url_to_save = os.path.join('images/profiles', secure_filename) # Chemin relatif pour la BDD/HTML
+            
+            db = sqlite3.connect('ppii.db')
+            c = db.cursor()
+            sql_update = "UPDATE Utilisateur_Intervenant SET pdp_url = ? WHERE nom_utilisateur = ?"
+            c.execute(sql_update, (url_to_save, username))
+            
+            db.commit()
+            session['pdp_url'] = url_to_save
+            db.close()
+
+            # Succès : Retour à la page de profil
+            return redirect(url_for('Mon_compte'))
+
+        except Exception as e:
+            # Gérer les erreurs (problème de BDD ou de disque)
+            print(f"Erreur lors de l'upload ou de la mise à jour : {e}")
+            # Idéalement, utilisez un message flash ici
+            return redirect(url_for('Mon_compte'))
+            
+    else:
+        # Échec de la vérification (pas de fichier soumis ou extension non autorisée)
+        return redirect(url_for('Mon_compte'))
 
 if __name__ == '__main__':
     app.run(debug=True)
