@@ -23,11 +23,11 @@
         </div>
 
         <div class="search-box">
-            <form action="/recherche" method="GET">
-                <input type="text" placeholder="Rechercher un client, un projet...">
-                <button type="submit">🔍</button>
-            </form>
+            {% block search_bar %}
+            {% endblock %}
         </div>
+
+        
 
         <div class="header-right">
             {% if 'logged_in' in session %}
@@ -38,7 +38,7 @@
                     alt="Profil">
                 <div class="profile-dropdown" id="monProfilDropdown">
                     <a href="/Mon_compte">Mon compte</a>
-                    <a href="{{ url_for('logout') }}">Déconnexion</a> ⬅️ Lien fonctionnel
+                    <a href="{{ url_for('logout') }}">Déconnexion</a>
                 </div>
             </div>
             {% endif %}
