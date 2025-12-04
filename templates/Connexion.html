@@ -2,5 +2,15 @@
 
 {% block content %}
     <h1>Connexion :</h1>
-    <p></p>
+    <form action="/login" method="POST">
+    <label for="username_field">Identifiant :</label>
+    <input type="text" id="username_field" name="identifiant" required>
+    <br>
+    
+    <label for="password_field">Mot de passe :</label>
+    <input type="password" id="password_field" name="mot_de_passe" required>
+    <br>
+    
+    <button type="submit">Se connecter</button>
+</form>
 {% endblock %}
