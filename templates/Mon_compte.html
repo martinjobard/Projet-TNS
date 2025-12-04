@@ -2,5 +2,12 @@
 
 {% block content %}
     <h1>Mon compte :</h1>
-    <p></p>
+    <form action="/upload_profile_pic" method="POST" enctype="multipart/form-data">
+    <form action="/upload_profile_pic" method="POST" enctype="multipart/form-data">
+        <label for="pdp_file_input">Sélectionner une photo :</label>
+        <input type="file" id="pdp_file_input" name="pdp_file" accept="image/*" required>
+        <br>
+        
+        <button type="submit">Enregistrer les modifications</button>
+    </form>
 {% endblock %}

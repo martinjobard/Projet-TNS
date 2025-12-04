@@ -27,17 +27,17 @@
             {% endblock %}
         </div>
 
-        
-
         <div class="header-right">
             {% if 'logged_in' in session %}
             <div class="profile-container">
-                <img src="{{ url_for('static', filename='images/default-avatar.png') }}" 
+                <span class="username-display">{{ session.get('username') }}</span> 
+                
+                <img src="{{ url_for('static', filename=session.get('pdp_url') or 'images/default-avatar.png') }}" 
                     class="avatar" 
                     onclick="toggleProfileMenu()" 
                     alt="Profil">
                 <div class="profile-dropdown" id="monProfilDropdown">
-                    <a href="/Mon_compte">Mon compte</a>
+                    <a href="{{ url_for('Mon_compte') }}">Mon compte</a>
                     <a href="{{ url_for('logout') }}">Déconnexion</a>
                 </div>
             </div>
@@ -48,27 +48,27 @@
     <aside class="sidebar">
         <nav>
             <ul>
-                <li><a href="/">Accueil</a></li>
+                <li><a href="{{ url_for('Accueil') }}">Accueil</a></li>
 
                 <li>
                     <a href="#" class="sidebar-title" onclick="toggleSidebarItem(this)">Gestion ▾</a>
                     <ul class="sidebar-submenu">
-                        <li><a href="/Clients">Clients</a></li>
-                        <li><a href="/Intervenants">Intervenants</a></li>
-                        <li><a href="/Projets">Projets</a></li>
-                        <li><a href="/Partenaires">Partenaires</a></li>
+                        <li><a href="{{ url_for('Clients') }}">Clients</a></li>
+                        <li><a href="{{ url_for('Intervenants') }}">Intervenants</a></li>
+                        <li><a href="{{ url_for('Projets') }}">Projets</a></li>
+                        <li><a href="{{ url_for('Partenaires') }}">Partenaires</a></li>
                     </ul>
                 </li>
 
-                <li><a href="/Missions_réalisées">Missions</a></li>
+                <li><a href="{{ url_for('Missions_réalisées') }}">Missions</a></li>
 
                 <li>
                     <a href="#" class="sidebar-title" onclick="toggleSidebarItem(this)">Outils ▾</a>
                     <ul class="sidebar-submenu">
-                        <li><a href="/Stats">Stats</a></li>
-                        <li><a href="/Import-Export">Import-Export</a></li>
-                        <li><a href="/Wiki-Docs">Wiki-Docs</a></li>
-                        <li><a href="/tinder_like">Tinder Like</a></li>
+                        <li><a href="{{ url_for('Stats') }}">Stats</a></li>
+                        <li><a href="{{ url_for('Import_Export') }}">Import-Export</a></li>
+                        <li><a href="{{ url_for('Wiki_Docs') }}">Wiki-Docs</a></li>
+                        <li><a href="{{ url_for('tinder_like') }}">Tinder Like</a></li>
                     </ul>
                 </li>
             </ul>
@@ -80,7 +80,7 @@
     </main>
 
     <footer>
-        <p>Copyright 2025 - Site Interne TNS - <a href="/Contact">Contact</a></p>
+        <p>Copyright 2025 - Site Interne TNS - <a href="{{ url_for('Contact') }}">Contact</a></p>
     </footer>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
