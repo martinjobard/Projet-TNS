@@ -1,13 +1,75 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Mon compte :</h1>
-    <form action="/upload_profile_pic" method="POST" enctype="multipart/form-data">
+<h1>Mon compte</h1> 
+
+<div class="user-info-container">
+    <div> Nom : {{nom_utilisateur}} </div> 
+    <div> Email : {{email_utilisateur}} </div>
+    <img src="{{ url_for('static', filename=pdp_actuelle or 'images/default-avatar.png') }}" alt="Photo de profil" style="max-width:150px;">
+
+    <button id="btn_modifier_pdp">Modifier photo de profil</button> 
+</div>
+
+<div id="pdp_modifier_block" style="display:none;"> 
     <form action="/upload_profile_pic" method="POST" enctype="multipart/form-data">
         <label for="pdp_file_input">Sélectionner une photo :</label>
         <input type="file" id="pdp_file_input" name="pdp_file" accept="image/*" required>
         <br>
-        
+        <button type="submit">Enregistrer la nouvelle photo</button>
+    </form>
+</div>
+
+<button id="btn_modifier_profil">Modifier profil (Nom & Email)</button> 
+<button id="btn_modifier_mdp">Modifier mot de passe</button> 
+
+
+<div id="nom_email_modifier_block" style="display:none;">
+    <form action="/modifier_nom_email" method="POST">
+        <label for="nom_input">Choisir un nom :</label>
+        <input type="text" id="nom_input" name="nom" value="{{nom_utilisateur}}" >
+        <br>
+        <label for="email_input">Choisir un email :</label>
+        <input type="email" id="email_input" name="email" value="{{email_utilisateur}}" >
+        <br>
         <button type="submit">Enregistrer les modifications</button>
     </form>
+</div>
+
+
+<div id="mdp_modifier_block" style="display:none;">
+    <form action="/modifier_mdp" method="POST">
+        <label for="ancien_mdp_input">Ancien mot de passe :</label>
+        <input type="password" id="ancien_mdp_input" name="ancien_mdp" required>
+        <br>
+        <label for="nouveau_mdp_input">Nouveau mot de passe :</label>
+        <input type="password" id="nouveau_mdp_input" name="nouveau_mdp" required>
+        <br>
+        <label for="conf_mdp_input">Confirmer le nouveau mot de passe :</label>
+        <input type="password" id="conf_mdp_input" name="conf_nouveau_mdp" required>
+        <button type="submit">Enregistrer le nouveau mot de passe</button>
+    </form>
+</div>
+
+<h3>Missions en cours :</h3>
+<div> 
+    stats de {{nom_utilisateur}}  
+    <a href="{{ url_for('Stats') }}">statistiques de {{nom_utilisateur}} </a>
+</div> 
+<div> 
+    profile de {{nom_utilisateur}}  
+    <a href="{{ url_for('Inter_profil', nomcomplet=nom_utilisateur) }}">profile de {{nom_utilisateur}}</a>
+</div>
+
+<p>
+    <a href="{{ url_for('supprimer_compte') }}" 
+       onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement votre compte ? Cette action est irréversible.');"
+       style="color: red; font-weight: bold;">
+       Supprimer le compte
+    </a> 
+    | 
+    <a href="{{ url_for('telecharger_donnees') }}">Télécharger mes données</a>
+</p>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock %}
