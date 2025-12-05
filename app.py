@@ -229,16 +229,19 @@ def upload_profile_pic():
 if __name__ == '__main__':
     app.run(debug=True)
 
-def normalize_text(text):
+
+
+def normalize_text():
+    def normalize_text(text):
     if not text:
         return ""
     #on enlève toutes les maj
     text = text.lower()
     #on passe en NFD puis suppression des marques ( é = e + accent)
     normalized = unicodedata.normalize('NFD', text)
+    
     # On filtre pour ne garder que le caractère de base (élimine les accents, trémas, etc.)
     text_sans_accents = "".join(char for char in normalized if unicodedata.category(char) != 'Mn')
-    
     return text_sans_accents
 
 
@@ -248,7 +251,7 @@ def Inter_profil(nomcomplet=None):
     c = db.cursor()
     [name, surname]=nomcomplet.split('.')
     name_search = normalize_text(name) 
-    surname_search = normalize_text(surname) 
+    surname_search = normalize_text(surname)
     sql = "SELECT Intervenants.nom, Intervenants.prenom, Competences.competence, PossedeCompetence.niveau FROM Intervenants JOIN PossedeCompetence ON Intervenants.idi=PossedeCompetence.idi JOIN Competences ON Competences.idcomp=PossedeCompetence.idcomp WHERE Intervenants.nom=? AND Intervenants.prenom=?"
     c.execute(sql, (name_search, surname_search))
     rows= c.fetchall()  
