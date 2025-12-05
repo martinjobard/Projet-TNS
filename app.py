@@ -233,16 +233,16 @@ if __name__ == '__main__':
 
 def normalize_text():
     def normalize_text(text):
-    if not text:
-        return ""
-    #on enlève toutes les maj
-    text = text.lower()
-    #on passe en NFD puis suppression des marques ( é = e + accent)
-    normalized = unicodedata.normalize('NFD', text)
-    
-    # On filtre pour ne garder que le caractère de base (élimine les accents, trémas, etc.)
-    text_sans_accents = "".join(char for char in normalized if unicodedata.category(char) != 'Mn')
-    return text_sans_accents
+        if not text:
+            return ""
+        #on enlève toutes les maj
+        text = text.lower()
+        #on passe en NFD puis suppression des marques ( é = e + accent)
+        normalized = unicodedata.normalize('NFD', text)
+        
+        # On filtre pour ne garder que le caractère de base (élimine les accents, trémas, etc.)
+        text_sans_accents = "".join(char for char in normalized if unicodedata.category(char) != 'Mn')
+        return text_sans_accents
 
 
 @app.route('/Intervenants/<nomcomplet>')
