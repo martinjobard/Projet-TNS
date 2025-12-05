@@ -3,7 +3,6 @@ from flask import Flask, render_template, request, url_for, session, redirect, g
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 import os
-<<<<<<< app.py
 import unicodedata
 import json
 app = Flask(__name__)
@@ -387,8 +386,6 @@ def supprimer_compte():
     except Exception as e:
         return f"Erreur lors de la suppression : {e}"
 
-if __name__ == '__main__':
-    app.run(debug=True)
 
 
 
@@ -406,6 +403,7 @@ def normalize_text():
         return text_sans_accents
 
 
+    
 @app.route('/Intervenants/<nomcomplet>')
 def Inter_profil(nomcomplet=None):
     db = get_db()
@@ -424,3 +422,9 @@ def Inter_profil(nomcomplet=None):
     nom = rows[0]['nom']
     prenom = rows[0]['prenom']
     return render_template('Intervenant_profil.html', nom=nom, prenom=prenom, competences=competences)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
