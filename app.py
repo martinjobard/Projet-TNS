@@ -1,8 +1,9 @@
 from jinja2 import Environment, FileSystemLoader
-from flask import Flask, render_template, request, url_for, session, redirect, g
+from flask import Flask, render_template, request, url_for, session, redirect, g, Response
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 import os
+import json
 app = Flask(__name__)
 
 
@@ -134,8 +135,91 @@ def Mon_compte():
     redirect_if_needed = require_login()
     if redirect_if_needed:
         return redirect_if_needed
-    titre_site = "Site interne TNS"
-    return render_template('Mon_compte.html', titre=titre_site)
+    
+    username = session.get('username')
+    
+    db = sqlite3.connect('ppii.db')
+    c = db.cursor()
+    # On récupère aussi la pdp_url depuis la BDD pour être sûr d'avoir la dernière version
+    sql = "SELECT nom_utilisateur, email_utilisateur, pdp_url FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+    c.execute(sql, (username,))
+    user_data = c.fetchone()
+    db.close()
+
+    if user_data:
+        nom_complet = user_data[0] 
+        email = user_data[1]
+        pdp_url = user_data[2] # Récupération de l'image
+    else:
+        nom_complet = "Non trouvé" 
+        email = "Non trouvé"
+        pdp_url = None
+
+    return render_template('Mon_compte.html', 
+        nom_utilisateur=nom_complet, 
+        email_utilisateur=email,
+        pdp_actuelle=pdp_url # On passe la variable au template
+    )
+
+# --- NOUVELLES ROUTES (Ajoute ceci avant le if __name__ == '__main__':) ---
+
+@app.route('/modifier_nom_email', methods=['POST'])
+def modifier_nom_email():
+    if 'logged_in' not in session:
+        return redirect(url_for('Connexion'))
+    
+    nouveau_nom = request.form['nom']
+    nouvel_email = request.form['email']
+    username_actuel = session['username']
+
+    try:
+        db = sqlite3.connect('ppii.db')
+        c = db.cursor()
+        # Mise à jour
+        sql = "UPDATE Utilisateur_Intervenant SET nom_utilisateur = ?, email_utilisateur = ? WHERE nom_utilisateur = ?"
+        c.execute(sql, (nouveau_nom, nouvel_email, username_actuel))
+        db.commit()
+        db.close()
+
+        # IMPORTANT : Mettre à jour la session si le nom change
+        session['username'] = nouveau_nom
+    except Exception as e:
+        print(f"Erreur update profil: {e}")
+    
+    return redirect(url_for('Mon_compte'))
+
+@app.route('/modifier_mdp', methods=['POST'])
+def modifier_mdp():
+    if 'logged_in' not in session:
+        return redirect(url_for('Connexion'))
+        
+    ancien_mdp = request.form['ancien_mdp']
+    nouveau_mdp = request.form['nouveau_mdp']
+    conf_mdp = request.form['conf_nouveau_mdp']
+    username = session['username']
+
+    if nouveau_mdp != conf_mdp:
+        # Idéalement, utiliser 'flash' pour afficher l'erreur
+        print("Les mots de passe ne correspondent pas")
+        return redirect(url_for('Mon_compte'))
+
+    db = sqlite3.connect('ppii.db')
+    c = db.cursor()
+    # Vérifier l'ancien mot de passe
+    c.execute("SELECT mdp_haché FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?", (username,))
+    result = c.fetchone()
+    
+    if result and check_password_hash(result[0], ancien_mdp):
+        # Hacher le nouveau mot de passe
+        nouveau_hash = generate_password_hash(nouveau_mdp)
+        c.execute("UPDATE Utilisateur_Intervenant SET mdp_haché = ? WHERE nom_utilisateur = ?", (nouveau_hash, username))
+        db.commit()
+        print("Mot de passe modifié avec succès")
+    else:
+        print("Ancien mot de passe incorrect")
+        
+    db.close()
+    return redirect(url_for('Mon_compte'))
 
 # --- Routes Publiques (Laissées sans Gardien) ---
 
@@ -227,6 +311,82 @@ def upload_profile_pic():
     else:
         # Échec de la vérification (pas de fichier soumis ou extension non autorisée)
         return redirect(url_for('Mon_compte'))
+
+# --- ROUTE : TÉLÉCHARGER SES DONNÉES (Export JSON) ---
+@app.route('/telecharger_donnees')
+def telecharger_donnees():
+    if 'logged_in' not in session:
+        return redirect(url_for('Connexion'))
+    
+    username = session['username']
+    
+    try:
+        db = sqlite3.connect('ppii.db')
+        # On configure la connexion pour récupérer les résultats sous forme de dictionnaire (plus facile pour le JSON)
+        db.row_factory = sqlite3.Row 
+        c = db.cursor()
+        
+        # 1. Récupération des infos utilisateur
+        sql = "SELECT nom_utilisateur, email_utilisateur, pdp_url FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+        c.execute(sql, (username,))
+        user_row = c.fetchone()
+        
+        db.close()
+
+        if user_row:
+            # 2. Création du dictionnaire de données
+            donnees = {
+                "profil": {
+                    "nom_utilisateur": user_row['nom_utilisateur'],
+                    "email": user_row['email_utilisateur'],
+                    "photo_profil": user_row['pdp_url']
+                },
+                "statut": "Actif",
+                "date_export": "Aujourd'hui" # Tu pourrais utiliser datetime.now() ici
+            }
+            
+            # 3. Conversion en JSON
+            json_str = json.dumps(donnees, indent=4, ensure_ascii=False)
+            
+            # 4. Création de la réponse "Fichier à télécharger"
+            return Response(
+                json_str,
+                mimetype="application/json",
+                headers={"Content-Disposition": f"attachment;filename=donnees_{username}.json"}
+            )
+        else:
+            return "Erreur : Données introuvables", 404
+
+    except Exception as e:
+        return f"Erreur lors de l'export : {e}"
+
+
+# --- ROUTE : SUPPRIMER LE COMPTE ---
+@app.route('/supprimer_compte')
+def supprimer_compte():
+    if 'logged_in' not in session:
+        return redirect(url_for('Connexion'))
+    
+    username = session['username']
+    
+    try:
+        db = sqlite3.connect('ppii.db')
+        c = db.cursor()
+        
+        # Suppression de l'utilisateur
+        sql = "DELETE FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+        c.execute(sql, (username,))
+        db.commit()
+        db.close()
+        
+        # IMPORTANT : On vide la session (déconnexion forcée)
+        session.clear()
+        
+        # On redirige vers l'accueil ou la connexion avec un message (optionnel)
+        return redirect(url_for('Connexion'))
+        
+    except Exception as e:
+        return f"Erreur lors de la suppression : {e}"
 
 if __name__ == '__main__':
     app.run(debug=True)
