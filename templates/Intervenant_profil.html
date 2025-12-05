@@ -1,11 +1,11 @@
-<!doctype html>
+{% extends 'base.html' %}
 <head>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
 </head>
-
-<title>
+{% block content %}
+<h1>
 PROFIL DE {{nom}} {{prenom}}
-</title>
+</h1>
 <li>
     {% if photo %}
     {{photo}}
@@ -14,6 +14,8 @@ PROFIL DE {{nom}} {{prenom}}
 <h3>
 Compétences:
 {% for comp in competences %}
-<li>{{comp}} : {{niveau}}</li>
+<li>{{ comp.nom }} : {{ comp.niveau }}</li>
+
 {% endfor %}
 </h3>
+{% endblock %}
