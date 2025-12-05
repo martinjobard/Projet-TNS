@@ -237,9 +237,9 @@ def Inter_profil(nomcomplet=None):
     db = get_db()
     c = db.cursor()
     [name, surname]=nomcomplet.split('.')
-    sql = "SELECT nom, prenom FROM Intervenants WHERE nom=? AND prenom=?"
+    sql = "SELECT i.nom, i.prenom, i.photo, c.competence, pc.niveau FROM Intervenants AS i JOIN PossedeCompetence AS pc ON i.idi=pc.idi JOIN Competences AS c ON c.idc=pc.idc WHERE nom=? AND prenom=?"
     c.execute(sql, (name, surname))
-    selected_students = c.fetchone() #plus trouver les compétences 
-    if selected_students is None:
+    selected_info = c.fetchone()  
+    if selected_info is None:
        return render_template("error_intervenant.html", message="Intervenant non trouvé")
-    return render_template('Intervenant_profil.html', nom=selected_students['nom'], prenom=selected_students['prenom'] )
+    return render_template('Intervenant_profil.html', nom=selected_info['i.nom'], prenom=selected_info['i.prenom'], competences=selected_info['c.competence'], photo=selected_info['i.photo'], niveau=selected_info['pc.niveau'])

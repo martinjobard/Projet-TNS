@@ -6,3 +6,14 @@
 <title>
 PROFIL DE {{nom}} {{prenom}}
 </title>
+<li>
+    {% if photo %}
+    {{photo}}
+    {% endif %}
+</li>
+<h3>
+Compétences:
+{% for comp in competences %}
+<li>{{comp}} : {{niveau}}</li>
+{% endfor %}
+</h3>
