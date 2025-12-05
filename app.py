@@ -122,8 +122,33 @@ def Mon_compte():
     redirect_if_needed = require_login()
     if redirect_if_needed:
         return redirect_if_needed
-    titre_site = "Site interne TNS"
-    return render_template('Mon_compte.html', titre=titre_site)
+    
+    # 1. Récupérer le nom d'utilisateur de la session
+    username = session.get('username')
+    
+    # 2. Récupérer les données utilisateur de la base de données
+    db = sqlite3.connect('ppii.db')
+    c = db.cursor()
+    # ATTENTION : Adaptez cette requête SQL à la structure exacte de votre table Utilisateur_Intervenant
+    sql = "SELECT nom_utilisateur, email_utilisateur FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+    c.execute(sql, (username,))
+    user_data = c.fetchone()
+    db.close()
+
+    # 3. Préparer les variables pour le template
+    if user_data:
+        # Assurez-vous que l'index correspond à l'ordre des colonnes dans le SELECT (0=nom_complet, 1=email)
+        nom_complet = user_data[0] 
+        email = user_data[1]
+    else:
+        # Cas d'erreur si l'utilisateur n'est pas trouvé (devrait être impossible après login)
+        nom_complet = "Non trouvé" 
+        email = "Non trouvé"
+
+    return render_template('Mon_compte.html', 
+        nom_utilisateur=nom_complet, # Maintenant défini et passé au template
+        email_utilisateur=email      # Maintenant défini et passé au template
+    )
 
 # --- Routes Publiques (Laissées sans Gardien) ---
 

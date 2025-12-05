@@ -213,3 +213,57 @@ function handleSwipe(deltaX) {
     
     // isDragging est déjà remis à false dans mouseup/touchend, donc pas besoin de le remettre ici
 }
+
+/*page mon compte*/
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Boutons pour afficher/masquer les blocs ---
+    const btnModifierProfil = document.getElementById('btn_modifier_profil'); // Pour Nom & Email
+    const btnModifierMdp = document.getElementById('btn_modifier_mdp');     // Pour Mot de passe
+    const btnModifierPdp = document.getElementById('btn_modifier_pdp');     // Pour Photo de profil (nouveau bouton)
+
+    // --- Blocs de formulaires à afficher/masquer ---
+    const blocNomEmail = document.getElementById('nom&email_modifier_block');
+    const blocMdp = document.getElementById('mdp_modifier_block');
+    const blocPdp = document.getElementById('pdp_modifier_block');
+
+    // Fonction générique pour afficher un bloc et cacher les autres
+    function toggleBlock(blockToShow) {
+        // Cacher tous les blocs
+        [blocNomEmail, blocMdp, blocPdp].forEach(block => {
+            if (block) { // Vérifier si le bloc existe avant de tenter de le manipuler
+                block.style.display = 'none';
+            }
+        });
+
+        // Afficher le bloc désiré
+        if (blockToShow && blockToShow.style.display === 'none') {
+            blockToShow.style.display = 'block'; // Ou 'flex' si vous utilisez flexbox pour le layout
+        } else if (blockToShow) {
+            blockToShow.style.display = 'none'; // Si déjà affiché, le cacher
+        }
+    }
+
+    // --- Écouteurs d'événements pour les boutons ---
+
+    if (btnModifierProfil) {
+        btnModifierProfil.addEventListener('click', function(event) {
+            event.preventDefault(); // Empêche le comportement par défaut du lien/bouton
+            toggleBlock(blocNomEmail);
+        });
+    }
+
+    if (btnModifierMdp) {
+        btnModifierMdp.addEventListener('click', function(event) {
+            event.preventDefault();
+            toggleBlock(blocMdp);
+        });
+    }
+
+    if (btnModifierPdp) {
+        btnModifierPdp.addEventListener('click', function(event) {
+            event.preventDefault();
+            toggleBlock(blocPdp);
+        });
+    }
+
+});
