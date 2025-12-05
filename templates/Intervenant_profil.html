@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+<head>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+{% block content %}
+<h1>
+PROFIL DE {{nom}} {{prenom}}
+</h1>
+
+<h3>
+Compétences:
+{% for comp in competences %}
+<li>{{ comp.nom }} : {{ comp.niveau }}</li>
+
+{% endfor %}
+</h3>
+{% endblock %}
