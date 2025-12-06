@@ -1,6 +1,136 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Stats :</h1>
-    <p></p>
+<div class="stats-container">
+
+    <!-- TITRE -->
+    <h1>Statistiques</h1>
+
+    <!-- FILTRES -->
+    <div class="stats-filters">
+        <label>Mois :</label>
+        <select name="month">
+            <option value="all">Tous</option>
+            <option value="01">Janvier</option>
+            <option value="02">Février</option>
+            <option value="03">Mars</option>
+            <option value="04">Avril</option>
+            <option value="05">Mai</option>
+            <option value="06">Juin</option>
+            <option value="07">Juillet</option>
+            <option value="08">Août</option>
+            <option value="09">Septembre</option>
+            <option value="10">Octobre</option>
+            <option value="11">Novembre</option>
+            <option value="12">Décembre</option>
+        </select>
+
+        <label>Année :</label>
+        <select name="year">
+            {% for y in range(2026, 2003, -1) %}
+            <option value="{{ y }}">{{ y }}</option>
+            {% endfor %}
+        </select>
+
+        <button>Tout</button>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-cards">
+        <div class="kpi">
+            <span>Nb Clients</span>
+            <strong>{{ nb_clients }}</strong>
+        </div>
+        <div class="kpi">
+            <span>Nb Projets en cours</span>
+            <strong>{{ nb_projects }}</strong>
+        </div>
+        <div class="kpi">
+            <span>CA</span>
+            <strong>{{ ca }}</strong>
+        </div>
+    </div>
+
+    <!-- COURBE -->
+    <section class="chart-box">
+        <h2>Courbe du nombre de projets par mois</h2>
+        <canvas id="lineChart"></canvas>
+    </section>
+
+    <!-- PIE CHART -->
+    <section class="chart-box">
+        <h2>Répartition par secteur</h2>
+        <canvas id="pieChart"></canvas>
+    </section>
+
+    <!-- TABLEAU -->
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Secteur</th>
+                <th>Projet</th>
+                <th>État</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in table_data %}
+            <tr>
+                <td>{{ row.client }}</td>
+                <td>{{ row.sector }}</td>
+                <td>{{ row.project }}</td>
+                <td>{{ row.status }}</td>
+                <td>{{ row.date }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+<!-- ========== SCRIPTS CHARTS ========== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    /* --- DONNÉES PYTHON -> JS --- */
+    const monthlyLabels = JSON.parse('{{ monthly_labels|tojson }}');
+    const monthlyProjects = JSON.parse('{{ monthly_projects|tojson }}');
+
+    const sectorLabels = JSON.parse('{{ sector_labels|tojson }}');
+    const sectorValues = JSON.parse('{{ sector_values|tojson }}');
+
+    /* --- LINE CHART --- */
+    new Chart(
+        document.getElementById('lineChart'),
+        {
+            type: 'line',
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: "Projets",
+                    data: monthlyProjects,
+                    borderWidth: 2,
+                    tension: 0.3
+                }]
+            }
+        }
+    );
+
+    /* --- PIE CHART --- */
+    new Chart(
+        document.getElementById('pieChart'),
+        {
+            type: 'pie',
+            data: {
+                labels: sectorLabels,
+                datasets: [{
+                    data: sectorValues
+                }]
+            }
+        }
+    );
+});
+</script>
+
 {% endblock %}
