@@ -233,3 +233,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- Logique pour la recherche de Client ---
+    
+    // Assurez-vous que l'ID du formulaire dans clients.html est bien "searchForm"
+    const searchFormClient = document.getElementById("searchFormClient"); 
+
+    // On vérifie si le formulaire existe sur la page actuelle avant de continuer
+    if (searchFormClient) {
+
+        // Fonction utilitaire (interne à ce bloc)
+        function normalizeTextJS(text) {
+            if (!text) return '';
+            // Supprime les accents et met en minuscule pour une URL propre
+            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
+
+        searchFormClient.addEventListener("submit", function(e) {
+            e.preventDefault(); // On bloque l'envoi classique
+            
+            // On utilise 'this' (qui est le formulaire) pour accéder aux champs par leur attribut 'name'
+            const nom_input = this.nom.value.trim();
+            const prenom_input = this.prenom.value.trim();
+
+            const nom_url = normalizeTextJS(nom_input);
+            const prenom_url = normalizeTextJS(prenom_input);
+
+            if(nom_url && prenom_url){
+                // SEULE LIGNE MODIFIÉE on pointe vers /Clients/
+                window.location.href = `/Clients/${encodeURIComponent(nom_url)}.${encodeURIComponent(prenom_url)}`;
+            }
+        });
+    }
+});
