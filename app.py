@@ -102,7 +102,28 @@ def Stats():
     if redirect_if_needed:
         return redirect_if_needed
     titre_site = "Site interne TNS"
-    return render_template('Stats.html', titre=titre_site)
+    return render_template(
+        "Stats.html",
+        nb_clients=42,
+        nb_projects=6,
+        ca="52 000 €",
+
+        monthly_labels=["Jan", "Fév", "Mar", "Avr"],
+        monthly_projects=[3, 2, 7, 5],
+
+        sector_labels=["Tech", "Énergie", "Santé"],
+        sector_values=[12, 8, 5],
+
+        table_data=[
+            {
+                "client": "EDF",
+                "sector": "Énergie",
+                "project": "SmartGrid",
+                "status": "En cours",
+                "date": "2025-12-01"
+            }
+        ]
+    )
 
 @app.route('/Missions_réalisées')
 def Missions_réalisées():
