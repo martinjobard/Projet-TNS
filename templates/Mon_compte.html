@@ -57,8 +57,14 @@
     <a href="{{ url_for('Stats') }}">statistiques de {{nom_utilisateur}} </a>
 </div> 
 <div> 
-    profile de {{nom_utilisateur}}  
-    <a href="{{ url_for('Inter_profil', nomcomplet=nom_utilisateur) }}">profile de {{nom_utilisateur}}</a>
+    {% if lien_intervenant %}
+        Profil public :
+        <a href="{{ url_for('Inter_profil', nomcomplet=lien_intervenant) }}">
+            Voir le profil de {{nom_utilisateur}}
+        </a>
+    {% else %}
+        <p>Votre compte n'est pas lié à une fiche intervenant publique.</p>
+    {% endif %}
 </div>
 
 <p>

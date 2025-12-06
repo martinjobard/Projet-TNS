@@ -201,3 +201,35 @@ if (tinderContainer) { // <--- C'est cette ligne qui empêche le crash sur les a
         }
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- Logique pour la recherche d'intervenant ---
+    
+    const searchForm = document.getElementById("searchForm");
+
+    // On vérifie si le formulaire existe sur la page actuelle avant de continuer
+    if (searchForm) {
+
+        // Fonction utilitaire (interne à ce bloc)
+        function normalizeTextJS(text) {
+            if (!text) return '';
+            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
+
+        searchForm.addEventListener("submit", function(e) {
+            e.preventDefault(); // On bloque l'envoi classique
+            
+            const nom_input = this.nom.value.trim();
+            const prenom_input = this.prenom.value.trim();
+
+            const nom_url = normalizeTextJS(nom_input);
+            const prenom_url = normalizeTextJS(prenom_input);
+
+            if(nom_url && prenom_url){
+                // Redirection vers la route Flask
+                window.location.href = `/Intervenants/${encodeURIComponent(nom_url)}.${encodeURIComponent(prenom_url)}`;
+            }
+        });
+    }
+});

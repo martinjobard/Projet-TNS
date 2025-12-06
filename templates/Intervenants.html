@@ -1,40 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
 
-
 <h1>
     Veuillez chercher le nom de l'intervenant qui vous intéresse pour accéder à son profil:
 </h1>
 
-<form action="/recherche" method="get">
-    <input type="text" name="nom" placeholder="Nom">
-    <input type="text" name="prenom" placeholder="Prénom">
+<form id="searchForm" action="/recherche" method="get">
+    <input type="text" name="nom" placeholder="Nom" required>
+    <input type="text" name="prenom" placeholder="Prénom" required>
     <button type="submit">Rechercher</button>
 </form>
-<script>
-
-function normalizeTextJS(text) {
-    if (!text) return '';
-    // ici ça supprime les accents (NFD/u0300-\u036f) et met en minuscule.
-    return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-}
-
-document.getElementById("searchForm").addEventListener("submit", function(e) {
-    e.preventDefault(); // empêche l'envoi direct 
-    const nom_input = this.nom.value.trim();
-    const prenom_input = this.prenom.value.trim();
-
-    const nom_url=normalizeTextJS(nom_input) // on met en forme normalisée ie sans accents et sans maj
-    const prenom_url=normalizeTextJS(prenom_input)
-
-
-    if(nom_url && prenom_url){
-        window.location.href = `/${encodeURIComponent(nom)}.${encodeURIComponent(prenom)}`;
-    }
-});
-</script>
-{% endblock %}
-
-
 
 {% endblock %}

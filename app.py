@@ -136,27 +136,52 @@ def Mon_compte():
     
     username = session.get('username')
     
-    db = sqlite3.connect('ppii.db')
+    # On utilise ta fonction get_db() qui est plus propre
+    db = get_db()
     c = db.cursor()
-    # On récupère aussi la pdp_url depuis la BDD pour être sûr d'avoir la dernière version
-    sql = "SELECT nom_utilisateur, email_utilisateur, pdp_url FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+
+    # --- LA REQUÊTE AVEC JOINTURE ---
+    # On récupère les infos du compte ET les infos de l'intervenant lié par l'idi
+    sql = """
+    SELECT 
+        UI.nom_utilisateur, 
+        UI.email_utilisateur, 
+        UI.pdp_url, 
+        I.nom, 
+        I.prenom 
+    FROM Utilisateur_Intervenant UI
+    JOIN Intervenants I ON UI.idi = I.idi 
+    WHERE UI.nom_utilisateur = ?
+    """
+    
     c.execute(sql, (username,))
-    user_data = c.fetchone()
-    db.close()
+    data = c.fetchone()
 
-    if user_data:
-        nom_complet = user_data[0] 
-        email = user_data[1]
-        pdp_url = user_data[2] # Récupération de l'image
-    else:
-        nom_complet = "Non trouvé" 
-        email = "Non trouvé"
-        pdp_url = None
+    # Initialisation des variables
+    nom_compte = "Inconnu"
+    email = "Inconnu"
+    pdp_url = None
+    lien_formatte = None # C'est la variable pour ton URL
 
+    if data:
+        # 1. Infos du compte utilisateur
+        nom_compte = data['nom_utilisateur']
+        email = data['email_utilisateur']
+        pdp_url = data['pdp_url']
+        
+        # 2. Infos de l'intervenant pour construire le lien
+        # On vérifie que les champs existent bien
+        if data['nom'] and data['prenom']:
+            nom_reel = data['nom']
+            prenom_reel = data['prenom']
+            # On formate : "Nom.Prenom" pour que la route Inter_profil puisse faire le split('.')
+            lien_formatte = f"{nom_reel}.{prenom_reel}"
+    
     return render_template('Mon_compte.html', 
-        nom_utilisateur=nom_complet, 
+        nom_utilisateur=nom_compte, 
         email_utilisateur=email,
-        pdp_actuelle=pdp_url # On passe la variable au template
+        pdp_actuelle=pdp_url,
+        lien_intervenant=lien_formatte # <--- C'est la nouvelle variable importante !
     )
 
 # --- NOUVELLES ROUTES (Ajoute ceci avant le if __name__ == '__main__':) ---
@@ -389,39 +414,77 @@ def supprimer_compte():
 
 
 
-def normalize_text():
-    def normalize_text(text):
-        if not text:
-            return ""
-        #on enlève toutes les maj
-        text = text.lower()
-        #on passe en NFD puis suppression des marques ( é = e + accent)
-        normalized = unicodedata.normalize('NFD', text)
-        
-        # On filtre pour ne garder que le caractère de base (élimine les accents, trémas, etc.)
-        text_sans_accents = "".join(char for char in normalized if unicodedata.category(char) != 'Mn')
-        return text_sans_accents
+def normalize_text(text):
+    if not text:
+        return ""
+    # on enlève toutes les majuscules
+    text = text.lower()
+    # on passe en NFD puis suppression des marques ( é = e + accent)
+    normalized = unicodedata.normalize('NFD', text)
+    
+    # On filtre pour ne garder que le caractère de base
+    text_sans_accents = "".join(char for char in normalized if unicodedata.category(char) != 'Mn')
+    return text_sans_accents
 
 
     
 @app.route('/Intervenants/<nomcomplet>')
 def Inter_profil(nomcomplet=None):
+    # 1. Sécurité sur le format de l'URL
+    try:
+        [name, surname] = nomcomplet.split('.')
+    except ValueError:
+        return "Format URL invalide (attendu: Nom.Prenom)", 400
+
     db = get_db()
     c = db.cursor()
-    [name, surname]=nomcomplet.split('.')
+    
+    # 2. On prépare les noms pour la recherche
     name_search = normalize_text(name) 
     surname_search = normalize_text(surname)
-    sql = "SELECT Intervenants.nom, Intervenants.prenom, Competences.competence, PossedeCompetence.niveau FROM Intervenants JOIN PossedeCompetence ON Intervenants.idi=PossedeCompetence.idi JOIN Competences ON Competences.idcomp=PossedeCompetence.idcomp WHERE Intervenants.nom=? AND Intervenants.prenom=?"
+
+    # 3. LA REQUÊTE SQL AVEC ALIAS ET LEFT JOIN
+    # I  = Intervenants
+    # PC = PossedeCompetence
+    # C  = Competences
+    sql = """
+    SELECT 
+        I.nom, 
+        I.prenom, 
+        C.competence, 
+        PC.niveau 
+    FROM Intervenants I
+    LEFT JOIN PossedeCompetence PC ON I.idi = PC.idi
+    LEFT JOIN Competences C ON C.idcomp = PC.idcomp
+    WHERE I.nom = ? AND I.prenom = ?
+    """
+    
     c.execute(sql, (name_search, surname_search))
-    rows= c.fetchall()  
-    competences = []
-    for row in rows:
-        competences.append({"nom": row["competence"],"niveau": row["niveau"]})
+    rows = c.fetchall()
+
+    # 4. Vérification : Si la liste est vide, c'est que la personne n'existe vraiment pas
     if not rows:
        return render_template("error_intervenant.html", message="Intervenant non trouvé")
-    nom = rows[0]['nom']
-    prenom = rows[0]['prenom']
-    return render_template('Intervenant_profil.html', nom=nom, prenom=prenom, competences=competences)
+
+    # 5. On récupère les infos de base (sur la première ligne)
+    nom_affiche = rows[0]['nom']
+    prenom_affiche = rows[0]['prenom']
+    
+    # 6. On boucle pour récupérer les compétences (si elles existent)
+    competences = []
+    for row in rows:
+        # Grâce au LEFT JOIN, 'competence' sera None si l'admin n'en a pas.
+        # On ne l'ajoute à la liste que si ce n'est pas None.
+        if row["competence"]: 
+            competences.append({
+                "nom": row["competence"],
+                "niveau": row["niveau"]
+            })
+
+    return render_template('Intervenant_profil.html', 
+                           nom=nom_affiche, 
+                           prenom=prenom_affiche, 
+                           competences=competences)
 
 
 if __name__ == '__main__':
