@@ -62,7 +62,17 @@ def Projets():
     if redirect_if_needed:
         return redirect_if_needed
     titre_site = "Site interne TNS"
-    return render_template('Projets.html', titre=titre_site)
+
+    db=get_db()
+    sql="""
+    SELECT p.idp, p.etat, c.nom as Nom_Client
+    FROM Projets p LEFT JOIN Clients c ON p.idc=c.idc
+    """
+    liste_projets=db.execute(sql).fetchall()
+    total_projets=len(liste_projets)
+    liste_en_cours=[p for p in liste_projets if p['etat']=='En cours']
+    liste_termines=[p for p in liste_projets if p['etat']=='Terminé']
+    return render_template('Projets.html', titre=titre_site, tous_les_projets=liste_projets, projets_en_cours=liste_en_cours, projets_termines=liste_termines)
 
 @app.route('/Intervenants')
 def Intervenants():
