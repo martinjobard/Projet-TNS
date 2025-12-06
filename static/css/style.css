@@ -305,6 +305,15 @@ main {
     top: 5px;
     transform: scale(0.95);
 }
+.left-text {
+    color: #f00;
+    left: auto; 
+}
+
+.right-text {
+    color: #008000;
+    right: 50 px; 
+}
 
 .stats-container {
     padding: 20px;
@@ -341,6 +350,9 @@ main {
     padding: 15px;
     border-radius: 6px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    width: 500px; 
+    height: 600px;
+    margin: 20px auto;
 }
 
 .stats-table {
