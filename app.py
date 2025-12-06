@@ -523,3 +523,74 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
+
+@app.route('/Clients/<nomcomplet>')
+def Client_profil(nomcomplet=None):
+    # 1. Sécurité sur le format de l'URL
+    try:
+        [name, surname] = nomcomplet.split('.')
+    except ValueError:
+        return "Format URL invalide (attendu: Nom.Prenom)", 400
+
+    db = get_db()
+    c = db.cursor()
+    
+    # 2. On prépare les noms pour la recherche
+    name_search = normalize_text(name) 
+    surname_search = normalize_text(surname)
+
+    # 3. LA REQUÊTE SQL AVEC ALIAS ET LEFT JOIN
+    # C  = Clients
+    # P = Projets
+    sql = """
+    SELECT 
+        C.nom, 
+        C.prenom, 
+        C.secteur, 
+        C.telephone,
+        C.email,
+        C.dernier_contact,
+        P.idp,
+        P.etat
+
+    FROM Clients C
+    LEFT JOIN Projet P ON C.idc = P.idc
+    WHERE C.nom = ? AND C.prenom = ?
+    """
+    
+    c.execute(sql, (name_search, surname_search))
+    rows = c.fetchall()
+
+    # 4. Vérification : Si la liste est vide, c'est que la personne n'existe vraiment pas
+    if not rows:
+       return render_template("error_client.html", message="Nous n'avons pas encore travaillé avec cette personne, vérifiez peut-être l'orthographe ")
+
+    # 5. On récupère les infos de base (sur la première ligne)
+    nom_affiche = rows[0]['nom']
+    prenom_affiche = rows[0]['prenom']
+    secteur=rows[0]['secteur']
+    telephone=rows[0]['telephone']
+    dernier_contact=rows[0]['dernier_contact']
+    email=rows[0]['email']
+
+    
+    # 6. On boucle pour récupérer les compétences (si elles existent)
+    projets = []
+    for row in rows:
+        # Grâce au LEFT JOIN, 'competence' sera None si l'admin n'en a pas.
+        # On ne l'ajoute à la liste que si ce n'est pas None.
+        if row["idp"]: 
+            projets.append({
+                "idp": row["idp"],
+                "etat": row["etat"]
+            })
+
+    return render_template('Client_profil.html', 
+                           nom=nom_affiche, 
+                           prenom=prenom_affiche, 
+                           secteur=secteur,
+                           telephone=telephone,
+                           dernier_contact=dernier_contact,
+                           email=email,
+                           projets=projets)
+
