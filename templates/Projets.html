@@ -1,33 +1,53 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container">
     <h1>Tableau de bord des Projets :</h1>
 	
+    <div class="stats">
 	<h3>Nombre de Projets :</h3>
-	<p></p>
+	<p>{{ tous_les_projets }}</p>
 
 	<h3>Projets en cours :</h3>
-        <p></p>
-	    <h4>Budget :</h4>
-	    <p></p>
+        <ul>
+            {% for projet in projets_en_cours %}
+                <li>
+                    <strong>#{{ projet.idp }}</strong> - {{ projet.Nom_Client }}
+                </li>
+            {% else %}
+                <li>Aucun projet en cours</li>
+            {% endfor %}
+        </ul>
+	
 
 	<h3>Projets terminés :</h3>
-        <p></p>
+        <ul>   
+            {% for projet in projets_termines %}
+                <li>
+                    <strong>#{{ projet.idp }}</strong> - {{ projet.Nom_Client }}
+                </li>
+            {% else %}
+                <li>Aucun projet terminé</li>
+            {% endfor %}
+        </ul>          
+    </div>
 
-            <h4>Budget utilisé :</h4>
-            <p></p>
-
-        <h3>Budget restant :</h3>
-        <p></p>
 
 
     <h2>Détails des Projets :</h2>
+    {% for projet in projets_en_cours %}
+        <div class="projet-card">
+            <h3>Projet #{{ projet.idp }} :</h3>
+	<p><strong>Client :</strong> {{ projet.Nom.Client }}</p>
+            <p><strong>État :</strong> 
+                {% if projet.etat == 'En cours' %}
+                    <span style="color: orange;">{{ projet.etat }}</span>
+                {% else %}
+                    <span style="color: green;">{{ projet.etat }}</span>
+                {% endif %}
+            </p>
+        </div>
+    {% endfor %}
 
-	<h3>Projet 1 :</h3>
-	<p>Avancement :</p>
-	<p><strong>Chef de Projet :</strong></p>
-
-	<h3>Projet 2 :</h3>
-        <p>Avancement :</p>
-        <p><strong>Chef de Projet :</strong></p>
+</div>
 {% endblock %}
