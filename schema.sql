@@ -20,7 +20,8 @@ CREATE TABLE Clients (
      email TEXT,
      telephone TEXT,
      secteur TEXT,
-     dernier_contact TEXT
+     dernier_contact TEXT,
+     nom_entreprise TEXT
 );
 
 CREATE TABLE Intervenants (
@@ -43,7 +44,7 @@ CREATE TABLE "Projets" (
     idp INTEGER PRIMARY KEY,
     idc INTEGER,
     etat TEXT,
-    budget INTEGER
+    budget INTEGER,
     FOREIGN KEY (idc) REFERENCES Clients(idc)
 );
 
