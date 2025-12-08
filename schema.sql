@@ -43,6 +43,7 @@ CREATE TABLE "Projets" (
     idp INTEGER PRIMARY KEY,
     idc INTEGER,
     etat TEXT,
+    budget INTEGER
     FOREIGN KEY (idc) REFERENCES Clients(idc)
 );
 
