@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<body>
+    <h1>
+        Page de {{nom}} {{prenom}}
+    </h1>
+
+<li>
+    Secteur : {{secteur}}
+    
+</li>
+<li>
+    Contact: 
+    <p>
+        adresse mail: {{email}}
+    </p>
+    <p>
+        téléphone: {{telephone}}
+    </p>
+
+</li>
+<li>
+    Historique:
+
+       <p>
+        Date du dernier contact: {{dernier_contact}}
+       </p> 
+
+       <p>
+        Projets :
+        {% for proj in projets %}
+        <p>
+            Projet n° {{proj.idp}} : {{proj.etat}}
+        </p>
+        
+        {% endfor %}
+       </p>
+        
+</li>
+</body>
+
+{% endblock %}
