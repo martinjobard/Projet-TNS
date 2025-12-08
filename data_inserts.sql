@@ -32,11 +32,11 @@ INSERT INTO Competences (idcomp, competence) VALUES
 -- ------------------------------
 -- Projets (Référence Clients)
 -- ------------------------------
-INSERT INTO Projets (idp, idc, etat) VALUES
-(1001, 1, 'En cours'),
-(1002, 2, 'Terminé'),
-(1003, 1, 'En attente'),
-(1004, 3, 'En cours');
+INSERT INTO Projets (idp, idc, etat, budget) VALUES
+(1001, 1, 'En cours', 50),
+(1002, 2, 'Terminé', 80),
+(1003, 1, 'En attente', 500),
+(1004, 3, 'En cours', 99);
 
 -- ------------------------------
 -- Participation (Référence Projets et Intervenants)
