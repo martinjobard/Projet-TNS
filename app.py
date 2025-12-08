@@ -518,12 +518,6 @@ def Inter_profil(nomcomplet=None):
                            competences=competences)
 
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
-
 @app.route('/Clients/<nomcomplet>')
 def Client_profil(nomcomplet=None):
     # 1. Sécurité sur le format de l'URL
@@ -594,3 +588,111 @@ def Client_profil(nomcomplet=None):
                            email=email,
                            projets=projets)
 
+
+@app.route('/Inscription', methods=['GET', 'POST'])
+def Inscription():
+    if request.method == 'POST':
+        # Récupération sécurisée des données
+        username = request.form.get('nom_utilisateur')
+        email = request.form.get('email')
+        password = request.form.get('mot_de_passe')
+        confirm_password = request.form.get('confirmation_mdp')
+        prenom = request.form.get('prenom')
+        nom = request.form.get('nom')
+        competence = request.form.get('competence')
+        niveau = request.form.get('niveau')
+
+        # --- Vérification 1 : Champs non vides ---
+        if not all([username, email, password, confirm_password, prenom, nom]):
+            erreur = "Veuillez remplir tous les champs obligatoires."
+            return render_template('Inscription.html', erreur=erreur)
+
+        # --- Vérification 2 : Mots de passe correspondants ---
+        if password != confirm_password:
+            erreur = "Les mots de passe ne correspondent pas."
+            return render_template('Inscription.html', erreur=erreur)
+
+        # Si nous arrivons ici, les données sont complètes et les mots de passe correspondent.
+        
+        # 3. Vérification de l'existence de l'utilisateur (Prochaine étape !)
+        db = get_db()
+        c = db.cursor()
+        
+        sql_check = "SELECT COUNT(*) FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+        c.execute(sql_check, (username,))
+        
+        # Récupère le compte (le résultat est un tuple, ex: (1,))
+        count = c.fetchone()[0]
+        
+        if count > 0:
+            # L'utilisateur existe déjà !
+            erreur = f"Le nom d'utilisateur '{username}' est déjà pris."
+            return render_template('Inscription.html', erreur=erreur)
+
+        # Si nous arrivons ici, le nom d'utilisateur est unique.
+        
+        # 4. Hachage du mot de passe (Prochaine étape !)
+        hashed_password = generate_password_hash(password)
+
+        # 5. Insertion dans la BDD (Prochaine étape !)
+        try:
+            db = get_db()
+            cursor = db.cursor()
+            
+            # --- 5A. Insertion dans Intervenants (Profil Personnel) ---
+            # Récupérer l'idi généré
+            sql_intervenant = """
+                INSERT INTO Intervenants (nom, prenom) 
+                VALUES (?, ?)
+            """
+            cursor.execute(sql_intervenant, (nom, prenom))
+            idi = cursor.lastrowid # ⬅️ On récupère la clé primaire du nouvel Intervenant
+
+            # --- 5B. Insertion dans Competences ---
+            # D'abord, on vérifie si la compétence existe déjà pour éviter les doublons
+            sql_check_comp = "SELECT idcomp FROM Competences WHERE competence = ?"
+            cursor.execute(sql_check_comp, (competence,))
+            comp_result = cursor.fetchone()
+
+            if comp_result:
+                idcomp = comp_result[0]
+            else:
+                # Si la compétence n'existe pas, on l'insère et on récupère l'idcomp
+                sql_comp = "INSERT INTO Competences (competence) VALUES (?)"
+                cursor.execute(sql_comp, (competence,))
+                idcomp = cursor.lastrowid
+            
+            # --- 5C. Insertion dans PossedeCompetence (Lien Intervenant - Compétence) ---
+            sql_possede = """
+                INSERT INTO PossedeCompetence (idi, idcomp, niveau) 
+                VALUES (?, ?, ?)
+            """
+            cursor.execute(sql_possede, (idi, idcomp, niveau))
+
+            # --- 5D. Insertion dans Utilisateur_Intervenant (Compte de Connexion) ---
+            sql_utilisateur = """
+                INSERT INTO Utilisateur_Intervenant 
+                (mdp_haché, idi, nom_utilisateur, pdp_url, email_utilisateur) 
+                VALUES (?, ?, ?, ?, ?)
+            """
+            # Valeurs par défaut : pdp_url est vide au départ
+            pdp_default = ''
+            cursor.execute(sql_utilisateur, (hashed_password, idi, username, pdp_default, email))
+
+            db.commit() # ⬅️ Valide toutes les insertions en même temps
+
+        except sqlite3.Error as e:
+            # En cas d'erreur de BDD, on annule tout
+            erreur = f"Erreur de base de données lors de l'inscription : {e}"
+            return render_template('Inscription.html', erreur=erreur)
+
+        # 6. Redirection après succès
+        # Après une inscription réussie, redirigez l'utilisateur vers la page de connexion
+        return redirect(url_for('Connexion'))
+        
+    # Si la méthode est GET, on affiche le formulaire
+    return render_template('Inscription.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
