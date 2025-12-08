@@ -196,15 +196,15 @@ def Mon_compte():
 
     if data:
         # 1. Infos du compte utilisateur
-        nom_compte = data['nom_utilisateur']
+        nom_compte = (data['nom_utilisateur'])
         email = data['email_utilisateur']
         pdp_url = data['pdp_url']
         
         # 2. Infos de l'intervenant pour construire le lien
         # On vérifie que les champs existent bien
         if data['nom'] and data['prenom']:
-            nom_reel = data['nom']
-            prenom_reel = data['prenom']
+            nom_reel = normalize_text(data['nom'])
+            prenom_reel = normalize_text(data['prenom'])
             # On formate : "Nom.Prenom" pour que la route Inter_profil puisse faire le split('.')
             lien_formatte = f"{nom_reel}.{prenom_reel}"
     
@@ -471,8 +471,8 @@ def Inter_profil(nomcomplet=None):
     c = db.cursor()
     
     # 2. On prépare les noms pour la recherche
-    name_search = normalize_text(name) 
-    surname_search = normalize_text(surname)
+    name_search = name
+    surname_search = surname
 
     # 3. LA REQUÊTE SQL AVEC ALIAS ET LEFT JOIN
     # I  = Intervenants
@@ -498,8 +498,8 @@ def Inter_profil(nomcomplet=None):
        return render_template("error_intervenant.html", message="Intervenant non trouvé")
 
     # 5. On récupère les infos de base (sur la première ligne)
-    nom_affiche = rows[0]['nom']
-    prenom_affiche = rows[0]['prenom']
+    nom_affiche = normalize_text(rows[0]['nom'])
+    prenom_affiche = normalize_text(rows[0]['prenom'])
     
     # 6. On boucle pour récupérer les compétences (si elles existent)
     competences = []
