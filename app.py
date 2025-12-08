@@ -28,7 +28,7 @@ def allowed_file(filename):
 
 
 # --- Fonctions de Routes Protégées ---
-DATABASE= "ppii.db"
+DATABASE= "gestion_projets_test.db"
 
 
 def get_db(): # cette fonction permet de créer une connexion à la base 
@@ -227,7 +227,7 @@ def modifier_nom_email():
     username_actuel = session['username']
 
     try:
-        db = sqlite3.connect('ppii.db')
+        db = sqlite3.connect(DATABASE)
         c = db.cursor()
         # Mise à jour
         sql = "UPDATE Utilisateur_Intervenant SET nom_utilisateur = ?, email_utilisateur = ? WHERE nom_utilisateur = ?"
@@ -257,7 +257,7 @@ def modifier_mdp():
         print("Les mots de passe ne correspondent pas")
         return redirect(url_for('Mon_compte'))
 
-    db = sqlite3.connect('ppii.db')
+    db = sqlite3.connect(DATABASE)
     c = db.cursor()
     # Vérifier l'ancien mot de passe
     c.execute("SELECT mdp_haché FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?", (username,))
@@ -292,7 +292,7 @@ def login():
         username = request.form['identifiant']
         password = request.form['mot_de_passe']
         
-        db = sqlite3.connect('ppii.db')
+        db = sqlite3.connect(DATABASE)
         c = db.cursor()
         sql = "SELECT mdp_haché, pdp_url FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
         c.execute(sql, (username,))
@@ -344,7 +344,7 @@ def upload_profile_pic():
             # 3. Mise à jour de la BDD
             url_to_save = os.path.join('images/profiles', secure_filename) # Chemin relatif pour la BDD/HTML
             
-            db = sqlite3.connect('ppii.db')
+            db = sqlite3.connect(DATABASE)
             c = db.cursor()
             sql_update = "UPDATE Utilisateur_Intervenant SET pdp_url = ? WHERE nom_utilisateur = ?"
             c.execute(sql_update, (url_to_save, username))
@@ -375,7 +375,7 @@ def telecharger_donnees():
     username = session['username']
     
     try:
-        db = sqlite3.connect('ppii.db')
+        db = sqlite3.connect(DATABASE)
         # On configure la connexion pour récupérer les résultats sous forme de dictionnaire (plus facile pour le JSON)
         db.row_factory = sqlite3.Row 
         c = db.cursor()
@@ -424,7 +424,7 @@ def supprimer_compte():
     username = session['username']
     
     try:
-        db = sqlite3.connect('ppii.db')
+        db = sqlite3.connect(DATABASE)
         c = db.cursor()
         
         # Suppression de l'utilisateur
@@ -516,6 +516,7 @@ def Inter_profil(nomcomplet=None):
                            nom=nom_affiche, 
                            prenom=prenom_affiche, 
                            competences=competences)
+
 
 
 if __name__ == '__main__':
