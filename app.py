@@ -554,7 +554,7 @@ def Client_profil(nomcomplet=None):
         P.etat
 
     FROM Clients C
-    LEFT JOIN Projet P ON C.idc = P.idc
+    LEFT JOIN Projets P ON C.idc = P.idc
     WHERE C.nom = ? AND C.prenom = ?
     """
     
