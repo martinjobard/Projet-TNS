@@ -4,19 +4,19 @@ PRAGMA foreign_keys = ON;
 -- ------------------------------
 -- Clients (Parents)
 -- ------------------------------
-INSERT INTO Clients (idc, nom, prenom, email, telephone, secteur, dernier_contact) VALUES
-(1, 'TechCorp', 'Alice', 'alice@techcorp.com', '0123456789', 'IT', '2025-11-20'),
-(2, 'InnovSolutions', 'Bob', 'bob@innov.com', '0987654321', 'Finance', '2025-12-01'),
-(3, 'GreenFuture', 'Charlie', 'charlie@green.org', '0611223344', 'Environnement', '2025-10-15');
+INSERT INTO Clients (idc, nom, prenom, email, telephone, secteur, dernier_contact, nom_entreprise) VALUES
+(1, 'jobart', 'alice', 'alice@techcorp.com', '0123456789', 'IT', '2025-11-20', 'TechCorp'),
+(2, 'cipres', 'bob', 'bob@innov.com', '0987654321', 'Finance', '2025-12-01', 'InnovSolutions'),
+(3, 'dubois', 'charlie', 'charlie@green.org', '0611223344', 'Environnement', '2025-10-15', 'GreenFuture');
 
 -- ------------------------------
 -- Intervenants (Parents)
 -- ------------------------------
 INSERT INTO Intervenants (idi, role, nb_heure, dispo, nom, prenom) VALUES
-(101, 'Chef de Projet', 35, 'Oui', 'Dubois', 'Marc'),
-(102, 'Développeur Senior', 30, 'Oui', 'Lefevre', 'Sophie'),
-(103, 'Designer UX/UI', 20, 'Non', 'Martin', 'Pierre'),
-(104, 'Consultant', 40, 'Oui', 'Bernard', 'Julie');
+(101, 'Chef de Projet', 35, 'Oui', 'dubois', 'marc'),
+(102, 'Développeur Senior', 30, 'Oui', 'lefevre', 'sophie'),
+(103, 'Designer UX/UI', 20, 'Non', 'martin', 'pierre'),
+(104, 'Consultant', 40, 'Oui', 'bernard', 'julie');
 
 -- ------------------------------
 -- Compétences (Parents)
