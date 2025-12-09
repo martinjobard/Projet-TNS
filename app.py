@@ -112,11 +112,33 @@ def Stats():
     if redirect_if_needed:
         return redirect_if_needed
     titre_site = "Site interne TNS"
+    db = get_db()
+    username = session['username']
+    sql_user = "SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+    user_data = db.execute(sql_user, (username,)).fetchone()
+    if not user_data:
+        return redirect(url_for('logout'))
+    
+    mon_idi = user_data['idi']
+
+    sql_nb_projets = "SELECT COUNT(*) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
+    nb_projects = db.execute(sql_nb_projets, (mon_idi,)).fetchone()[0]
+
+    sql_nb_clients = "SELECT COUNT(DISTINCT idc) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
+    nb_clients = db.execute(sql_nb_clients, (mon_idi,)).fetchone()[0]
+
+    sql_ca = "SELECT SUM(budget) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
+    ca_result = db.execute(sql_ca, (mon_idi,)).fetchone()[0]
+
+    if ca_result is None:
+        ca_result = 0
+    ca_affiche = f"{ca_result:,.0f} €".replace(',', ' ') 
+
     return render_template(
         "Stats.html",
-        nb_clients=42,
-        nb_projects=6,
-        ca="52 000 €",
+        nb_clients=nb_clients,
+        nb_projects=nb_projects,
+        ca=ca_affiche,
 
         monthly_labels=["Jan", "Fév", "Mar", "Avr"],
         monthly_projects=[3, 2, 7, 5],
