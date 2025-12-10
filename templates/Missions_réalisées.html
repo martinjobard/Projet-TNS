@@ -21,7 +21,13 @@
             <td>{{ projet['client_nom'] }}</td>
             <td>{{ projet['titre_projet'] }}</td>
             <td>{{ projet['budget'] }}</td>
-            <td>{{ projet['doc_ul'] }}</td>
+            <td>
+                {% if projet['doc_ul'] %}
+                    <a href="{{ projet['doc_ul'] }}">Voir le doc</a>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </table>
