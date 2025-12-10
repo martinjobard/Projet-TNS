@@ -173,6 +173,7 @@ def Stats():
                 "date": line['deb']
                 })
     table = table_vide
+    
 
     return render_template(
         "Stats.html",
