@@ -65,11 +65,10 @@ def Projets():
 
     db=get_db()
     sql="""
-    SELECT p.idp, p.etat, c.nom as client_nom, p.budget, p.date_debut, p.date_fin 
+    SELECT p.idp, p.etat, c.nom as client_nom, p.budget, p.deb, p.fin 
     FROM Projets p LEFT JOIN Clients c ON p.idc=c.idc
     """
     liste_projets=db.execute(sql).fetchall()
-    total_projets=len(liste_projets)
     liste_en_cours=[p for p in liste_projets if p['etat']=='En cours']
     liste_termines=[p for p in liste_projets if p['etat']=='Terminé']
     liste_en_attente=[p for p in liste_projets if p['etat']=='En attente']

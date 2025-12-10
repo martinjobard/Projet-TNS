@@ -6,9 +6,9 @@
 	
     <div class="stats">
 	<h3>Nombre de Projets :</h3>
-	<p>{{ tous_les_projets }}</p>
+	<p>{{ tous_les_projets|length }}</p>
 
-	<h3>Projets en cours :</h3>
+	<h3><span style="color: orange;">Projets en cours :</span></h3>
         <ul>
             {% for projet in projets_en_cours %}
                 <li>
@@ -20,7 +20,7 @@
         </ul>
 	
 
-	<h3>Projets terminés :</h3>
+	<h3><span style="color: green;">Projets terminés :</span></h3>
         <ul>   
             {% for projet in projets_termines %}
                 <li>
@@ -33,7 +33,7 @@
     </div>
 
 
-	<h3>Projets en attente :</h3>
+	<h3><span style="color: blue;">Projets en attente :</span></h3>
         <ul>   
             {% for projet in projets_attente %}
                 <li>
@@ -48,7 +48,7 @@
 
 
     <h2>Détails des Projets :</h2>
-    {% for projet in liste_projets %}
+    {% for projet in tous_les_projets %}
         <div class="projet-card">
             <h3>Projet #{{ projet.idp }} :</h3>
 	<p><strong>Client :</strong> {{ projet.client_nom }}</p>
@@ -66,12 +66,13 @@
                     {{ projet.budget }} €
                 {% else %}
                     Non défini
+                {% endif %}
             </p>
             <p><strong>Période :</strong> 
-                {% if projet.date_debut and projet.date_fin %}
-                    {{ projet.date_debut }} ➝ {{ projet.date_fin }}
-                {% elif projet.date_debut %}
-                    Depuis le {{ projet.date_debut }}
+                {% if projet.deb and projet.fin %}
+                    {{ projet.deb }} ➝ {{ projet.fin }}
+                {% elif projet.deb %}
+                    Depuis le {{ projet.deb }}
                 {% else %}
                     Date à définir
                 {% endif %}
