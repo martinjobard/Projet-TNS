@@ -1,10 +1,12 @@
 from jinja2 import Environment, FileSystemLoader
-from flask import Flask, render_template, request, url_for, session, redirect, g, Response
+from flask import Flask, render_template, request, url_for, session, redirect, g, Response, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 import os
 import unicodedata
 import json
+import csv
+import io
 app = Flask(__name__)
 # Vous avez besoin d'une clé secrète pour les sessions (TRÈS IMPORTANT !)
 app.config['SECRET_KEY'] = 'ma_cle_secrete_tres_sure_a_changer'
@@ -38,6 +40,12 @@ def get_db(): # cette fonction permet de créer une connexion à la base
         g.db.row_factory = sqlite3.Row  # très important !
     return g.db
 
+@app.teardown_appcontext
+def close_db(e=None):
+    # Récupère l'objet 'db' de 'g' et le supprime (s'il existe)
+    db = g.pop('db', None) 
+    if db is not None:
+        db.close()
 
 
 @app.route('/')
@@ -88,24 +96,18 @@ def Import_Export():
     redirect_if_needed = require_login()
     if redirect_if_needed:
         return redirect_if_needed
+    
+    db = get_db() # ⬅️ Connexion à la BDD
+    cursor = db.cursor()
+    
+    # Exécution de la requête pour obtenir tous les clients
+    sql = "SELECT idc, nom, prenom FROM Clients"
+    liste_clients = cursor.execute(sql).fetchall() # Récupère toutes les lignes
     titre_site = "Site interne TNS"
-    return render_template('Import_Export.html', titre=titre_site)
+    return render_template('Import_Export.html', 
+                           titre=titre_site, 
+                           liste_clients=liste_clients)
 
-@app.route('/Export')
-def Export():
-    return
-
-@app.route('/Import', methods=['POST'])
-def Import():
-    return 
-
-@app.route('/Wiki-Docs')
-def Wiki_Docs():
-    redirect_if_needed = require_login()
-    if redirect_if_needed:
-        return redirect_if_needed
-    titre_site = "Site interne TNS"
-    return render_template('Wiki_Docs.html', titre=titre_site)
 
 @app.route('/tinder_like')
 def tinder_like():
@@ -734,6 +736,98 @@ def Inscription():
     # Si la méthode est GET, on affiche le formulaire
     return render_template('Inscription.html')
 
+
+@app.route('/export_client', methods=['POST'])
+def export_client():
+    # 1. On récupère l'ID directement depuis le formulaire
+    client_id = request.form.get('client_id')
+
+    # Sécurité : Si aucun ID n'est envoyé, on recharge la page
+    if not client_id:
+        return redirect(url_for('Import_Export'))
+
+    # 2. Connexion BDD
+    db = get_db()
+    cursor = db.cursor()
+    
+    # 3. Requête SQL
+    sql = "SELECT * FROM Clients WHERE idc = ?"
+    cursor.execute(sql, (client_id,)) 
+    client_data = cursor.fetchone() 
+    
+    # Si le client n'existe pas
+    if not client_data:
+        return "Erreur : Client non trouvé.", 404
+
+    # 4. Mise en forme CSV (Identique à avant)
+    headers = client_data.keys()
+    values = list(client_data) 
+    
+    csv_headers = ','.join(headers)
+    csv_data = ','.join([str(v) for v in values])
+    csv_content = f"{csv_headers}\n{csv_data}"
+
+    # 5. Envoi direct du fichier
+    return Response(
+        csv_content,
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename=client_{client_id}.csv"}
+    )
+
+@app.route('/import_clients', methods=['POST'])
+def import_clients():
+    # 1. Vérification que le fichier est présent
+    if 'csv_file' not in request.files:
+        return redirect(url_for('Import_Export'))
+    
+    file = request.files['csv_file']
+    
+    # 2. Vérification que le nom de fichier n'est pas vide
+    if file.filename == '':
+        return redirect(url_for('Import_Export'))
+
+    if file:
+        # 3. Transformation du fichier binaire en fichier texte pour le module CSV
+        # On utilise io.TextIOWrapper pour décoder les bytes en string (UTF-8)
+        stream = io.TextIOWrapper(file.stream._file, "utf8", newline=None)
+        
+        # 4. Lecture du CSV en mode "Dictionnaire"
+        # Cela permet d'appeler les colonnes par leur nom (ex: row['nom']) peu importe l'ordre
+        csv_input = csv.DictReader(stream)
+        
+        db = get_db()
+        cursor = db.cursor()
+        
+        # Votre requête SQL (Note: on ne met pas 'idc', la base le génère automatiquement)
+        sql = """
+            INSERT INTO Clients (nom, prenom, email, telephone, secteur, dernier_contact, nom_entreprise) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """
+        
+        try:
+            # 5. Boucle sur chaque ligne du CSV
+            for row in csv_input:
+                cursor.execute(sql, (
+                    row['nom'], 
+                    row['prenom'], 
+                    row['email'], 
+                    row['telephone'], 
+                    row['secteur'], 
+                    row['dernier_contact'], 
+                    row['nom_entreprise']
+                ))
+            
+            db.commit() # Valide toutes les insertions
+            flash("Succès ! Vos données ont été importées correctement.", "success")
+            return redirect(url_for('Import_Export'))
+            
+        except Exception as e:
+            db.rollback()
+            # On peut aussi flasher les erreurs !
+            flash(f"Erreur lors de l'importation : {e}", "error")
+            return redirect(url_for('Import_Export'))
+
+    return redirect(url_for('Import_Export'))
 
 if __name__ == '__main__':
     app.run(debug=True)

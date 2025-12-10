@@ -1,6 +1,53 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Import_export :</h1>
-    <p></p>
+    <h1>Import / Export</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="import-section" style="margin-bottom: 40px;">
+        <h2>Importer de nouveaux clients</h2>
+        
+        <form action="{{ url_for('import_clients') }}" method="POST" enctype="multipart/form-data">
+            <p>Veuillez sélectionner un fichier CSV contenant la liste des clients.</p>
+            
+            <label for="csv_file">Fichier CSV :</label>
+            <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
+            <br><br>
+            <button type="submit">Importer les données</button>
+        </form>
+    </div>
+
+    <hr>
+    
+    <div class="export-section" style="margin-top: 40px;">
+        <h2>Exporter des données clients</h2>
+        <p>Sélectionnez un client dans la liste pour télécharger ses données en CSV.</p>
+        
+        <form action="{{ url_for('export_client') }}" method="POST">
+    
+    <label for="client_select">Choisir un client :</label>
+    <select name="client_id" id="client_select" required style="padding: 5px;">
+        <option value="" disabled selected>-- Sélectionnez un client --</option>
+        
+        {% for client in liste_clients %}
+            <option value="{{ client.idc }}">
+                {{ client.nom }} {{ client.prenom }}
+            </option>
+        {% endfor %}
+    </select>
+    
+    <button type="submit" style="margin-left: 10px;">Exporter le CSV</button>
+</form>
+    </div>
 {% endblock %}
