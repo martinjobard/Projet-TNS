@@ -91,6 +91,14 @@ def Import_Export():
     titre_site = "Site interne TNS"
     return render_template('Import_Export.html', titre=titre_site)
 
+@app.route('/Export')
+def Export():
+    return
+
+@app.route('/Import', methods=['POST'])
+def Import():
+    return 
+
 @app.route('/Wiki-Docs')
 def Wiki_Docs():
     redirect_if_needed = require_login()
