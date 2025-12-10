@@ -170,9 +170,19 @@ def Stats():
 def Missions_réalisées():
     redirect_if_needed = require_login()
     if redirect_if_needed:
-        return redirect_if_needed
+        return redirect_if_needed 
     titre_site = "Site interne TNS"
-    return render_template('Missions_réalisées.html', titre=titre_site)
+
+    db=get_db()
+    sql = """SELECT p.idp, p.etat, c.nom as client_nom, p.budget, p.deb, p.fin, p.titre_projet, d.chemin as doc_ul
+    FROM Projets p LEFT JOIN Clients c ON p.idc=c.idc LEFT JOIN Documents d ON p.idp=d.idp"""
+    liste_projets=db.execute(sql).fetchall()
+    missions_finies=[p for p in liste_projets if p['etat']=='Terminé']
+
+    return render_template('Missions_réalisées.html', titre=titre_site, projets=missions_finies)
+
+
+
 
 @app.route('/Partenaires')
 def Partenaires():

@@ -1,6 +1,33 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Missions réalisées :</h1>
-    <p></p>
+<div class="container">
+    <h1>Historique des Missions Réalisées :</h1>
+
+    <table class="table">
+        <tr>
+            <th>Date début</th>
+            <th>Date fin</th>
+            <th>Client</th>
+            <th>Sujet</th>
+            <th>Budget</th>
+            <th>Documents</th> 
+        </tr>
+
+        {% for projet in projets %}
+        <tr>
+            <td>{{ projet['deb'] }}</td>
+            <td>{{ projet['fin'] }}</td>
+            <td>{{ projet['client_nom'] }}</td>
+            <td>{{ projet['titre_projet'] }}</td>
+            <td>{{ projet['budget'] }}</td>
+            <td>{{ projet['doc_ul'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    {% if not projets %}
+    Aucune mission terminée dans l'historique pour le moment
+    {% endif %}
+</div>
 {% endblock %}
