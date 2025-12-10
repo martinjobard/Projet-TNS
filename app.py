@@ -133,7 +133,46 @@ def Stats():
 
     if ca_result is None:
         ca_result = 0
-    ca_affiche = f"{ca_result:,.0f} €".replace(',', ' ') 
+    ca_affiche = f"{ca_result:,.0f} €".replace(',', ' ')
+
+    projets_par_mois = [0] * 12
+    sql_mois = "SELECT substr(Projets.deb, 4, 2) as mois, COUNT(*) as nombre FROM Projets JOIN Participation ON Projets.idp = Participation.idp WHERE Participation.idi = ? GROUP BY mois"
+    resultats_mois = db.execute(sql_mois, (mon_idi, )).fetchall()
+
+    for row in resultats_mois:
+        mois_str = row['mois']
+        if mois_str:
+            numero_mois = int(mois_str)
+            index = numero_mois - 1
+            if 0 <= index < 12: 
+                projets_par_mois[index] = row['nombre']
+    
+    sql_table_data = "SELECT nom_entreprise, secteur, etat, deb, budget FROM Clients LEFT JOIN Projets ON Clients.idc=Projets.idc LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
+    table = db.execute(sql_table_data, (mon_idi,)).fetchall()
+
+    sql_secteur = "SELECT secteur FROM Clients LEFT JOIN Projets ON Clients.idc=Projets.idc LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
+    pie_chart = db.execute(sql_secteur, (mon_idi,)).fetchall()
+    
+    sql_secteur = "SELECT Clients.secteur, COUNT(*) as nombre FROM Clients LEFT JOIN Projets ON Clients.idc = Projets.idc LEFT JOIN Participation ON Projets.idp = Participation.idp WHERE Participation.idi = ? GROUP BY Clients.secteur"
+    resultats_pie_chart = db.execute(sql_secteur, (mon_idi, )).fetchall()
+    
+    liste_labels = [] 
+    liste_values = [] 
+
+    for row in resultats_pie_chart:
+        liste_labels.append(row['secteur']) 
+        liste_values.append(row['nombre']) 
+
+    table_vide = []
+    for line in table:
+            table_vide.append({
+                "client": line['nom_entreprise'],
+                "sector": line['secteur'],
+                "project": line['budget'],
+                "status": line['etat'],
+                "date": line['deb']
+                })
+    table = table_vide
 
     return render_template(
         "Stats.html",
@@ -141,22 +180,14 @@ def Stats():
         nb_projects=nb_projects,
         ca=ca_affiche,
 
-        monthly_labels=["Jan", "Fév", "Mar", "Avr"],
-        monthly_projects=[3, 2, 7, 5],
+        monthly_labels=["Jan", "Fév", "Mar", "Avr", "May", "Juin", "Juil", "Août", "Sep", "Octo", "Nov", "Dec"],
+        monthly_projects=projets_par_mois,
 
-        sector_labels=["Tech", "Énergie", "Santé"],
-        sector_values=[12, 8, 5],
+        sector_labels= liste_labels,
+        sector_values=liste_values,
 
-        table_data=[
-            {
-                "client": "EDF",
-                "sector": "Énergie",
-                "project": "SmartGrid",
-                "status": "En cours",
-                "date": "2025-12-01"
-            }
-        ]
-    )
+        table_data=table
+        )
 
 @app.route('/Missions_réalisées')
 def Missions_réalisées():
