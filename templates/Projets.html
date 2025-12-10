@@ -12,7 +12,7 @@
         <ul>
             {% for projet in projets_en_cours %}
                 <li>
-                    <strong>#{{ projet.idp }}</strong> - {{ projet.Nom_Client }}
+                    <strong>#{{ projet.idp }}</strong> - {{ projet.client_nom }}
                 </li>
             {% else %}
                 <li>Aucun projet en cours</li>
@@ -24,7 +24,7 @@
         <ul>   
             {% for projet in projets_termines %}
                 <li>
-                    <strong>#{{ projet.idp }}</strong> - {{ projet.Nom_Client }}
+                    <strong>#{{ projet.idp }}</strong> - {{ projet.client_nom }}
                 </li>
             {% else %}
                 <li>Aucun projet terminé</li>
@@ -33,17 +33,47 @@
     </div>
 
 
+	<h3>Projets en attente :</h3>
+        <ul>   
+            {% for projet in projets_attente %}
+                <li>
+                    <strong>#{{ projet.idp }}</strong> - {{ projet.client_nom }}
+                </li>
+            {% else %}
+                <li>Aucun projet en attente</li>
+            {% endfor %}
+        </ul>          
+    </div>
+
+
 
     <h2>Détails des Projets :</h2>
-    {% for projet in projets_en_cours %}
+    {% for projet in liste_projets %}
         <div class="projet-card">
             <h3>Projet #{{ projet.idp }} :</h3>
-	<p><strong>Client :</strong> {{ projet.Nom.Client }}</p>
+	<p><strong>Client :</strong> {{ projet.client_nom }}</p>
             <p><strong>État :</strong> 
                 {% if projet.etat == 'En cours' %}
                     <span style="color: orange;">{{ projet.etat }}</span>
-                {% else %}
+                {% elif projet.etat=='Terminé' %}
                     <span style="color: green;">{{ projet.etat }}</span>
+                {% else %}
+                    <span style="color: blue;">{{ projet.etat }}</span>
+                {% endif %}
+            </p>
+            <p><strong>Budget :</strong> 
+                {% if projet.budget %}
+                    {{ projet.budget }} €
+                {% else %}
+                    Non défini
+            </p>
+            <p><strong>Période :</strong> 
+                {% if projet.date_debut and projet.date_fin %}
+                    {{ projet.date_debut }} ➝ {{ projet.date_fin }}
+                {% elif projet.date_debut %}
+                    Depuis le {{ projet.date_debut }}
+                {% else %}
+                    Date à définir
                 {% endif %}
             </p>
         </div>

@@ -65,14 +65,16 @@ def Projets():
 
     db=get_db()
     sql="""
-    SELECT p.idp, p.etat, c.nom as Nom_Client
+    SELECT p.idp, p.etat, c.nom as client_nom, p.budget, p.date_debut, p.date_fin 
     FROM Projets p LEFT JOIN Clients c ON p.idc=c.idc
     """
     liste_projets=db.execute(sql).fetchall()
     total_projets=len(liste_projets)
     liste_en_cours=[p for p in liste_projets if p['etat']=='En cours']
     liste_termines=[p for p in liste_projets if p['etat']=='Terminé']
-    return render_template('Projets.html', titre=titre_site, tous_les_projets=liste_projets, projets_en_cours=liste_en_cours, projets_termines=liste_termines)
+    liste_en_attente=[p for p in liste_projets if p['etat']=='En attente']
+    return render_template('Projets.html', titre=titre_site, tous_les_projets=liste_projets, 
+                           projets_en_cours=liste_en_cours, projets_termines=liste_termines, projets_attente=liste_en_attente)
 
 @app.route('/Intervenants')
 def Intervenants():
