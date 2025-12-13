@@ -117,16 +117,25 @@ if (tinderContainer) { // <--- C'est cette ligne qui empêche le crash sur les a
     const cardColors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#00FFFF", "#FF00FF", "#FFA500", "#800080", "#D3D3D3", "#000000"];
 
     function createCards() {
-        for(let i = 0; i < cardColors.length; i++){
+        // IMPORTANT : On vérifie si dbClients existe (défini dans le HTML)
+        if (typeof dbClients === 'undefined' || dbClients.length === 0) {
+            console.log("Aucun client trouvé dans la BDD");
+            return;
+        }
+        
+        dbClients.forEach((client, index) => {
             const card = document.createElement("div");
             card.className = "card";
-            card.style.backgroundColor = cardColors[i];
+            card.style.backgroundColor = cardColors[index % cardColors.length];
+            
+            // Stocker l'ID du client dans la carte (utile pour savoir qui on like/dislike plus tard)
+            card.dataset.clientId = client.id; 
             const cardContent = document.createElement("div"); 
             cardContent.className = "card-content";
-            cardContent.textContent = (i + 1).toString();
+            cardContent.textContent = client.nom; 
             card.appendChild(cardContent);
             tinderContainer.appendChild(card);
-        }
+        });
     }
 
     createCards();
