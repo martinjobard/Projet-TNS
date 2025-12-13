@@ -6,6 +6,11 @@
 <h1>
 PROFIL DE {{nom}} {{prenom}}
 </h1>
+<div class="user-info-container">
+    <div> Nom : {{nom_utilisateur}} </div> 
+    <div> Email : {{email_utilisateur}} </div>
+    <img src="{{ url_for('static', filename=pdp_actuelle or 'images/default-avatar.png') }}" alt="Photo de profil" style="max-width:150px;">
+</div>
 <h3 style="margin-top: 0;">
         Statut : 
         {% if dispo == 'Oui' %}
