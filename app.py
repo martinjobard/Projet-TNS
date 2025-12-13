@@ -254,7 +254,8 @@ def Mon_compte():
         UI.email_utilisateur, 
         UI.pdp_url, 
         I.nom, 
-        I.prenom 
+        I.prenom,
+        I.dispo
     FROM Utilisateur_Intervenant UI
     JOIN Intervenants I ON UI.idi = I.idi 
     WHERE UI.nom_utilisateur = ?
@@ -262,6 +263,23 @@ def Mon_compte():
     
     c.execute(sql, (username,))
     data = c.fetchone()
+
+    # On joint Projets, Participation et Utilisateur_Intervenant pour recuperer les missions
+    sql_missions = """
+    SELECT 
+        P.titre_projet, 
+        P.etat, 
+        P.deb, 
+        P.fin, 
+        Pa.role 
+    FROM Projets P
+    JOIN Participation Pa ON P.idp = Pa.idp
+    JOIN Utilisateur_Intervenant UI ON Pa.idi = UI.idi
+    WHERE UI.nom_utilisateur = ?
+    ORDER BY P.deb DESC
+    """
+    c.execute(sql_missions, (username,))
+    missions_data = c.fetchall() # On récupère toutes les lignes (liste de missions)
 
     # Initialisation des variables
     nom_compte = "Inconnu"
@@ -274,6 +292,7 @@ def Mon_compte():
         nom_compte = (data['nom_utilisateur'])
         email = data['email_utilisateur']
         pdp_url = data['pdp_url']
+        dispo_actuelle = data['dispo']
         
         # 2. Infos de l'intervenant pour construire le lien
         # On vérifie que les champs existent bien
@@ -287,10 +306,42 @@ def Mon_compte():
         nom_utilisateur=nom_compte, 
         email_utilisateur=email,
         pdp_actuelle=pdp_url,
-        lien_intervenant=lien_formatte # <--- C'est la nouvelle variable importante !
+        lien_intervenant=lien_formatte,
+        liste_missions=missions_data,
+        dispo=dispo_actuelle
     )
 
-# --- NOUVELLES ROUTES (Ajoute ceci avant le if __name__ == '__main__':) ---
+# --- NOUVELLES ROUTES ---
+
+@app.route('/modifier_disponibilite', methods=['POST'])
+def modifier_disponibilite():
+    if not session.get('username'):
+        return redirect(url_for('login'))
+
+    username = session.get('username')
+    nouvelle_dispo = request.form.get('dispo') # Sera 'Oui' ou 'Non'
+
+    db = get_db()
+    c = db.cursor()
+
+    try:
+        # On met à jour la table Intervenants en passant par la table de liaison
+        sql_update = """
+        UPDATE Intervenants
+        SET dispo = ?
+        WHERE idi = (
+            SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?
+        )
+        """
+        c.execute(sql_update, (nouvelle_dispo, username))
+        db.commit()
+        # Optionnel : Ajouter un message flash
+        # flash("Disponibilité mise à jour !", "success")
+    except Exception as e:
+        db.rollback()
+        print(f"Erreur update dispo: {e}")
+
+    return redirect(url_for('Mon_compte'))
 
 @app.route('/modifier_nom_email', methods=['POST'])
 def modifier_nom_email():
@@ -572,9 +623,10 @@ def Inter_profil(nomcomplet=None):
     sql = """
     SELECT 
         I.nom, 
-        I.prenom, 
+        I.prenom,
+        I.dispo,
         C.competence, 
-        PC.niveau 
+        PC.niveau
     FROM Intervenants I
     LEFT JOIN PossedeCompetence PC ON I.idi = PC.idi
     LEFT JOIN Competences C ON C.idcomp = PC.idcomp
@@ -591,6 +643,7 @@ def Inter_profil(nomcomplet=None):
     # 5. On récupère les infos de base (sur la première ligne)
     nom_affiche = normalize_text(rows[0]['nom'])
     prenom_affiche = normalize_text(rows[0]['prenom'])
+    dispo = rows[0]['dispo']
     
     # 6. On boucle pour récupérer les compétences (si elles existent)
     competences = []
@@ -606,7 +659,8 @@ def Inter_profil(nomcomplet=None):
     return render_template('Intervenant_profil.html', 
                            nom=nom_affiche, 
                            prenom=prenom_affiche, 
-                           competences=competences)
+                           competences=competences,
+                           dispo=dispo)
 
 
 @app.route('/Clients/<nomcomplet>')

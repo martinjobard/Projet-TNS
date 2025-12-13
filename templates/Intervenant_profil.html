@@ -6,7 +6,14 @@
 <h1>
 PROFIL DE {{nom}} {{prenom}}
 </h1>
-
+<h3 style="margin-top: 0;">
+        Statut : 
+        {% if dispo == 'Oui' %}
+            <span style="color: green;">● Disponible</span>
+        {% else %}
+            <span style="color: red;">● Indisponible</span>
+        {% endif %}
+</h3>
 <h3>
 Compétences:
 {% for comp in competences %}

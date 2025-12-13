@@ -51,7 +51,78 @@
     </form>
 </div>
 
-<h3>Missions en cours :</h3>
+<div class="dispo-container" style="border: 1px solid #ddd; padding: 15px; margin: 20px 0; border-radius: 8px; background-color: #f9f9f9;">
+    <h3>Ma Disponibilité</h3>
+    
+    <p>
+        Statut actuel : 
+        {% if dispo == 'Oui' %}
+            <span style="color: green; font-weight: bold; font-size: 1.2em;">● DISPONIBLE</span>
+        {% else %}
+            <span style="color: red; font-weight: bold; font-size: 1.2em;">● INDISPONIBLE</span>
+        {% endif %}
+    </p>
+
+    <form action="{{ url_for('modifier_disponibilite') }}" method="POST">
+        <label style="margin-right: 15px; cursor: pointer;">
+            <input type="radio" name="dispo" value="Oui" {% if dispo == 'Oui' %}checked{% endif %}> 
+            Je suis disponible
+        </label>
+        
+        <label style="margin-right: 15px; cursor: pointer;">
+            <input type="radio" name="dispo" value="Non" {% if dispo == 'Non' %}checked{% endif %}> 
+            Je ne suis pas disponible
+        </label>
+
+        <button type="submit" style="padding: 5px 10px; cursor: pointer;">Mettre à jour</button>
+    </form>
+</div>
+
+<hr> <h3>Mes Missions</h3>
+
+<div class="missions-container">
+    {% if liste_missions %}
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+                <tr style="background-color: #f2f2f2; text-align: left;">
+                    <th style="padding: 10px; border: 1px solid #ddd;">Projet</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">Mon Rôle</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">État</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">Dates</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mission in liste_missions %}
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        <strong>{{ mission.titre_projet }}</strong>
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        {{ mission.role }}
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        {% if mission.etat == 'En cours' %}
+                            <span style="color: green; font-weight: bold;">{{ mission.etat }}</span>
+                        {% elif mission.etat == 'Terminé' %}
+                            <span style="color: gray;">{{ mission.etat }}</span>
+                        {% else %}
+                            <span style="color: orange;">{{ mission.etat }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        {{ mission.deb }} 
+                        {% if mission.fin %} - {{ mission.fin }} {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p><em>Vous ne participez à aucune mission pour le moment.</em></p>
+    {% endif %}
+</div>
+
+
 <div> 
     stats de {{nom_utilisateur}}  
     <a href="{{ url_for('Stats') }}">statistiques de {{nom_utilisateur}} </a>
