@@ -38,15 +38,29 @@
         </fieldset>
 
         <fieldset>
-            <legend>Compétence Principale</legend>
+            <legend>Compétences</legend>
             
-            <label for="competence">Compétence :</label>
-            <input type="text" id="competence" name="competence" required>
+            <div id="competences-container">
+                <div class="competence-row" style="margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+                    <label>Compétence :</label>
+                    <input type="text" name="competence[]" required placeholder="Ex: Python, Cuisine...">
 
-            <label for="niveau">Niveau (ex: Expert, Intermédiaire) :</label>
-            <input type="text" id="niveau" name="niveau" required>
+                    <label>Niveau :</label>
+                    <select name="niveau[]" required>
+                        <option value="" disabled selected>Choisir...</option>
+                        <option value="Expert">Expert</option>
+                        <option value="Avancé">Avancé</option>
+                        <option value="Intermédiaire">Intermédiaire</option>
+                        <option value="Débutant">Débutant</option>
+                    </select>
+                    
+                    <button type="button" onclick="supprimerLigne(this)" style="margin-left: 10px; color: red;">X</button>
+                </div>
+            </div>
+
+            <button type="button" id="btn-add-competence" style="margin-top: 10px; background-color: #e0f7fa;">+ Ajouter une compétence</button>
         </fieldset>
-
         <button type="submit">Créer le compte</button>
     </form>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 {% endblock %}

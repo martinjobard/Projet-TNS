@@ -268,3 +268,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+document.getElementById('btn-add-competence').addEventListener('click', function() {
+            // 1. Sélectionner le conteneur et la première ligne (le modèle)
+            var container = document.getElementById('competences-container');
+            var firstRow = container.getElementsByClassName('competence-row')[0];
+            
+            // 2. Cloner la ligne
+            var newRow = firstRow.cloneNode(true);
+            
+            // 3. Réinitialiser les valeurs du clone (pour qu'il soit vide)
+            var inputs = newRow.getElementsByTagName('input');
+            var selects = newRow.getElementsByTagName('select');
+            
+            if (inputs.length > 0) inputs[0].value = ''; // Vider le texte
+            if (selects.length > 0) selects[0].selectedIndex = 0; // Remettre le select à défaut
+            
+            // 4. Ajouter la nouvelle ligne au conteneur
+            container.appendChild(newRow);
+        });
+
+        // Fonction pour supprimer une ligne
+        function supprimerLigne(btn) {
+            var container = document.getElementById('competences-container');
+            var rows = container.getElementsByClassName('competence-row');
+            
+            // On empêche la suppression s'il ne reste qu'une seule ligne
+            if (rows.length > 1) {
+                btn.parentNode.remove();
+            } else {
+                alert("Vous devez avoir au moins une compétence.");
+            }
+        }   
