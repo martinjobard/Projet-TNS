@@ -690,8 +690,8 @@ def Inscription():
         confirm_password = request.form.get('confirmation_mdp')
         prenom = request.form.get('prenom')
         nom = request.form.get('nom')
-        competence = request.form.get('competence')
-        niveau = request.form.get('niveau')
+        liste_competences = request.form.getlist('competence[]')
+        liste_niveaux = request.form.getlist('niveau[]')
 
         # --- Vérification 1 : Champs non vides ---
         if not all([username, email, password, confirm_password, prenom, nom]):
@@ -722,10 +722,10 @@ def Inscription():
 
         # Si nous arrivons ici, le nom d'utilisateur est unique.
         
-        # 4. Hachage du mot de passe (Prochaine étape !)
+        # 4. Hachage du mot de passe avant stockage
         hashed_password = generate_password_hash(password)
 
-        # 5. Insertion dans la BDD (Prochaine étape !)
+        # 5. Insertion dans la BDD
         try:
             db = get_db()
             cursor = db.cursor()
@@ -739,26 +739,38 @@ def Inscription():
             cursor.execute(sql_intervenant, (nom, prenom))
             idi = cursor.lastrowid # ⬅️ On récupère la clé primaire du nouvel Intervenant
 
-            # --- 5B. Insertion dans Competences ---
-            # D'abord, on vérifie si la compétence existe déjà pour éviter les doublons
-            sql_check_comp = "SELECT idcomp FROM Competences WHERE competence = ?"
-            cursor.execute(sql_check_comp, (competence,))
-            comp_result = cursor.fetchone()
-
-            if comp_result:
-                idcomp = comp_result[0]
-            else:
-                # Si la compétence n'existe pas, on l'insère et on récupère l'idcomp
-                sql_comp = "INSERT INTO Competences (competence) VALUES (?)"
-                cursor.execute(sql_comp, (competence,))
-                idcomp = cursor.lastrowid
+            for competence_nom, niveau_val in zip(liste_competences, liste_niveaux):
             
-            # --- 5C. Insertion dans PossedeCompetence (Lien Intervenant - Compétence) ---
-            sql_possede = """
-                INSERT INTO PossedeCompetence (idi, idcomp, niveau) 
-                VALUES (?, ?, ?)
-            """
-            cursor.execute(sql_possede, (idi, idcomp, niveau))
+                # Nettoyage des données (enlever les espaces inutiles)
+                competence_clean = competence_nom.strip()
+                
+                # Sécurité : On ignore les lignes vides (si l'utilisateur a cliqué sur + sans remplir)
+                if not competence_clean:
+                    continue 
+
+                # --- 5B. Insertion dans Competences (LOGIQUE INTÉGRÉE DANS LA BOUCLE) ---
+                
+                # On vérifie si la compétence existe déjà
+                sql_check_comp = "SELECT idcomp FROM Competences WHERE competence = ?"
+                cursor.execute(sql_check_comp, (competence_clean,))
+                comp_result = cursor.fetchone()
+
+                if comp_result:
+                    idcomp = comp_result[0]
+                else:
+                    # Si elle n'existe pas, on l'insère
+                    sql_comp = "INSERT INTO Competences (competence) VALUES (?)"
+                    cursor.execute(sql_comp, (competence_clean,))
+                    idcomp = cursor.lastrowid
+                
+                # --- 5C. Insertion dans PossedeCompetence (Lien) ---
+                
+                sql_possede = """
+                    INSERT INTO PossedeCompetence (idi, idcomp, niveau) 
+                    VALUES (?, ?, ?)
+                """
+                # Notez que 'idi' doit avoir été récupéré plus haut (lors de la création de l'intervenant)
+                cursor.execute(sql_possede, (idi, idcomp, niveau_val))
 
             # --- 5D. Insertion dans Utilisateur_Intervenant (Compte de Connexion) ---
             sql_utilisateur = """
@@ -846,16 +858,34 @@ def import_clients():
         db = get_db()
         cursor = db.cursor()
         
-        # Votre requête SQL (Note: on ne met pas 'idc', la base le génère automatiquement)
-        sql = """
-            INSERT INTO Clients (nom, prenom, email, telephone, secteur, dernier_contact, nom_entreprise) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """
-        
         try:
-            # 5. Boucle sur chaque ligne du CSV
+            nb_ajouts = 0
+            nb_doublons = 0
+
+            # On prépare la requête d'insertion (AVEC l'idc cette fois)
+            # Puisqu'on vérifie l'ID, on doit aussi l'insérer pour garder la cohérence
+            sql_insert = """
+                INSERT INTO Clients (idc, nom, prenom, email, telephone, secteur, dernier_contact, nom_entreprise) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """
+
             for row in csv_input:
-                cursor.execute(sql, (
+                # 1. On récupère l'IDC du fichier CSV
+                id_client = row['idc']
+                
+                # 2. VÉRIFICATION : Est-ce que cet IDC existe déjà dans la base ?
+                sql_verif = "SELECT idc FROM Clients WHERE idc = ?"
+                cursor.execute(sql_verif, (id_client,))
+                existe = cursor.fetchone()
+
+                if existe:
+                    # 3. CAS DOUBLON : L'ID existe déjà, on ignore cette ligne
+                    nb_doublons += 1
+                    continue 
+                
+                # 4. CAS NOUVEAU : On insère la ligne (en forçant l'IDC du fichier)
+                cursor.execute(sql_insert, (
+                    row['idc'],  # On insère l'ID du fichier
                     row['nom'], 
                     row['prenom'], 
                     row['email'], 
@@ -864,15 +894,22 @@ def import_clients():
                     row['dernier_contact'], 
                     row['nom_entreprise']
                 ))
+                nb_ajouts += 1
             
-            db.commit() # Valide toutes les insertions
-            flash("Succès ! Vos données ont été importées correctement.", "success")
+            db.commit()
+
+            if nb_ajouts > 0:
+                flash(f"Succès ! {nb_ajouts} clients importés ({nb_doublons} ID existants ignorés).", "success")
+            elif nb_doublons > 0:
+                flash(f"Aucun import : les {nb_doublons} clients du fichier existent déjà (basé sur l'IDC).", "error")
+            else:
+                flash("Le fichier semblait vide ou incorrect.", "error")
+
             return redirect(url_for('Import_Export'))
             
         except Exception as e:
             db.rollback()
-            # On peut aussi flasher les erreurs !
-            flash(f"Erreur lors de l'importation : {e}", "error")
+            flash(f"Erreur technique : {e}", "error")
             return redirect(url_for('Import_Export'))
 
     return redirect(url_for('Import_Export'))
