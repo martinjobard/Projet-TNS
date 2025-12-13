@@ -138,24 +138,39 @@ def Stats():
     redirect_if_needed = require_login()
     if redirect_if_needed:
         return redirect_if_needed
+    
     titre_site = "Site interne TNS"
     db = get_db()
+    
     username = session['username']
     sql_user = "SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
     user_data = db.execute(sql_user, (username,)).fetchone()
+    
     if not user_data:
         return redirect(url_for('logout'))
     
     mon_idi = user_data['idi']
+    sql_tous = "SELECT idi, nom, prenom FROM Intervenants ORDER BY nom"
+    tous_les_intervenants = db.execute(sql_tous).fetchall()
+
+    target_idi = request.args.get('target_idi')
+    
+    if target_idi:
+        try:
+            id_a_analyser = int(target_idi)
+        except ValueError:
+            id_a_analyser = mon_idi 
+    else:
+        id_a_analyser = mon_idi
 
     sql_nb_projets = "SELECT COUNT(*) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
-    nb_projects = db.execute(sql_nb_projets, (mon_idi,)).fetchone()[0]
+    nb_projects = db.execute(sql_nb_projets, (id_a_analyser,)).fetchone()[0]
 
     sql_nb_clients = "SELECT COUNT(DISTINCT idc) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
-    nb_clients = db.execute(sql_nb_clients, (mon_idi,)).fetchone()[0]
+    nb_clients = db.execute(sql_nb_clients, (id_a_analyser,)).fetchone()[0]
 
     sql_ca = "SELECT SUM(budget) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
-    ca_result = db.execute(sql_ca, (mon_idi,)).fetchone()[0]
+    ca_result = db.execute(sql_ca, (id_a_analyser,)).fetchone()[0]
 
     if ca_result is None:
         ca_result = 0
@@ -163,24 +178,24 @@ def Stats():
 
     projets_par_mois = [0] * 12
     sql_mois = "SELECT substr(Projets.deb, 4, 2) as mois, COUNT(*) as nombre FROM Projets JOIN Participation ON Projets.idp = Participation.idp WHERE Participation.idi = ? GROUP BY mois"
-    resultats_mois = db.execute(sql_mois, (mon_idi, )).fetchall()
+    resultats_mois = db.execute(sql_mois, (id_a_analyser, )).fetchall()
 
     for row in resultats_mois:
         mois_str = row['mois']
         if mois_str:
-            numero_mois = int(mois_str)
-            index = numero_mois - 1
-            if 0 <= index < 12: 
-                projets_par_mois[index] = row['nombre']
+            try:
+                numero_mois = int(mois_str)
+                index = numero_mois - 1
+                if 0 <= index < 12: 
+                    projets_par_mois[index] = row['nombre']
+            except ValueError:
+                pass 
     
     sql_table_data = "SELECT nom_entreprise, secteur, etat, deb, budget FROM Clients LEFT JOIN Projets ON Clients.idc=Projets.idc LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
-    table = db.execute(sql_table_data, (mon_idi,)).fetchall()
+    table = db.execute(sql_table_data, (id_a_analyser,)).fetchall()
 
-    sql_secteur = "SELECT secteur FROM Clients LEFT JOIN Projets ON Clients.idc=Projets.idc LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
-    pie_chart = db.execute(sql_secteur, (mon_idi,)).fetchall()
-    
     sql_secteur = "SELECT Clients.secteur, COUNT(*) as nombre FROM Clients LEFT JOIN Projets ON Clients.idc = Projets.idc LEFT JOIN Participation ON Projets.idp = Participation.idp WHERE Participation.idi = ? GROUP BY Clients.secteur"
-    resultats_pie_chart = db.execute(sql_secteur, (mon_idi, )).fetchall()
+    resultats_pie_chart = db.execute(sql_secteur, (id_a_analyser, )).fetchall()
     
     liste_labels = [] 
     liste_values = [] 
@@ -200,20 +215,18 @@ def Stats():
                 })
     table = table_vide
     
-
     return render_template(
         "Stats.html",
         nb_clients=nb_clients,
         nb_projects=nb_projects,
         ca=ca_affiche,
-
         monthly_labels=["Jan", "Fév", "Mar", "Avr", "May", "Juin", "Juil", "Août", "Sep", "Octo", "Nov", "Dec"],
         monthly_projects=projets_par_mois,
-
         sector_labels= liste_labels,
         sector_values=liste_values,
-
-        table_data=table
+        table_data=table,
+        intervenants=tous_les_intervenants, 
+        selected_id=id_a_analyser           
         )
 
 @app.route('/Missions_réalisées')
