@@ -499,23 +499,39 @@ def supprimer_compte():
     username = session['username']
     
     try:
-        db = sqlite3.connect(DATABASE)
-        c = db.cursor()
+        db = get_db()
+        cursor = db.cursor()
         
-        # Suppression de l'utilisateur
-        sql = "DELETE FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
-        c.execute(sql, (username,))
+        # ÉTAPE 1 : On récupère l'ID de l'intervenant (idi) avant de supprimer le compte
+        # Cela nous servira à supprimer aussi son profil "Physique" (Nom, Prénom)
+        cursor.execute("SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?", (username,))
+        result = cursor.fetchone()
+        
+        idi_a_supprimer = result['idi'] if result else None
+        
+        # ÉTAPE 2 : Supprimer le compte de connexion (Utilisateur_Intervenant)
+        cursor.execute("DELETE FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?", (username,))
+        
+        # ÉTAPE 3 : Supprimer la fiche intervenant 
+        if idi_a_supprimer:
+            cursor.execute("DELETE FROM Intervenants WHERE idi = ?", (idi_a_supprimer,))
+
+        # ÉTAPE 4 : Supprimer la fiche PC et recuperer les compétences associées
+        if idi_a_supprimer:
+            cursor.execute("DELETE FROM PossedeCompetence WHERE idi = ?", (idi_a_supprimer,)) 
+
+        # ÉTAPE 5 : Valider les changements
         db.commit()
-        db.close()
         
-        # IMPORTANT : On vide la session (déconnexion forcée)
+        # Déconnexion et retour à l'accueil
         session.clear()
-        
-        # On redirige vers l'accueil ou la connexion avec un message (optionnel)
+        flash("Votre compte a été supprimé définitivement.", "success")
         return redirect(url_for('Connexion'))
         
     except Exception as e:
-        return f"Erreur lors de la suppression : {e}"
+        db.rollback()
+        flash(f"Erreur lors de la suppression : {e}", "error")
+        return redirect(url_for('Mon_compte'))
 
 
 
