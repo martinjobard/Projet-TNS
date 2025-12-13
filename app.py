@@ -641,11 +641,15 @@ def Inter_profil(nomcomplet=None):
         I.nom, 
         I.prenom,
         I.dispo,
+        UI.pdp_url,
+        UI.nom_utilisateur,
+        UI.email_utilisateur,
         C.competence, 
         PC.niveau
     FROM Intervenants I
     LEFT JOIN PossedeCompetence PC ON I.idi = PC.idi
     LEFT JOIN Competences C ON C.idcomp = PC.idcomp
+    LEFT JOIN Utilisateur_Intervenant UI ON I.idi = UI.idi
     WHERE I.nom = ? AND I.prenom = ?
     """
     
@@ -660,6 +664,9 @@ def Inter_profil(nomcomplet=None):
     nom_affiche = normalize_text(rows[0]['nom'])
     prenom_affiche = normalize_text(rows[0]['prenom'])
     dispo = rows[0]['dispo']
+    pdp_actuelle = rows[0]['pdp_url']
+    nom_utilisateur = rows[0]['nom_utilisateur']
+    email_utilisateur = rows[0]['email_utilisateur']
     
     # 6. On boucle pour récupérer les compétences (si elles existent)
     competences = []
@@ -676,7 +683,11 @@ def Inter_profil(nomcomplet=None):
                            nom=nom_affiche, 
                            prenom=prenom_affiche, 
                            competences=competences,
-                           dispo=dispo)
+                           dispo=dispo,
+                           pdp_actuelle=pdp_actuelle,
+                           nom_utilisateur=nom_utilisateur,
+                           email_utilisateur=email_utilisateur
+                           )
 
 
 @app.route('/Clients/<nomcomplet>')
