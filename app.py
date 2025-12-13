@@ -115,7 +115,23 @@ def tinder_like():
     if redirect_if_needed:
         return redirect_if_needed
     titre_site = "Site interne TNS"
-    return render_template('tinder_like.html', titre=titre_site)
+    db = get_db()
+    username = session['username']
+    sql_user = "SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+    user_data = db.execute(sql_user, (username,)).fetchone()
+    if not user_data:
+        return redirect(url_for('logout'))
+    
+    mon_idi = user_data['idi']
+
+    sql_noms_entreprises = "SELECT DISTINCT Clients.idc, Clients.nom_entreprise FROM Clients LEFT JOIN Projets ON Clients.idc = Projets.idc LEFT JOIN Participation ON Projets.idp = Participation.idp WHERE Participation.idi = ?"
+    clients_data = db.execute(sql_noms_entreprises, (mon_idi,)).fetchall()
+
+    clients_list = []
+    if clients_data:
+        clients_list = [{'id': row['idc'], 'nom': row['nom_entreprise']} for row in clients_data]
+    
+    return render_template('tinder_like.html', titre=titre_site, clients=clients_list)
 
 @app.route('/Stats')
 def Stats():
