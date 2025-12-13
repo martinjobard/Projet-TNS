@@ -8,6 +8,14 @@
 
     <!-- FILTRES -->
     <div class="stats-filters">
+        <label style="font-weight:bold; color:#333;">Voir :</label>
+        <select onchange="window.location.href='?target_idi=' + this.value" style="margin-right: 20px; border: 2px solid #007bff;">
+            {% for user in intervenants %}
+                <option value="{{ user.idi }}" {% if user.idi == selected_id %}selected{% endif %}>
+                    {{ user.prenom|capitalize }} {{ user.nom|upper }}
+                </option>
+            {% endfor %}
+        </select>
         <label>Mois :</label>
         <select name="month">
             <option value="all">Tous</option>
