@@ -4,6 +4,10 @@
 <div class="container">
     <h1>Historique des Missions Réalisées :</h1>
 
+    <div class="import-export">
+        <a href="{{ url_for('Import_Export') }}">Voir l'Import-Export</a>
+    </div>
+
     <table class="table">
         <tr>
             <th>Date début</th>
@@ -22,8 +26,11 @@
             <td>{{ projet['titre_projet'] }}</td>
             <td>{{ projet['budget'] }}</td>
             <td>
-                {% if projet['doc_ul'] %}
-                    <a href="{{ projet['doc_ul'] }}">Voir le doc</a>
+                {% if projet['docs'] %}
+                    {% set liste_docs=projet['docs'].split(',') %}
+                    {% for doc in liste_docs %}
+                        <a href="{{ url_for('static', filename=doc) }}">Voir le doc</a>
+                    {% endfor %}
                 {% else %}
                     -
                 {% endif %}

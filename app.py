@@ -265,8 +265,8 @@ def Missions_réalisées():
     titre_site = "Site interne TNS"
 
     db=get_db()
-    sql = """SELECT p.idp, p.etat, c.nom as client_nom, p.budget, p.deb, p.fin, p.titre_projet, d.chemin as doc_ul
-    FROM Projets p LEFT JOIN Clients c ON p.idc=c.idc LEFT JOIN Documents d ON p.idp=d.idp"""
+    sql = """SELECT p.idp, p.etat, c.nom as client_nom, p.budget, p.deb, p.fin, p.titre_projet, d.chemin as doc_ul, GROUP_CONCAT(d.chemin) as docs
+    FROM Projets p LEFT JOIN Clients c ON p.idc=c.idc LEFT JOIN Documents d ON p.idp=d.idp GROUP BY p.idp"""
     liste_projets=db.execute(sql).fetchall()
     missions_finies=[p for p in liste_projets if p['etat']=='Terminé']
     titre_page_actuelle = "Missions Réalisées"
