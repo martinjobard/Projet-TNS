@@ -7,41 +7,32 @@
     <h1>Statistiques</h1>
 
     <!-- FILTRES -->
-    <div class="stats-filters">
+    <form class="stats-filters" action="{{ url_for('Stats') }}" method="get">
+        
         <label style="font-weight:bold; color:#333;">Voir :</label>
-        <select onchange="window.location.href='?target_idi=' + this.value" style="margin-right: 20px; border: 2px solid #007bff;">
+        <select name="target_idi" onchange="this.form.submit()" style="margin-right: 20px; border: 2px solid #007bff;">
             {% for user in intervenants %}
                 <option value="{{ user.idi }}" {% if user.idi == selected_id %}selected{% endif %}>
                     {{ user.prenom|capitalize }} {{ user.nom|upper }}
                 </option>
             {% endfor %}
         </select>
-        <label>Mois :</label>
-        <select name="month">
-            <option value="all">Tous</option>
-            <option value="01">Janvier</option>
-            <option value="02">Février</option>
-            <option value="03">Mars</option>
-            <option value="04">Avril</option>
-            <option value="05">Mai</option>
-            <option value="06">Juin</option>
-            <option value="07">Juillet</option>
-            <option value="08">Août</option>
-            <option value="09">Septembre</option>
-            <option value="10">Octobre</option>
-            <option value="11">Novembre</option>
-            <option value="12">Décembre</option>
-        </select>
 
         <label>Année :</label>
-        <select name="year">
+        <select name="year" onchange="this.form.submit()">
+            <option value="all" {% if selected_year == 'all' %}selected{% endif %}>Toutes</option>
+            
             {% for y in range(2026, 2003, -1) %}
-            <option value="{{ y }}">{{ y }}</option>
+                <option value="{{ y }}" {% if selected_year == y|string %}selected{% endif %}>
+                    {{ y }}
+                </option>
             {% endfor %}
         </select>
-
-        <button>Tout</button>
-    </div>
+        
+        <a href="{{ url_for('Stats') }}" class="button-reset" style="margin-left:10px; text-decoration:none; color: white; background-color: #333; padding: 5px 10px; border-radius: 4px; font-size: 14px;">
+            Tout (Reset)
+        </a>
+    </form>
 
     <!-- KPIs -->
     <div class="kpi-cards">

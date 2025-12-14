@@ -189,73 +189,69 @@ def Stats():
             id_a_analyser = mon_idi 
     else:
         id_a_analyser = mon_idi
+    
+    selected_year = request.args.get('year')
+    if selected_year == 'all':
+        selected_year = None 
 
-    sql_nb_projets = "SELECT COUNT(*) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
-    nb_projects = db.execute(sql_nb_projets, (id_a_analyser,)).fetchone()[0]
+    sql_year_filter = ""
+    params_base = [id_a_analyser]
+    
+    if selected_year:
+        sql_year_filter = " AND substr(Projets.deb, 7, 4) = ?"
+        params_base.append(selected_year)
 
-    sql_nb_clients = "SELECT COUNT(DISTINCT idc) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
-    nb_clients = db.execute(sql_nb_clients, (id_a_analyser,)).fetchone()[0]
+    sql_nb_projets = f"SELECT COUNT(*) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ? {sql_year_filter}"
+    nb_projects = db.execute(sql_nb_projets, params_base).fetchone()[0]
 
-    sql_ca = "SELECT SUM(budget) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
-    ca_result = db.execute(sql_ca, (id_a_analyser,)).fetchone()[0]
+    sql_nb_clients = f"SELECT COUNT(DISTINCT idc) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ? {sql_year_filter}"
+    nb_clients = db.execute(sql_nb_clients, params_base).fetchone()[0]
 
-    if ca_result is None:
-        ca_result = 0
-    ca_affiche = f"{ca_result:,.0f} €".replace(',', ' ')
+    sql_ca = f"SELECT SUM(budget) FROM Projets LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ? {sql_year_filter}"
+    ca_result = db.execute(sql_ca, params_base).fetchone()[0]
+    ca_affiche = f"{ca_result:,.0f} €".replace(',', ' ') if ca_result else "0 €"
 
+    sql_mois = f"SELECT substr(Projets.deb, 4, 2) as mois, COUNT(*) as nombre FROM Projets LEFT JOIN Participation ON Projets.idp = Participation.idp WHERE Participation.idi = ? {sql_year_filter} GROUP BY mois"
+    resultats_mois = db.execute(sql_mois, params_base).fetchall()
+    
     projets_par_mois = [0] * 12
-    sql_mois = "SELECT substr(Projets.deb, 4, 2) as mois, COUNT(*) as nombre FROM Projets JOIN Participation ON Projets.idp = Participation.idp WHERE Participation.idi = ? GROUP BY mois"
-    resultats_mois = db.execute(sql_mois, (id_a_analyser, )).fetchall()
-
     for row in resultats_mois:
-        mois_str = row['mois']
-        if mois_str:
+        if row['mois']:
             try:
-                numero_mois = int(mois_str)
-                index = numero_mois - 1
-                if 0 <= index < 12: 
-                    projets_par_mois[index] = row['nombre']
-            except ValueError:
-                pass 
+                index = int(row['mois']) - 1
+                if 0 <= index < 12: projets_par_mois[index] = row['nombre']
+            except: pass
+
+    sql_table = f"SELECT nom_entreprise, secteur, etat, deb, budget FROM Clients LEFT JOIN Projets ON Clients.idc=Projets.idc LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ? {sql_year_filter}"
+    table_raw = db.execute(sql_table, params_base).fetchall()
+
+    sql_pie = f"SELECT Clients.secteur, COUNT(*) as nombre FROM Clients LEFT JOIN Projets ON Clients.idc = Projets.idc LEFT JOIN Participation ON Projets.idp = Participation.idp WHERE Participation.idi = ? {sql_year_filter} GROUP BY Clients.secteur"
+    pie_raw = db.execute(sql_pie, params_base).fetchall()
+
+    liste_labels = [row['secteur'] for row in pie_raw]
+    liste_values = [row['nombre'] for row in pie_raw]
     
-    sql_table_data = "SELECT nom_entreprise, secteur, etat, deb, budget FROM Clients LEFT JOIN Projets ON Clients.idc=Projets.idc LEFT JOIN Participation ON Projets.idp=Participation.idp WHERE idi = ?"
-    table = db.execute(sql_table_data, (id_a_analyser,)).fetchall()
+    table_data = []
+    for line in table_raw:
+        table_data.append({
+            "client": line['nom_entreprise'],
+            "sector": line['secteur'],
+            "project": line['budget'],
+            "status": line['etat'],
+            "date": line['deb']
+        })
 
-    sql_secteur = "SELECT Clients.secteur, COUNT(*) as nombre FROM Clients LEFT JOIN Projets ON Clients.idc = Projets.idc LEFT JOIN Participation ON Projets.idp = Participation.idp WHERE Participation.idi = ? GROUP BY Clients.secteur"
-    resultats_pie_chart = db.execute(sql_secteur, (id_a_analyser, )).fetchall()
-    
-    liste_labels = [] 
-    liste_values = [] 
-
-    for row in resultats_pie_chart:
-        liste_labels.append(row['secteur']) 
-        liste_values.append(row['nombre']) 
-
-    table_vide = []
-    for line in table:
-            table_vide.append({
-                "client": line['nom_entreprise'],
-                "sector": line['secteur'],
-                "project": line['budget'],
-                "status": line['etat'],
-                "date": line['deb']
-                })
-    table = table_vide
-    titre_page_actuelle = "Statistiques"
     return render_template(
         "Stats.html",
-        nb_clients=nb_clients,
-        nb_projects=nb_projects,
-        ca=ca_affiche,
-        monthly_labels=["Jan", "Fév", "Mar", "Avr", "May", "Juin", "Juil", "Août", "Sep", "Octo", "Nov", "Dec"],
+        nb_clients=nb_clients, nb_projects=nb_projects, ca=ca_affiche,
+        monthly_labels=["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Octo", "Nov", "Dec"],
         monthly_projects=projets_par_mois,
-        sector_labels= liste_labels,
-        sector_values=liste_values,
-        table_data=table,
-        intervenants=tous_les_intervenants, 
+        sector_labels=liste_labels, sector_values=liste_values,
+        table_data=table_data,
+        intervenants=tous_les_intervenants,
         selected_id=id_a_analyser,
-        titre_page_actuelle=titre_page_actuelle,         
-        )
+        selected_year=selected_year if selected_year else 'all' 
+    )
 
 @app.route('/Missions_réalisées')
 def Missions_réalisées():
