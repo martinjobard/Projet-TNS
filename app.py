@@ -1,3 +1,4 @@
+from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from flask import Flask, render_template, request, url_for, session, redirect, g, Response, flash
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -536,22 +537,36 @@ def telecharger_donnees():
         c = db.cursor()
         
         # 1. Récupération des infos utilisateur
-        sql = "SELECT nom_utilisateur, email_utilisateur, pdp_url FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+        sql = "SELECT UI.nom_utilisateur, UI.email_utilisateur, UI.pdp_url, I.role, I.prenom, I.nom, PC.niveau, C.competence FROM Utilisateur_Intervenant UI LEFT JOIN Intervenants I ON UI.idi = I.idi LEFT JOIN PossedeCompetence PC ON I.idi = PC.idi LEFT JOIN Competences C ON PC.idcomp = C.idcomp WHERE nom_utilisateur = ?"
         c.execute(sql, (username,))
-        user_row = c.fetchone()
+        rows = c.fetchall()
         
         db.close()
 
-        if user_row:
+        if rows:
+            first_row = rows[0]
+            # Agrégation des compétences
+            liste_competences = []
+            for row in rows:
+                if row['competence']:
+                    liste_competences.append({
+                        "competence": row['competence'],
+                        "niveau": row['niveau']
+                    })
             # 2. Création du dictionnaire de données
             donnees = {
                 "profil": {
-                    "nom_utilisateur": user_row['nom_utilisateur'],
-                    "email": user_row['email_utilisateur'],
-                    "photo_profil": user_row['pdp_url']
+                    "nom_utilisateur": first_row['nom_utilisateur'],
+                    "email": first_row['email_utilisateur'],
+                    "photo_profil": first_row['pdp_url'],
+                    "role": first_row['role'],
+                    "prenom": first_row['prenom'],
+                    "nom": first_row['nom'],
+                    "competences": liste_competences
+                    
                 },
                 "statut": "Actif",
-                "date_export": "Aujourd'hui" # Tu pourrais utiliser datetime.now() ici
+                "date_export": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             
             # 3. Conversion en JSON
