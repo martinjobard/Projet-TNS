@@ -78,6 +78,5 @@ INSERT INTO Historique (idh, date, idc, idi, interaction_text) VALUES
 -- Documents (Référence Intervenants et Projets)
 -- ------------------------------
 INSERT INTO Documents (idDoc, idi, idp, type, chemin, upload) VALUES
-(2001, 101, 1001, 'Cahier des charges', '/doc/cahier_1001.pdf', '2025-11-01'),
-(2002, 102, 1001, 'Code Source', '/doc/code_1001.zip', '2025-11-15'),
-(2003, 104, 1002, 'Rapport Final', '/doc/rapport_1002.pdf', '2025-12-05');
+(2001, 101, 1002, 'CR1 PPII', 'documents/CR_PPII_24_11_25__.pdf', '2025-11-24'),
+(2002, 102, 1002, 'CR2 PPII', 'documents/CR_PPII_01_12_25.pdf', '2025-12-01');
