@@ -55,7 +55,29 @@ def Accueil():
     if redirect_if_needed:
         return redirect_if_needed
     titre_site = "Site interne TNS"
-    return render_template('Accueil.html', titre=titre_site)
+    titer_page_actuelle = "Accueil"
+    username = session.get('username')
+    db = get_db()
+    c = db.cursor()
+    sql_data = "SELECT I.role FROM Utilisateur_Intervenant UI LEFT JOIN Intervenants I ON UI.idi = I.idi WHERE UI.nom_utilisateur = ?"
+    c.execute(sql_data, (username,))
+    role_data = c.fetchone()
+    if role_data:
+        role = role_data['role']
+    sql_clients_projets = "SELECT C.nom, C.prenom, P.titre_projet, P.etat FROM Clients C LEFT JOIN Projets P ON C.idc = P.idc"
+    c.execute(sql_clients_projets)
+    clients_data = c.fetchall()
+    clients_dict = {}
+    for row in clients_data:
+        nom_complet = f"{row['nom']}.{row['prenom']}"
+        if nom_complet not in clients_dict:
+            clients_dict[nom_complet] = []
+        if row['titre_projet']:
+            clients_dict[nom_complet].append({
+                "titre_projet": row['titre_projet'],
+                "etat": row['etat']
+            })
+    return render_template('Accueil.html', titre=titre_site, titre_page_actuelle=titer_page_actuelle, username=username, role=role, clients=clients_dict)
 
 @app.route('/Clients')
 def Clients():
@@ -63,7 +85,8 @@ def Clients():
     if redirect_if_needed:
         return redirect_if_needed
     titre_site = "Site interne TNS"
-    return render_template('Clients.html', titre=titre_site)
+    titre_page_actuelle = "Clients"
+    return render_template('Clients.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle)
 
 @app.route('/Projets')
 def Projets():
@@ -71,6 +94,7 @@ def Projets():
     if redirect_if_needed:
         return redirect_if_needed
     titre_site = "Site interne TNS"
+    titre_page_actuelle = "Projets"
 
     db=get_db()
     sql="""
@@ -81,7 +105,7 @@ def Projets():
     liste_en_cours=[p for p in liste_projets if p['etat']=='En cours']
     liste_termines=[p for p in liste_projets if p['etat']=='Terminé']
     liste_en_attente=[p for p in liste_projets if p['etat']=='En attente']
-    return render_template('Projets.html', titre=titre_site, tous_les_projets=liste_projets, 
+    return render_template('Projets.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle, tous_les_projets=liste_projets, 
                            projets_en_cours=liste_en_cours, projets_termines=liste_termines, projets_attente=liste_en_attente)
 
 @app.route('/Intervenants')
@@ -90,7 +114,8 @@ def Intervenants():
     if redirect_if_needed:
         return redirect_if_needed
     titre_site = "Site interne TNS"
-    return render_template('Intervenants.html', titre=titre_site)
+    titre_page_actuelle = "Intervenants"
+    return render_template('Intervenants.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle)
 
 @app.route('/Import-Export')
 def Import_Export():
@@ -105,8 +130,10 @@ def Import_Export():
     sql = "SELECT idc, nom, prenom FROM Clients"
     liste_clients = cursor.execute(sql).fetchall() # Récupère toutes les lignes
     titre_site = "Site interne TNS"
+    titre_page_actuelle = "Import-Export"
     return render_template('Import_Export.html', 
                            titre=titre_site, 
+                           titre_page_actuelle=titre_page_actuelle,
                            liste_clients=liste_clients)
 
 
@@ -131,8 +158,8 @@ def tinder_like():
     clients_list = []
     if clients_data:
         clients_list = [{'id': row['idc'], 'nom': row['nom_entreprise']} for row in clients_data]
-    
-    return render_template('tinder_like.html', titre=titre_site, clients=clients_list)
+    titre_page_actuelle = "Tinder Like"
+    return render_template('tinder_like.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle, clients=clients_list)
 
 @app.route('/Stats')
 def Stats():
@@ -140,7 +167,6 @@ def Stats():
     if redirect_if_needed:
         return redirect_if_needed
     
-    titre_site = "Site interne TNS"
     db = get_db()
     
     username = session['username']
@@ -215,7 +241,7 @@ def Stats():
                 "date": line['deb']
                 })
     table = table_vide
-    
+    titre_page_actuelle = "Statistiques"
     return render_template(
         "Stats.html",
         nb_clients=nb_clients,
@@ -227,7 +253,8 @@ def Stats():
         sector_values=liste_values,
         table_data=table,
         intervenants=tous_les_intervenants, 
-        selected_id=id_a_analyser           
+        selected_id=id_a_analyser,
+        titre_page_actuelle=titre_page_actuelle,         
         )
 
 @app.route('/Missions_réalisées')
@@ -242,8 +269,8 @@ def Missions_réalisées():
     FROM Projets p LEFT JOIN Clients c ON p.idc=c.idc LEFT JOIN Documents d ON p.idp=d.idp"""
     liste_projets=db.execute(sql).fetchall()
     missions_finies=[p for p in liste_projets if p['etat']=='Terminé']
-
-    return render_template('Missions_réalisées.html', titre=titre_site, projets=missions_finies)
+    titre_page_actuelle = "Missions Réalisées"
+    return render_template('Missions_réalisées.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle, projets=missions_finies)
 
 
 
@@ -254,7 +281,8 @@ def Partenaires():
     if redirect_if_needed:
         return redirect_if_needed
     titre_site = "Site interne TNS"
-    return render_template('Partenaires.html', titre=titre_site)
+    titre_page_actuelle = "Partenaires"
+    return render_template('Partenaires.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle)
 
 @app.route('/Contact')
 def Contact():
@@ -262,7 +290,8 @@ def Contact():
     if redirect_if_needed:
         return redirect_if_needed
     titre_site = "Site interne TNS"
-    return render_template('Contact.html', titre=titre_site)
+    titre_page_actuelle = "Contact"
+    return render_template('Contact.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle)
 
 @app.route('/Mon_compte')
 def Mon_compte():
@@ -331,14 +360,15 @@ def Mon_compte():
             prenom_reel = normalize_text(data['prenom'])
             # On formate : "Nom.Prenom" pour que la route Inter_profil puisse faire le split('.')
             lien_formatte = f"{nom_reel}.{prenom_reel}"
-    
+    titre_page_actuelle = "Mon Compte"
     return render_template('Mon_compte.html', 
         nom_utilisateur=nom_compte, 
         email_utilisateur=email,
         pdp_actuelle=pdp_url,
         lien_intervenant=lien_formatte,
         liste_missions=missions_data,
-        dispo=dispo_actuelle
+        dispo=dispo_actuelle,
+        titre_page_actuelle=titre_page_actuelle
     )
 
 # --- NOUVELLES ROUTES ---
@@ -437,7 +467,7 @@ def modifier_mdp():
 def Connexion():
     titre_site = "Site interne TNS"
     # Cette page doit être accessible à tous
-    return render_template('Connexion.html', titre=titre_site)
+    return render_template('Connexion.html', titre=titre_site, titre_page_actuelle="Connexion")
 
 # ... (votre fonction login() sécurisée que nous avons construite va ici) ...
 @app.route('/login', methods=['GET', 'POST'])
@@ -714,7 +744,8 @@ def Inter_profil(nomcomplet=None):
                            dispo=dispo,
                            pdp_actuelle=pdp_actuelle,
                            nom_utilisateur=nom_utilisateur,
-                           email_utilisateur=email_utilisateur
+                           email_utilisateur=email_utilisateur,
+                           titre_page_actuelle="Profil Intervenant"
                            )
 
 
@@ -786,7 +817,9 @@ def Client_profil(nomcomplet=None):
                            telephone=telephone,
                            dernier_contact=dernier_contact,
                            email=email,
-                           projets=projets)
+                           projets=projets,
+                           titre_page_actuelle="Profil Client"
+                           )
 
 
 @app.route('/Inscription', methods=['GET', 'POST'])
@@ -903,7 +936,7 @@ def Inscription():
         return redirect(url_for('Connexion'))
         
     # Si la méthode est GET, on affiche le formulaire
-    return render_template('Inscription.html')
+    return render_template('Inscription.html', titre_page_actuelle="Inscription")
 
 
 @app.route('/export_client', methods=['POST'])

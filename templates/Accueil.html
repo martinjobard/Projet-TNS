@@ -2,6 +2,22 @@
 
 {% block content %}
     <h1>Tableau de bord :</h1>
-    <p></p>
+    <p>Bienvenue, <strong>{{ username }}</strong> !, vous êtes actuellement <strong>{{ role }}</strong> dans TNS, félicitations !</p>
+    <h2>Liste des clients :</h2>
+    <ul>
+        {% for nom_clients, projets in clients.items() %}
+            <li> <strong>{{ nom_clients }}</strong>
+                {% if projets %}
+                <ul>
+                    {% for projet in projets %}
+                        <li>{{ projet.titre_projet }} <strong>({{ projet.etat }})</strong></li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <p>Aucun projet associé.</p>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 

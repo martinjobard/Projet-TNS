@@ -13,7 +13,7 @@ INSERT INTO Clients (idc, nom, prenom, email, telephone, secteur, dernier_contac
 -- Intervenants (Parents)
 -- ------------------------------
 INSERT INTO Intervenants (idi, role, nb_heure, dispo, nom, prenom) VALUES
-(101, 'Chef de Projet', 35, 'Oui', 'dubois', 'marc'),
+(101, 'Président', 35, 'Oui', 'dubois', 'marc'),
 (102, 'Développeur Senior', 30, 'Oui', 'lefevre', 'sophie'),
 (103, 'Designer UX/UI', 20, 'Non', 'martin', 'pierre'),
 (104, 'Consultant', 40, 'Oui', 'bernard', 'julie');
