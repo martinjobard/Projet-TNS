@@ -278,94 +278,115 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-document.getElementById('btn-add-competence').addEventListener('click', function() {
-            // 1. Sélectionner le conteneur et la première ligne (le modèle)
+
+/* =========================================
+   LOGIQUE AJOUT COMPETENCE (Protégée)
+   ========================================= */
+document.addEventListener('DOMContentLoaded', function() {
+    const btnAddCompetence = document.getElementById('btn-add-competence');
+
+    // On ne lance le code que si le bouton existe sur la page
+    if (btnAddCompetence) {
+        btnAddCompetence.addEventListener('click', function() {
             var container = document.getElementById('competences-container');
             var firstRow = container.getElementsByClassName('competence-row')[0];
-            
-            // 2. Cloner la ligne
             var newRow = firstRow.cloneNode(true);
-            
-            // 3. Réinitialiser les valeurs du clone (pour qu'il soit vide)
             var inputs = newRow.getElementsByTagName('input');
             var selects = newRow.getElementsByTagName('select');
             
-            if (inputs.length > 0) inputs[0].value = ''; // Vider le texte
-            if (selects.length > 0) selects[0].selectedIndex = 0; // Remettre le select à défaut
+            if (inputs.length > 0) inputs[0].value = ''; 
+            if (selects.length > 0) selects[0].selectedIndex = 0; 
             
-            // 4. Ajouter la nouvelle ligne au conteneur
             container.appendChild(newRow);
         });
+    }
+});
 
-        // Fonction pour supprimer une ligne
-        function supprimerLigne(btn) {
-            var container = document.getElementById('competences-container');
-            var rows = container.getElementsByClassName('competence-row');
-            
-            // On empêche la suppression s'il ne reste qu'une seule ligne
-            if (rows.length > 1) {
-                btn.parentNode.remove();
-            } else {
-                alert("Vous devez avoir au moins une compétence.");
-            }
-        }   
+// La fonction supprimerLigne peut rester globale car elle est appelée via onclick="" dans le HTML
+function supprimerLigne(btn) {
+    var container = document.getElementById('competences-container');
+    var rows = container.getElementsByClassName('competence-row');
+    
+    if (rows.length > 1) {
+        btn.parentNode.remove();
+    } else {
+        alert("Vous devez avoir au moins une compétence.");
+    }
+}   
 
-document.getElementById('SearchFormSecteurClient').addEventListener('submit', function(event) {
-            event.preventDefault(); // Empêche le rechargement de la page
-            const secteur = document.getElementById('secteur-input').value.trim();
 
-            if (secteur) {
-                fetchClientProfiles(secteur);
+/* =========================================
+   LOGIQUE RECHERCHE SECTEUR (Protégée)
+   ========================================= */
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const formSecteur = document.getElementById('SearchFormSecteurClient');
+
+    // On vérifie que le formulaire existe avant d'ajouter l'écouteur
+    if (formSecteur) {
+        formSecteur.addEventListener('submit', function(event) {
+            event.preventDefault(); // Empêche le rechargement
+            console.log("Formulaire secteur soumis via JS !"); // Debug
+
+            const secteurInput = document.getElementById('secteur-input');
+            if (secteurInput) {
+                const secteur = secteurInput.value.trim();
+                if (secteur) {
+                    fetchClientProfiles(secteur);
+                }
             }
         });
+    }
+});
 
-        function fetchClientProfiles(secteur) {
-            // Encode l'entrée utilisateur pour la sécurité de l'URL
-            const encodedSecteur = encodeURIComponent(secteur);
-            const url = `/api/recherche/clients?secteur=${encodedSecteur}`;
+// Ces fonctions peuvent rester en dehors car ce sont des définitions, pas des exécutions
+function fetchClientProfiles(secteur) {
+    const encodedSecteur = encodeURIComponent(secteur);
+    const url = `/api/recherche/clients?secteur=${encodedSecteur}`;
 
-            // Envoi de la requête asynchrone au backend (Flask)
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        // Gère les erreurs HTTP (400, 500)
-                        throw new Error(`Erreur HTTP: ${response.status}`);
-                    }
-                    return response.json(); // Le backend répond en JSON
-                })
-                .then(data => {
-                    // data.profils contient le tableau des liens renvoyés par Flask
-                    afficherResultats(data.profils);
-                })
-                .catch(error => {
-                    console.error('Erreur lors de la recherche :', error);
-                    document.getElementById('resultats-secteur').innerHTML = `<p class="error">Erreur serveur : ${error.message}</p>`;
-                });
-        }
-
-        function afficherResultats(profils) {
-            const container = document.getElementById('resultats-secteur');
-            container.innerHTML = ''; // Nettoyage des anciens résultats
-            
-            if (profils.length === 0) {
-                container.innerHTML = '<p>Aucun client trouvé pour ce secteur d\'activité.</p>';
-                return;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
             }
+            return response.json();
+        })
+        .then(data => {
+            afficherResultats(data.profils);
+        })
+        .catch(error => {
+            console.error('Erreur lors de la recherche :', error);
+            const container = document.getElementById('resultats-secteur');
+            if(container) container.innerHTML = `<p class="error">Erreur serveur : ${error.message}</p>`;
+        });
+}
 
-            const ul = document.createElement('ul');
-            profils.forEach(link => {
-                const li = document.createElement('li');
-                const a = document.createElement('a');
-                const parts = link.split('/');
-                const nom_lien=parts[parts.length - 1]
-            
-                // Les résultas de la recherche sont les liens des
-                a.href = link; 
-                a.textContent = nom_lien ;
-                a.target = "_blank";
-                
-                li.appendChild(a);
-                ul.appendChild(li);
-            });
-            container.appendChild(ul);
-        }
+function afficherResultats(profils) {
+    const container = document.getElementById('resultats-secteur');
+    if (!container) return; // Sécurité
+    
+    container.innerHTML = ''; 
+    
+    if (profils.length === 0) {
+        container.innerHTML = '<p>Aucun client trouvé pour ce secteur d\'activité.</p>';
+        return;
+    }
+
+    const ul = document.createElement('ul');
+    profils.forEach(link => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        
+        // Nettoyage pour obtenir le nom affichable
+        const parts = link.split('/');
+        const nom_lien = parts[parts.length - 1]; // ex: dupont.jean
+    
+        a.href = link; 
+        a.textContent = nom_lien.replace('.', ' ').toUpperCase(); // Optionnel : rend le texte plus joli (DUPONT JEAN)
+        a.target = "_blank";
+        
+        li.appendChild(a);
+        ul.appendChild(li);
+    });
+    container.appendChild(ul);
+}
