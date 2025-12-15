@@ -1311,6 +1311,59 @@ def recherche_secteur_client():
         "count": len(profils),
     })
 
+@app.route('/export_mission/<int:id_projet>', methods=['POST'])
+def export_mission(id_projet):
+    # 1. On récupère l'ID des projets finis
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        sql = """
+        SELECT 
+            P.titre_projet, 
+            P.deb, 
+            P.fin, 
+            P.budget, 
+            P.etat, 
+            C.nom AS nom_client, 
+            C.prenom AS prenom_client, 
+            C.nom_entreprise, 
+            I.nom AS nom_intervenant, 
+            I.prenom AS prenom_intervenant 
+        FROM Projets P 
+        LEFT JOIN Clients C ON P.idc = C.idc 
+        LEFT JOIN Participation PA ON P.idp = PA.idp 
+        LEFT JOIN Intervenants I on PA.idi = I.idi 
+        WHERE P.idp = ?
+        """
+       
+        cursor.execute(sql, (id_projet,))
+        projets_data = cursor.fetchall()
+        
+        # 2. Mise en forme CSV
+        if not projets_data:
+            return redirect(url_for('Missions_réalisées'))
+        
+        # Préparer les en-têtes
+        headers = projets_data[0].keys()
+        csv_headers = ','.join(headers)
+        
+        # Préparer les lignes de données
+        csv_lines = []
+        for projet in projets_data:
+            values = [str(projet[h]) for h in headers]
+            csv_lines.append(','.join(values))
+        
+        csv_content = f"{csv_headers}\n" + "\n".join(csv_lines)
+        
+        # 3. Envoi direct du fichier
+        return Response(
+            csv_content,
+            mimetype="text/csv",
+            headers={"Content-Disposition": "attachment;filename=projets_termines.csv"}
+        )    
+    except Exception as e:
+        return f"Erreur lors de l'export : {e}"
+
 
 if __name__ == '__main__':
     app.run(debug=True)

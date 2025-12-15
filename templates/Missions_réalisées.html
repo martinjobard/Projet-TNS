@@ -4,10 +4,6 @@
 <div class="container">
     <h1>Historique des Missions Réalisées :</h1>
 
-    <div class="import-export">
-        <a href="{{ url_for('Import_Export') }}">Voir l'Import-Export</a>
-    </div>
-
     <table class="table">
         <tr>
             <th>Date début</th>
@@ -32,9 +28,16 @@
                         <a href="{{ url_for('static', filename=doc) }}">Voir le doc</a>
                     {% endfor %}
                 {% else %}
-                    -
+                    
                 {% endif %}
             </td>
+            <td><form action="{{ url_for('export_mission', id_projet=projet['idp']) }}" method="POST">
+        
+        <button type="submit" style="background-color: rgb(39, 157, 242); color: white; padding: 10px; border: none; cursor: pointer;">
+            Télécharger le dossier mission de {{ projet['titre_projet'] }}
+        </button>
+        </form>
+        </td>
         </tr>
         {% endfor %}
     </table>
