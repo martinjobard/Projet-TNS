@@ -26,4 +26,26 @@ Compétences:
 
 {% endfor %}
 </h3>
+
+<div style="margin-top: 50px; border-top: 1px solid #ccc; padding-top: 20px;">
+    
+    <form action="{{ url_for('upload_intervenant', id_intervenant=id_intervenant) }}" method="POST">
+        
+        <button type="submit" style="background-color: rgb(39, 157, 242); color: white; padding: 10px; border: none; cursor: pointer;">
+            Télécharger le dossier intervenant de {{ nom }} {{ prenom }}
+        </button>
+        
+    </form>
+</div>
+<div style="margin-top: 50px; border-top: 1px solid #ccc; padding-top: 20px;">
+    <h3>Zone de danger</h3>
+    
+    <form action="{{ url_for('supprimer_intervenant', id_intervenant=id_intervenant) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet intervenant ? Tous ses projets seront aussi effacés.');">
+        
+        <button type="submit" style="background-color: red; color: white; padding: 10px; border: none; cursor: pointer;">
+            Supprimer le dossier intervenant de {{ nom }} {{ prenom }}
+        </button>
+        
+    </form>
+</div>
 {% endblock %}
