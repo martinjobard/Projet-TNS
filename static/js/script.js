@@ -179,7 +179,7 @@ if (tinderContainer) { // <--- C'est cette ligne qui empêche le crash sur les a
         if (!isDragging || !currentCard) return;
         const deltaX = e.touches[0].clientX - startX;
         currentCard.style.transform = `translateX(${deltaX}px) rotate(${deltaX/10}deg)`;
-    });
+    });0
 
     tinderContainer.addEventListener("touchend", (e) => {
         if(!isDragging || !currentCard) return;
@@ -359,7 +359,6 @@ document.getElementById('SearchFormSecteurClient').addEventListener('submit', fu
                 const parts = link.split('/');
                 const nom_lien=parts[parts.length - 1]
             
-                
                 // Les résultas de la recherche sont les liens des
                 a.href = link; 
                 a.textContent = nom_lien ;
