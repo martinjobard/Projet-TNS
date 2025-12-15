@@ -76,6 +76,8 @@ CREATE TABLE Utilisateur_Intervenant (
     nom_utilisateur TEXT, 
     pdp_url TEXT, 
     email_utilisateur TEXT,
+    fonction TEXT Default 'user',
+    status INTEGER DEFAULT 0,
     FOREIGN KEY (idi) REFERENCES Intervenants(idi)   -- Correction: "Intervenants" avec un S
 );
 

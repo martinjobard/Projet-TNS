@@ -62,9 +62,9 @@ INSERT INTO PossedeCompetence (idi, idcomp, niveau) VALUES
 -- ------------------------------
 -- Utilisateur_Intervenant (Référence Intervenants)
 -- ------------------------------
-INSERT INTO Utilisateur_Intervenant (idu, mdp_haché, idi, nom_utilisateur, pdp_url, email_utilisateur) VALUES
-(501, 'scrypt:32768:8:1$MOtMqccFPxmGG8Dv$3bc6e0c780e3a3c4901db9ae099eaf7233293a3c2a2dfac869f8ca7f6d8655a56d95eb4384a9662154473d786c01601aaebadaabad359be8ad39e5db5fa4230a', 101, 'marc_d', 'images/profiles/marc_d.png', 'marc@interv.com'),
-(502, 'scrypt:32768:8:1$9uGypIgiLHFN5Kh5$45286b231659b83a8338e9df56583afc7776f60a8c695e042bdfef6a2b8ebf33d13623ce2a24d7406bf14af5d9ca009da7f6a6db527e7aed678d840450fb062b', 102, 'sophie_l', 'images/profiles/sophie_l.png', 'sophie@interv.com');
+INSERT INTO Utilisateur_Intervenant (idu, mdp_haché, idi, nom_utilisateur, pdp_url, email_utilisateur,fonction,status) VALUES
+(501, 'scrypt:32768:8:1$MOtMqccFPxmGG8Dv$3bc6e0c780e3a3c4901db9ae099eaf7233293a3c2a2dfac869f8ca7f6d8655a56d95eb4384a9662154473d786c01601aaebadaabad359be8ad39e5db5fa4230a', 101, 'marc_d', 'images/profiles/marc_d.png', 'marc@interv.com', 'admin',1),
+(502, 'scrypt:32768:8:1$9uGypIgiLHFN5Kh5$45286b231659b83a8338e9df56583afc7776f60a8c695e042bdfef6a2b8ebf33d13623ce2a24d7406bf14af5d9ca009da7f6a6db527e7aed678d840450fb062b', 102, 'sophie_l', 'images/profiles/sophie_l.png', 'sophie@interv.com','user',1);
 
 -- ------------------------------
 -- Historique (Référence Clients et Intervenants)

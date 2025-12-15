@@ -27,25 +27,70 @@ Compétences:
 {% endfor %}
 </h3>
 
-<div style="margin-top: 50px; border-top: 1px solid #ccc; padding-top: 20px;">
-    
-    <form action="{{ url_for('upload_intervenant', id_intervenant=id_intervenant) }}" method="POST">
-        
-        <button type="submit" style="background-color: rgb(39, 157, 242); color: white; padding: 10px; border: none; cursor: pointer;">
-            Télécharger le dossier intervenant de {{ nom }} {{ prenom }}
-        </button>
-        
-    </form>
+
+
+<div style="margin: 20px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+    <strong>Poste actuel :</strong> 
+    {% if role %}
+        <span class="badge bg-secondary">{{ role }}</span>
+    {% else %}
+        <span class="text-muted">Non spécifié</span>
+    {% endif %}
 </div>
-<div style="margin-top: 50px; border-top: 1px solid #ccc; padding-top: 20px;">
-    <h3>Zone de danger</h3>
-    
-    <form action="{{ url_for('supprimer_intervenant', id_intervenant=id_intervenant) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet intervenant ? Tous ses projets seront aussi effacés.');">
+
+{% if session.get('fonction') == 'admin' %}
+
+    <div style="background-color: #ffffff; border: 1px solid #ddd; border-radius: 8px; padding: 25px; margin-top: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         
-        <button type="submit" style="background-color: red; color: white; padding: 10px; border: none; cursor: pointer;">
-            Supprimer le dossier intervenant de {{ nom }} {{ prenom }}
-        </button>
-        
-    </form>
-</div>
+        <h3 style="margin-top: 0; padding-bottom: 15px; border-bottom: 2px solid #007bff; color: #333; font-size: 1.25rem;">
+            <i class="fas fa-user-cog"></i> Administration Intervenant
+        </h3>
+
+        <div style="margin-top: 25px; margin-bottom: 25px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Changer le rôle entreprise :</label>
+            
+            <form action="{{ url_for('definir_role', id_intervenant=id_intervenant) }}" method="POST" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <select name="role_metier" class="form-select" style="max-width: 300px; padding: 5px;">
+                    <option value="" disabled selected>Choisir...</option>
+                    <option value="Développeur" {% if role == 'Développeur' %}selected{% endif %}>Développeur</option>
+                    <option value="Chef de Projet" {% if role == 'Chef de Projet' %}selected{% endif %}>Chef de Projet</option>
+                    <option value="Consultant" {% if role == 'Consultant' %}selected{% endif %}>Consultant</option>
+                    <option value="Commercial" {% if role == 'Commercial' %}selected{% endif %}>Commercial</option>
+                    <option value="Stagiaire" {% if role == 'Stagiaire' %}selected{% endif %}>Stagiaire</option>
+                </select>
+                <button type="submit" style="background-color: #efefef; color: black; border: 1px solid #767676; padding: 5px 10px; border-radius: 2px; cursor: pointer; font-size: 14px;">
+                    Enregistrer
+                </button>
+            </form>
+        </div>
+
+        <hr style="border-top: 1px solid #eee; margin: 30px 0;">
+
+        <div style="margin-bottom: 25px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Documents :</label>
+            <form action="{{ url_for('upload_intervenant', id_intervenant=id_intervenant) }}" method="POST">
+                <button type="submit" style="background-color: #efefef; color: black; border: 1px solid #767676; padding: 5px 15px; border-radius: 2px; cursor: pointer; width: 100%; max-width: 400px; text-align: left;">
+                    Télécharger le dossier complet
+                </button>
+            </form>
+        </div>
+
+        <div style="background-color: #fff5f5; border: 1px solid #ffcccc; padding: 20px; border-radius: 5px; margin-top: 30px;">
+            <h5 style="color: #dc3545; margin-top: 0; font-weight: bold; font-size: 1rem; display: flex; align-items: center;">
+                Zone de Danger
+            </h5>
+            <p style="color: #a71d2a; font-size: 0.9rem; margin-bottom: 15px;">
+                Attention : La suppression est définitive et effacera l'historique.
+            </p>
+            
+            <form action="{{ url_for('supprimer_intervenant', id_intervenant=id_intervenant) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr ? Cette action est irréversible.');">
+                <button type="submit" style="background-color: #efefef; color: black; border: 1px solid #767676; padding: 5px 15px; border-radius: 2px; cursor: pointer; width: 100%; max-width: 400px; text-align: left;">
+                    Supprimer ce compte définitivement
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+{% endif %}
 {% endblock %}

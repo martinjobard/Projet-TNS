@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<body>
+    <h1>Inscriptions en attente</h1>
+
+<table>
+    <tr>
+        <th>Nom d'utilisateur</th>
+        <th>Action</th>
+    </tr>
+    {% for u in utilisateurs %}
+    <tr>
+        <td>{{ u.nom_utilisateur }}</td>
+        <td>
+            <form action="{{ url_for('valider_utilisateur', id=u.idu) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn-success">Valider</button>
+            </form>
+            
+            <form action="{{ url_for('refuser_utilisateur', id=u.idu) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn-danger">Refuser</button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="2">Aucune nouvelle inscription.</td></tr>
+    {% endfor %}
+</table>
+</body>
+{% endblock %}

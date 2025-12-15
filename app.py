@@ -476,22 +476,28 @@ def login():
         
         db = sqlite3.connect(DATABASE)
         c = db.cursor()
-        sql = "SELECT mdp_haché, pdp_url FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+        sql = "SELECT mdp_haché, pdp_url, fonction, status FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
         c.execute(sql, (username,))
         result = c.fetchone()
         db.close()
         if result:
             mdp_hash = result[0]
             pdp_url = result[1]
+            fonction = result[2]
+            status = result[3]
         else:
             mdp_hash = None
             pdp_url = None
         
         if mdp_hash and check_password_hash(mdp_hash, password):
+            if status == 0:
+                erreur = "Compte inactif. Contactez l'administrateur."
+                return render_template('Connexion.html', erreur=erreur)
             # Succès ! Stocker les informations
             session['logged_in'] = True
             session['username'] = username
-            session['pdp_url'] = pdp_url # ⬅️ NOUVEAU : On stocke l'URL dans la session !
+            session['pdp_url'] = pdp_url # On stocke l'URL dans la session !
+            session['fonction'] = fonction if fonction else 'user' # Rôle par défaut 'user'
             return redirect(url_for('Accueil'))
         else:
             # 4. Si les informations sont incorrectes, afficher un message d'erreur
@@ -696,6 +702,7 @@ def Inter_profil(nomcomplet=None):
         I.nom, 
         I.prenom,
         I.dispo,
+        I.role,
         UI.pdp_url,
         UI.nom_utilisateur,
         UI.email_utilisateur,
@@ -723,6 +730,7 @@ def Inter_profil(nomcomplet=None):
     pdp_actuelle = rows[0]['pdp_url']
     nom_utilisateur = rows[0]['nom_utilisateur']
     email_utilisateur = rows[0]['email_utilisateur']
+    role = rows[0]['role']
     
     # 6. On boucle pour récupérer les compétences (si elles existent)
     competences = []
@@ -744,7 +752,8 @@ def Inter_profil(nomcomplet=None):
                            pdp_actuelle=pdp_actuelle,
                            nom_utilisateur=nom_utilisateur,
                            email_utilisateur=email_utilisateur,
-                           titre_page_actuelle="Profil Intervenant"
+                           titre_page_actuelle="Profil Intervenant",
+                           role=role
                            )
 
 
@@ -919,8 +928,8 @@ def Inscription():
             # --- 5D. Insertion dans Utilisateur_Intervenant (Compte de Connexion) ---
             sql_utilisateur = """
                 INSERT INTO Utilisateur_Intervenant 
-                (mdp_haché, idi, nom_utilisateur, pdp_url, email_utilisateur) 
-                VALUES (?, ?, ?, ?, ?)
+                (mdp_haché, idi, nom_utilisateur, pdp_url, email_utilisateur, fonction, status) 
+                VALUES (?, ?, ?, ?, ?, 'user', 0)
             """
             # Valeurs par défaut : pdp_url est vide au départ
             pdp_default = ''
@@ -1063,6 +1072,10 @@ def supprimer_client(id_clients):
     if 'logged_in' not in session:
         return redirect(url_for('Connexion'))
     
+    if session.get('fonction') != 'admin':
+        flash("Action non autorisée. Vous devez être administrateur.", "error")
+        return redirect(url_for('Clients'))
+    
     db = get_db()
     cursor = db.cursor()
     
@@ -1085,6 +1098,10 @@ def supprimer_client(id_clients):
 def upload_client(id_clients):
     if 'logged_in' not in session:
         return redirect(url_for('Connexion'))
+    
+    if session.get('fonction') != 'admin':
+        flash("Action non autorisée. Vous devez être administrateur.", "error")
+        return redirect(url_for('Clients'))
     
     db = get_db()
     c = db.cursor()
@@ -1155,6 +1172,10 @@ def supprimer_intervenant(id_intervenant):
     if 'logged_in' not in session:
         return redirect(url_for('Connexion'))
     
+    if session.get('fonction') != 'admin':
+        flash("Action non autorisée. Vous devez être administrateur.", "error")
+        return redirect(url_for('Intervenants'))
+    
     db = get_db()
     cursor = db.cursor()
     
@@ -1202,6 +1223,10 @@ def supprimer_intervenant(id_intervenant):
 def upload_intervenant(id_intervenant):
     if 'logged_in' not in session:
         return redirect(url_for('Connexion'))
+    
+    if session.get('fonction') != 'admin':
+        flash("Action non autorisée. Vous devez être administrateur.", "error")
+        return redirect(url_for('Intervenants'))
     
     db = get_db()
     c = db.cursor()
@@ -1363,6 +1388,82 @@ def export_mission(id_projet):
         )    
     except Exception as e:
         return f"Erreur lors de l'export : {e}"
+
+@app.route('/admin/utilisateurs_en_attente')
+def admin_validation():
+    # 1. Sécurité (Comme vu précédemment)
+    if session.get('fonction') != 'admin':
+        return redirect(url_for('Accueil'))
+    
+    db = get_db()
+    cursor = db.cursor()
+    
+    # On cherche uniquement ceux qui ne sont pas validés (0)
+    cursor.execute("SELECT * FROM Utilisateur_Intervenant WHERE status = 0")
+    utilisateurs_en_attente = cursor.fetchall()
+    
+    return render_template('admin_validation.html', utilisateurs=utilisateurs_en_attente)
+
+@app.route('/admin/valider/<int:id>', methods=['POST'])
+def valider_utilisateur(id):
+    if session.get('fonction') != 'admin':
+        return redirect(url_for('Connexion'))
+        
+    db = get_db()
+    db.execute("UPDATE Utilisateur_Intervenant SET status = 1 WHERE idu = ?", (id,))
+    db.commit()
+    
+    flash("Utilisateur validé avec succès.", "success")
+    return redirect(url_for('admin_validation'))
+
+@app.route('/admin/refuser/<int:id>', methods=['POST'])
+def refuser_utilisateur(id):
+    if session.get('fonction') != 'admin':
+        return redirect(url_for('Connexion'))
+        
+    db = get_db()
+    # Si on refuse, on supprime carrément la demande d'inscription
+    # On doit aussi supprimer l'intervenant lié
+    cursor = db.cursor()
+    cursor.execute("SELECT idi FROM Utilisateur_Intervenant WHERE idu = ?", (id,))
+    result = cursor.fetchone()
+    id_intervenant = result['idi'] if result else None
+    if id_intervenant:
+        db.execute("DELETE FROM Intervenants WHERE idi = ?", (id_intervenant,))
+    db.execute("DELETE FROM Utilisateur_Intervenant WHERE idu = ?", (id,))    
+    db.commit()
+    
+    flash("Inscription refusée et supprimée.", "warning")
+    return redirect(url_for('admin_validation'))
+
+@app.route('/admin/definir_role/<int:id_intervenant>', methods=['POST'])
+def definir_role(id_intervenant):
+    # 1. SÉCURITÉ : Seul l'admin peut faire ça
+    if session.get('fonction') != 'admin':
+        flash("Action non autorisée.", "error")
+        return redirect(url_for('profil_intervenant', id=id_intervenant))
+    
+    # 2. Récupération du nouveau rôle depuis le formulaire
+    nouveau_role = request.form.get('role_metier')
+    
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        # On met à jour la colonne 'role' de la table Intervenants
+        db.execute("UPDATE Intervenants SET role = ? WHERE idi = ?", (nouveau_role, id_intervenant))
+        db.commit()
+        flash(f"Le rôle a été modifié en : {nouveau_role}", "success")
+        cursor.execute("SELECT nom, prenom FROM Intervenants WHERE idi = ?", (id_intervenant,))
+        row = cursor.fetchone()
+        
+        if row:
+            # On reconstruit le format "Nom.Prenom" attendu par ta route
+            nom_complet_url = f"{row['nom']}.{row['prenom']}"
+            return redirect(url_for('Inter_profil', nomcomplet=nom_complet_url))
+        
+    except Exception as e:
+        flash(f"Erreur lors de la mise à jour : {e}", "error")
+    return redirect(url_for('Accueil'))
 
 
 if __name__ == '__main__':
