@@ -70,6 +70,9 @@
                         <li><a href="{{ url_for('tinder_like') }}">Tinder Like</a></li>
                     </ul>
                 </li>
+                {% if session.get('fonction') == 'admin' %}
+                    <li ><a href="{{ url_for('admin_validation') }}">Validation des inscriptions</a></li>
+                {% endif %}
             </ul>
         </nav>
     </aside>

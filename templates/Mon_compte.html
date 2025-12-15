@@ -123,30 +123,47 @@
 </div>
 
 
-<div> 
-    stats de {{nom_utilisateur}}  
-    <a href="{{ url_for('Stats') }}">statistiques de {{nom_utilisateur}} </a>
-</div> 
-<div> 
-    {% if lien_intervenant %}
-        Profil public :
-        <a href="{{ url_for('Inter_profil', nomcomplet=lien_intervenant) }}">
-            Voir le profil de {{nom_utilisateur}}
+<div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
+    
+    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+        <span style="font-weight: bold; min-width: 120px;">Statistiques :</span>
+        
+        <a href="{{ url_for('Stats') }}" 
+           style="background-color: #f0f0f0; color: #333; border: 1px solid #ccc; padding: 6px 15px; text-decoration: none; border-radius: 3px; font-size: 14px; display: inline-block; cursor: pointer;">
+           <i class="fas fa-chart-bar" style="margin-right: 5px;"></i> Voir les stats de {{nom_utilisateur}}
         </a>
-    {% else %}
-        <p>Votre compte n'est pas lié à une fiche intervenant publique.</p>
-    {% endif %}
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 15px;">
+        {% if lien_intervenant %}
+            <span style="font-weight: bold; min-width: 120px;">Profil public :</span>
+            
+            <a href="{{ url_for('Inter_profil', nomcomplet=lien_intervenant) }}" 
+               style="background-color: #f0f0f0; color: #333; border: 1px solid #ccc; padding: 6px 15px; text-decoration: none; border-radius: 3px; font-size: 14px; display: inline-block; cursor: pointer;">
+                <i class="fas fa-eye" style="margin-right: 5px;"></i> Voir le profil de {{nom_utilisateur}}
+            </a>
+        {% else %}
+            <span style="font-weight: bold; min-width: 120px;">Profil public :</span>
+            <span style="color: #777; font-style: italic;">Votre compte n'est pas lié à une fiche intervenant publique.</span>
+        {% endif %}
+    </div>
+
 </div>
 
-<p>
+<div style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
+    
+    <a href="{{ url_for('telecharger_donnees') }}" 
+       style="background-color: #17a2b8; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; border: none; display: inline-block;">
+       Télécharger mes données
+    </a>
+
     <a href="{{ url_for('supprimer_compte') }}" 
        onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement votre compte ? Cette action est irréversible.');"
-       style="color: red; font-weight: bold;">
+       style="background-color: #dc3545; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; border: none; display: inline-block;">
        Supprimer le compte
-    </a> 
-    | 
-    <a href="{{ url_for('telecharger_donnees') }}">Télécharger mes données</a>
-</p>
+    </a>
+
+</div>
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock %}
