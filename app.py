@@ -1,6 +1,6 @@
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
-from flask import Flask, render_template, request, url_for, session, redirect, g, Response, flash
+from flask import Flask, render_template, request, url_for, session, redirect, g, Response, flash, jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 import os
@@ -1254,6 +1254,62 @@ def upload_intervenant(id_intervenant):
 
     except Exception as e:
         return f"Erreur lors de l'export : {e}"
+
+
+
+@app.route('/api/recherche/clients', methods=['GET'])
+def recherche_secteur_client():
+    """
+    Récupère le secteur depuis l'URL et renvoie les liens de profil correspondants.
+    """
+    secteur = request.args.get('secteur', default='', type=str).strip()
+    
+    if not secteur:
+        return jsonify({"profils": [], "message": "Le paramètre 'secteur' est manquant."}), 400
+
+
+    profils = []
+    
+    try:
+        db = get_db()
+        c = db.cursor()
+        
+        # 1. Préparation de la valeur de recherche pour la fonction LIKE
+    
+        search_secteur = f"%{secteur}%"
+
+        # 2. La Requête SQL avec le Placeholder Sécurisé (?)
+        # La requête est sécurisée contre l'injection SQL
+        sql = """
+        SELECT
+            nom, prenom
+        FROM
+            Clients
+        WHERE
+            secteur LIKE ?; 
+        """
+        
+        # 3. Exécution de la Requête PRÉPARÉE
+        c.execute(sql, (search_secteur,)) 
+        
+        results = c.fetchall()
+        for row in results:
+                    prenom = row['prenom'].lower()
+                    nom = row['nom'].lower()
+                    lien_profil = f"/Clients/{nom}.{prenom}"   
+                    profils.append(lien_profil) 
+                  
+        
+     
+    except sqlite3.Error as e:
+            print(f"Erreur de base de données SQLite : {e}")
+            return jsonify({"profils": [], "error": "Erreur serveur lors de l'accès à la base de données."}), 500  
+   
+
+    return jsonify({
+        "profils": profils,
+        "count": len(profils),
+    })
 
 
 if __name__ == '__main__':

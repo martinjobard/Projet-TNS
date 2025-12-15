@@ -309,3 +309,64 @@ document.getElementById('btn-add-competence').addEventListener('click', function
                 alert("Vous devez avoir au moins une compétence.");
             }
         }   
+
+document.getElementById('SearchFormSecteurClient').addEventListener('submit', function(event) {
+            event.preventDefault(); // Empêche le rechargement de la page
+            const secteur = document.getElementById('secteur-input').value.trim();
+
+            if (secteur) {
+                fetchClientProfiles(secteur);
+            }
+        });
+
+        function fetchClientProfiles(secteur) {
+            // Encode l'entrée utilisateur pour la sécurité de l'URL
+            const encodedSecteur = encodeURIComponent(secteur);
+            const url = `/api/recherche/clients?secteur=${encodedSecteur}`;
+
+            // Envoi de la requête asynchrone au backend (Flask)
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        // Gère les erreurs HTTP (400, 500)
+                        throw new Error(`Erreur HTTP: ${response.status}`);
+                    }
+                    return response.json(); // Le backend répond en JSON
+                })
+                .then(data => {
+                    // data.profils contient le tableau des liens renvoyés par Flask
+                    afficherResultats(data.profils);
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la recherche :', error);
+                    document.getElementById('resultats-secteur').innerHTML = `<p class="error">Erreur serveur : ${error.message}</p>`;
+                });
+        }
+
+        function afficherResultats(profils) {
+            const container = document.getElementById('resultats-secteur');
+            container.innerHTML = ''; // Nettoyage des anciens résultats
+            
+            if (profils.length === 0) {
+                container.innerHTML = '<p>Aucun client trouvé pour ce secteur d\'activité.</p>';
+                return;
+            }
+
+            const ul = document.createElement('ul');
+            profils.forEach(link => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                const parts = link.split('/');
+                const nom_lien=parts[parts.length - 1]
+            
+                
+                // Les résultas de la recherche sont les liens des
+                a.href = link; 
+                a.textContent = nom_lien ;
+                a.target = "_blank";
+                
+                li.appendChild(a);
+                ul.appendChild(li);
+            });
+            container.appendChild(ul);
+        }
