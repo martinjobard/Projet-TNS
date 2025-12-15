@@ -637,7 +637,7 @@ def supprimer_compte():
         if idi_a_supprimer:
             cursor.execute("DELETE FROM Intervenants WHERE idi = ?", (idi_a_supprimer,))
 
-        # ÉTAPE 4 : Supprimer la fiche PC et recuperer les compétences associées
+        # ÉTAPE 4 : Supprimer la fiche PC 
         if idi_a_supprimer:
             cursor.execute("DELETE FROM PossedeCompetence WHERE idi = ?", (idi_a_supprimer,)) 
 
@@ -691,7 +691,8 @@ def Inter_profil(nomcomplet=None):
     # PC = PossedeCompetence
     # C  = Competences
     sql = """
-    SELECT 
+    SELECT
+        I.idi,
         I.nom, 
         I.prenom,
         I.dispo,
@@ -715,6 +716,7 @@ def Inter_profil(nomcomplet=None):
        return render_template("error_intervenant.html", message="Intervenant non trouvé")
 
     # 5. On récupère les infos de base (sur la première ligne)
+    id_intervenant = rows[0]['idi']
     nom_affiche = normalize_text(rows[0]['nom'])
     prenom_affiche = normalize_text(rows[0]['prenom'])
     dispo = rows[0]['dispo']
@@ -733,7 +735,8 @@ def Inter_profil(nomcomplet=None):
                 "niveau": row["niveau"]
             })
 
-    return render_template('Intervenant_profil.html', 
+    return render_template('Intervenant_profil.html',
+                           id_intervenant=id_intervenant,
                            nom=nom_affiche, 
                            prenom=prenom_affiche, 
                            competences=competences,
@@ -765,6 +768,7 @@ def Client_profil(nomcomplet=None):
     # P = Projets
     sql = """
     SELECT 
+        C.idc,
         C.nom, 
         C.prenom, 
         C.secteur, 
@@ -787,6 +791,7 @@ def Client_profil(nomcomplet=None):
        return render_template("error_client.html", message="Nous n'avons pas encore travaillé avec cette personne, vérifiez peut-être l'orthographe ")
 
     # 5. On récupère les infos de base (sur la première ligne)
+    id_clients = rows[0]['idc']
     nom_affiche = rows[0]['nom']
     prenom_affiche = rows[0]['prenom']
     secteur=rows[0]['secteur']
@@ -806,7 +811,8 @@ def Client_profil(nomcomplet=None):
                 "etat": row["etat"]
             })
 
-    return render_template('Client_profil.html', 
+    return render_template('Client_profil.html',
+                           id_clients = id_clients,
                            nom=nom_affiche, 
                            prenom=prenom_affiche, 
                            secteur=secteur,
@@ -1051,6 +1057,204 @@ def import_clients():
             return redirect(url_for('Import_Export'))
 
     return redirect(url_for('Import_Export'))
+
+@app.route('/supprimer_client/<int:id_clients>', methods=['POST'])
+def supprimer_client(id_clients):
+    if 'logged_in' not in session:
+        return redirect(url_for('Connexion'))
+    
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        cursor.execute("DELETE FROM Projets WHERE idc = ?", (id_clients,))
+        cursor.execute("DELETE FROM Historique WHERE idc = ?", (id_clients,))
+        cursor.execute("DELETE FROM Clients WHERE idc = ?", (id_clients,))
+        
+        # Valider les changements
+        db.commit()
+        flash("Le compte client a été supprimé définitivement.", "success")
+        return redirect(url_for('Clients'))
+        
+    except Exception as e:
+        db.rollback()
+        print(f"Erreur SQL : {e}")
+        return f"Erreur lors de la suppression du client : {e}"
+    
+@app.route('/upload_client/<int:id_clients>', methods=['POST'])
+def upload_client(id_clients):
+    if 'logged_in' not in session:
+        return redirect(url_for('Connexion'))
+    
+    db = get_db()
+    c = db.cursor()
+    
+    try:
+        # 1. Récupération des infos utilisateur
+        sql = "SELECT C.nom, C.prenom, C.email, C.telephone, C.secteur, C.dernier_contact, C.nom_entreprise, H.date, H.interaction_text, P.etat, P.budget, P.deb, P.fin, P.titre_projet FROM Clients C LEFT JOIN Projets P ON P.idc = C.idc LEFT JOIN Historique H ON H.idc = C.idc WHERE C.idc = ?"
+        c.execute(sql, (id_clients,))
+        rows = c.fetchall()
+        
+        db.close()
+
+        if rows:
+            first_row = rows[0]
+            # Agrégation des compétences
+            liste_historique = []
+            for row in rows:
+                if row['date']:
+                    liste_historique.append({
+                        "date": row['date'],
+                        "interaction_text": row['interaction_text']
+                    })
+            liste_projets = []
+            for row in rows:
+                if row['date']:
+                    liste_projets.append({
+                        "titre_projet": row['titre_projet'],
+                        "etat": row['etat'],
+                        "budget": row['budget'],
+                        "deb": row['deb'],
+                        "fin": row['fin'],
+                    })
+            # 2. Création du dictionnaire de données
+            donnees = {
+                "profil_client": {
+                    "nom": first_row['nom'],
+                    "prenom": first_row['prenom'],
+                    "email": first_row['email'],
+                    "telephone": first_row['telephone'],
+                    "secteur": first_row['secteur'],
+                    "dernier_contact": first_row['dernier_contact'],
+                    "nom_entreprise": first_row['nom_entreprise'],
+                    "historique": liste_historique,
+                    "projets" : liste_projets
+                    
+                },
+                "statut": "Actif",
+                "date_export": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            
+            # 3. Conversion en JSON
+            json_str = json.dumps(donnees, indent=4, ensure_ascii=False)
+            
+            # 4. Création de la réponse "Fichier à télécharger"
+            return Response(
+                json_str,
+                mimetype="application/json",
+                headers={"Content-Disposition": f"attachment;filename=donnees_{id_clients}.json"}
+            )
+        else:
+            return "Erreur : Données introuvables", 404
+
+    except Exception as e:
+        return f"Erreur lors de l'export : {e}"
+    
+@app.route('/supprimer_intervenant/<int:id_intervenant>', methods=['POST'])
+def supprimer_intervenant(id_intervenant):
+    if 'logged_in' not in session:
+        return redirect(url_for('Connexion'))
+    
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        # --- ÉTAPE 1 : VÉRIFICATION (Est-ce mon propre compte ?) ---
+        # On regarde à quel nom d'utilisateur appartient cet ID intervenant
+        sql_check = "SELECT nom_utilisateur FROM Utilisateur_Intervenant WHERE idi = ?"
+        cursor.execute(sql_check, (id_intervenant,))
+        result = cursor.fetchone()
+        
+        # On prépare un "drapeau" (flag) pour savoir si on devra déconnecter à la fin
+        c_est_mon_compte = False
+        if result:
+            # Si le nom d'utilisateur lié à cet ID est le même que celui dans la session actuelle
+            if result['nom_utilisateur'] == session.get('username'):
+                c_est_mon_compte = True
+
+        cursor.execute("DELETE FROM Utilisateur_Intervenant WHERE idi = ?", (id_intervenant,))
+        cursor.execute("DELETE FROM PossedeCompetence WHERE idi = ?", (id_intervenant,))
+        cursor.execute("DELETE FROM Participation WHERE idi = ?", (id_intervenant,))
+        cursor.execute("DELETE FROM Historique WHERE idi = ?", (id_intervenant,))
+        cursor.execute("DELETE FROM Documents WHERE idi = ?", (id_intervenant,))
+        cursor.execute("DELETE FROM Intervenants WHERE idi = ?", (id_intervenant,))
+
+        db.commit()
+        
+        # --- ÉTAPE 3 : LOGIQUE DE REDIRECTION ---
+        if c_est_mon_compte:
+            # Si j'ai supprimé mon propre compte, je vide la session et je vais au login
+            session.clear()
+            flash("Votre compte a été supprimé avec succès. Au revoir !", "info")
+            return redirect(url_for('Connexion')) # Assurez-vous que la route s'appelle bien 'Connexion' ou 'login'
+        else:
+            # Si c'est un admin qui supprime un autre collègue, on reste sur la liste
+            flash("Le compte intervenant a été supprimé définitivement.", "success")
+            return redirect(url_for('Intervenants')) # Ou 'Accueil' selon votre préférence
+        
+    except Exception as e:
+        db.rollback()
+        print(f"Erreur SQL : {e}")
+        flash(f"Erreur lors de la suppression : {e}", "error")
+        return redirect(url_for('Intervenants')) # Redirection de sécurité en cas d'erreur  
+    
+@app.route('/upload_intervenant/<int:id_intervenant>', methods=['POST'])
+def upload_intervenant(id_intervenant):
+    if 'logged_in' not in session:
+        return redirect(url_for('Connexion'))
+    
+    db = get_db()
+    c = db.cursor()
+    
+    try:
+        # 1. Récupération des infos utilisateur
+        sql = "SELECT UI.nom_utilisateur, UI.email_utilisateur, UI.pdp_url, I.role, I.prenom, I.nom, PC.niveau, C.competence FROM Utilisateur_Intervenant UI LEFT JOIN Intervenants I ON UI.idi = I.idi LEFT JOIN PossedeCompetence PC ON I.idi = PC.idi LEFT JOIN Competences C ON PC.idcomp = C.idcomp WHERE I.idi = ?"
+        c.execute(sql, (id_intervenant,))
+        rows = c.fetchall()
+        
+        db.close()
+
+        if rows:
+            first_row = rows[0]
+            # Agrégation des compétences
+            liste_competences = []
+            for row in rows:
+                if row['competence']:
+                    liste_competences.append({
+                        "competence": row['competence'],
+                        "niveau": row['niveau']
+                    })
+            # 2. Création du dictionnaire de données
+            donnees = {
+                "profil": {
+                    "nom_utilisateur": first_row['nom_utilisateur'],
+                    "email": first_row['email_utilisateur'],
+                    "photo_profil": first_row['pdp_url'],
+                    "role": first_row['role'],
+                    "prenom": first_row['prenom'],
+                    "nom": first_row['nom'],
+                    "competences": liste_competences
+                    
+                },
+                "statut": "Actif",
+                "date_export": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            
+            # 3. Conversion en JSON
+            json_str = json.dumps(donnees, indent=4, ensure_ascii=False)
+            
+            # 4. Création de la réponse "Fichier à télécharger"
+            return Response(
+                json_str,
+                mimetype="application/json",
+                headers={"Content-Disposition": f"attachment;filename=donnees_{id_intervenant}.json"}
+            )
+        else:
+            return "Erreur : Données introuvables", 404
+
+    except Exception as e:
+        return f"Erreur lors de l'export : {e}"
+
 
 if __name__ == '__main__':
     app.run(debug=True)
