@@ -110,18 +110,21 @@ def Projets():
 
 @app.route('/Intervenants')
 def Intervenants():
+
     redirect_if_needed = require_login()
     if redirect_if_needed:
         return redirect_if_needed
     
     db = get_db()
     c = db.cursor()
+    titre_site = "Site interne TNS"
+    titre_page_actuelle = "Intervenants"
+    
+    rows=[]
     sql="SELECT nom, prenom FROM Intervenants "
-
     c.execute(sql)
     rows = c.fetchall()
 
-    # 5. On récupère les infos de base (sur la première ligne)
     nom_affiche = normalize_text(rows[0]['nom'])
     prenom_affiche = normalize_text(rows[0]['prenom'])
     
@@ -136,59 +139,98 @@ def Intervenants():
             "prenom":prenom , 
             "lien": lien
         })
-    titre_site = "Site interne TNS"
-    titre_page_actuelle = "Intervenants"
-    # recuperer la personne qui a le plus fait de missions
+
+    
+
+
+# FELICITER LA OU LES DEUX PERSONNES QUI ONT REALISE LE PLUS DE PROJET 
     sql1="""
-    SELECT Intervenants.nom, Intervenants.prenom, COUNT(Participation.idi) AS nb_projets
+    SELECT nom, prenom, COUNT(Participation.idi) as nb_projets
     FROM Intervenants
     LEFT JOIN Participation ON Intervenants.idi = Participation.idi
     LEFT JOIN Projets ON Projets.idp=Participation.idp
-    GROUP BY Intervenants.nom, Intervenants.prenom
+    GROUP BY nom, prenom
     ORDER BY nb_projets DESC
-    LIMIT 1
+    LIMIT 3  
     """
     c.execute(sql1)
-    honors1sql=c.fetchall()
-    nom=honors1sql[0][0]
-    prenom=honors1sql[0][1]
-    honors1 = f"{nom} {prenom}"
-    honors1count=honors1sql[0][2]
     
-    # recuperer la personne qui a gere le projet avec le plus d'argent
-    sql2="""SELECT nom, prenom FROM Intervenants 
-    LEFT JOIN Participation ON Intervenants.idi=Participation.idi 
-    LEFT JOIN Projets ON Participation.idp=Projets.idp 
-    WHERE Projets.fin IS NOT NULL
-    ORDER BY Projets.budget DESC LIMIT 1 
-    """
-    c.execute(sql2)
-    honors2sql=c.fetchall()
-    nom=honors2sql[0][0]
-    prenom=honors2sql[0][1]
-    honors2 = f"{nom} {prenom}"
-   
-    #les intervenants sur le projet qui s'est fini ya le moins longtemps
+    top_3 = c.fetchall()
+    
 
-    #bon courage pour le projet qui commence
-    sql3="""SELECT nom, prenom FROM Intervenants 
-    LEFT JOIN Participation ON Intervenants.idi=Participation.idi 
-    LEFT JOIN Projets ON Participation.idp=Projets.idp 
-    ORDER BY Projets.deb DESC LIMIT 1 
+    if len(top_3) > 0:
+    
+    # Le meilleur score 
+        score_max = top_3[0][2] 
+    
+    # On compte combien de gens ont ce score max dans notre liste de 3
+    # (On crée une liste temporaire avec tous les gagnants ex-aequo)
+    gagnants = [p for p in top_3 if p[2] == score_max]
+    
+    nb_gagnants = len(gagnants)
+        
+    if nb_gagnants == 1:
+        
+        p = gagnants[0]
+        honors1 = [f"{p[0]} {p[1]} qui a réalisé {p[2]} projets"]
+        
+    elif nb_gagnants == 2:
+        p1 = gagnants[0]
+        p2 = gagnants[1]
+        honors1=[]
+        honors1.append(f"{p1[0]} {p1[1]} et {p2[0]} {p2[1]} ({p1[2]} projets)")
+        
+    else: 
+       pass 
+  
+#BON COURAGE POUR LE PROJET QUI VIENT DE SE FINIR
+    sql3="""SELECT Intervenants.nom, Intervenants.prenom 
+    FROM Intervenants 
+    LEFT JOIN Participation ON Intervenants.idi = Participation.idi 
+    WHERE Participation.idp = (
+    
+    SELECT idp FROM Projets WHERE fin='' 
+    ORDER BY deb DESC 
+    LIMIT 1)
+    
     """
     c.execute(sql3)
-    honors3sql=c.fetchall()
-    nom=honors3sql[0][0]
-    prenom=honors3sql[0][1]
-    honors3= f"{nom} {prenom}"
+    honors3sql = c.fetchall()
+    honors3=[]
+    for row in honors3sql:
+        nom=row[0]
+        prenom=row[1]
+        membre=f"{nom} {prenom}"
+        honors3.append(membre)
 
+ 
+#les intervenants sur le projet qui s'est fini ya le moins longtemps
 
+    sql4="""SELECT Intervenants.nom, Intervenants.prenom 
+    FROM Intervenants 
+    LEFT JOIN Participation ON Intervenants.idi = Participation.idi 
+    WHERE Participation.idp = (
+    
+    SELECT idp FROM Projets 
+    ORDER BY fin  
+    LIMIT 1)
+    """
+    c.execute(sql4)
+    honors4sql=c.fetchall()
+    honors4=[]
+    
+    for row in honors4sql:
+        nom=row[0]
+        prenom=row[1]
+        membre=f"{nom} {prenom}"
+        honors4.append(membre)
 
 
 
     return render_template('Intervenants.html', titre=titre_site,
                             titre_page_actuelle=titre_page_actuelle, intervenants=intervenants, 
-                            honors1=honors1, nbr_projet=honors1count, honors2=honors2, honors3=honors3)
+                            honors1=honors1, honors3=honors3,
+                            honors4=honors4)
 
 @app.route('/Import-Export')
 def Import_Export():
