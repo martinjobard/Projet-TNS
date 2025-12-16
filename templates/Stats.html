@@ -11,6 +11,9 @@
         
         <label style="font-weight:bold; color:#333;">Voir :</label>
         <select name="target_idi" onchange="this.form.submit()" style="margin-right: 20px; border: 2px solid #007bff;">
+            <option value="all" {% if selected_id == 'all' %}selected{% endif %} >
+                Tout le monde
+            </option>
             {% for user in intervenants %}
                 <option value="{{ user.idi }}" {% if user.idi == selected_id %}selected{% endif %}>
                     {{ user.prenom|capitalize }} {{ user.nom|upper }}
@@ -44,10 +47,6 @@
             <span>Nb Projets en cours</span>
             <strong>{{ nb_projects }}</strong>
         </div>
-        <div class="kpi">
-            <span>CA</span>
-            <strong>{{ ca }}</strong>
-        </div>
     </div>
 
     <!-- COURBE -->
@@ -68,7 +67,7 @@
             <tr>
                 <th>Client</th>
                 <th>Secteur</th>
-                <th>Projet</th>
+                <th>Rôle</th>
                 <th>État</th>
                 <th>Date</th>
             </tr>
@@ -78,7 +77,7 @@
             <tr>
                 <td>{{ row.client }}</td>
                 <td>{{ row.sector }}</td>
-                <td>{{ row.project }}</td>
+                <td>{{ row.role }}</td>
                 <td>{{ row.status }}</td>
                 <td>{{ row.date }}</td>
             </tr>
