@@ -30,7 +30,8 @@ CREATE TABLE Intervenants (
     nb_heure INTEGER,
     dispo TEXT, 
     nom TEXT NOT NULL, 
-    prenom TEXT
+    prenom TEXT,
+    date_inscription TEXT
 );
 
 CREATE TABLE Competences (
