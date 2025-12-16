@@ -113,9 +113,32 @@ def Intervenants():
     redirect_if_needed = require_login()
     if redirect_if_needed:
         return redirect_if_needed
+    
+    db = get_db()
+    c = db.cursor()
+    sql="SELECT nom, prenom FROM Intervenants "
+
+    c.execute(sql)
+    rows = c.fetchall()
+
+    # 5. On récupère les infos de base (sur la première ligne)
+    nom_affiche = normalize_text(rows[0]['nom'])
+    prenom_affiche = normalize_text(rows[0]['prenom'])
+    
+    intervenants = []
+    for row in rows:
+        nom=row["nom"]
+        prenom=row["prenom"]
+        lien=f"{nom}.{prenom}"
+        intervenants.append({
+            
+            "nom": nom, 
+            "prenom":prenom , 
+            "lien": lien
+        })
     titre_site = "Site interne TNS"
     titre_page_actuelle = "Intervenants"
-    return render_template('Intervenants.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle)
+    return render_template('Intervenants.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle, intervenants=intervenants)
 
 @app.route('/Import-Export')
 def Import_Export():

@@ -11,4 +11,15 @@
     <button type="submit">Rechercher</button>
 </form>
 
+<h2>
+    Tous nos intervenants:
+</h2>
+{% for int in intervenants %}
+<li> <a href= "/Intervenants/{{int.lien}}" > {{int.nom}} {{int.prenom}} </a>
+ </li>
+
+{% endfor %}
+
+
+
 {% endblock %}
