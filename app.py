@@ -138,7 +138,57 @@ def Intervenants():
         })
     titre_site = "Site interne TNS"
     titre_page_actuelle = "Intervenants"
-    return render_template('Intervenants.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle, intervenants=intervenants)
+    # recuperer la personne qui a le plus fait de missions
+    sql1="""
+    SELECT Intervenants.nom, Intervenants.prenom, COUNT(Participation.idi) AS nb_projets
+    FROM Intervenants
+    LEFT JOIN Participation ON Intervenants.idi = Participation.idi
+    LEFT JOIN Projets ON Projets.idp=Participation.idp
+    GROUP BY Intervenants.nom, Intervenants.prenom
+    ORDER BY nb_projets DESC
+    LIMIT 1
+    """
+    c.execute(sql1)
+    honors1sql=c.fetchall()
+    nom=honors1sql[0][0]
+    prenom=honors1sql[0][1]
+    honors1 = f"{nom} {prenom}"
+    honors1count=honors1sql[0][2]
+    
+    # recuperer la personne qui a gere le projet avec le plus d'argent
+    sql2="""SELECT nom, prenom FROM Intervenants 
+    LEFT JOIN Participation ON Intervenants.idi=Participation.idi 
+    LEFT JOIN Projets ON Participation.idp=Projets.idp 
+    WHERE Projets.fin IS NOT NULL
+    ORDER BY Projets.budget DESC LIMIT 1 
+    """
+    c.execute(sql2)
+    honors2sql=c.fetchall()
+    nom=honors2sql[0][0]
+    prenom=honors2sql[0][1]
+    honors2 = f"{nom} {prenom}"
+   
+    #les intervenants sur le projet qui s'est fini ya le moins longtemps
+
+    #bon courage pour le projet qui commence
+    sql3="""SELECT nom, prenom FROM Intervenants 
+    LEFT JOIN Participation ON Intervenants.idi=Participation.idi 
+    LEFT JOIN Projets ON Participation.idp=Projets.idp 
+    ORDER BY Projets.deb DESC LIMIT 1 
+    """
+    c.execute(sql3)
+    honors3sql=c.fetchall()
+    nom=honors3sql[0][0]
+    prenom=honors3sql[0][1]
+    honors3= f"{nom} {prenom}"
+
+
+
+
+
+    return render_template('Intervenants.html', titre=titre_site,
+                            titre_page_actuelle=titre_page_actuelle, intervenants=intervenants, 
+                            honors1=honors1, nbr_projet=honors1count, honors2=honors2, honors3=honors3)
 
 @app.route('/Import-Export')
 def Import_Export():
