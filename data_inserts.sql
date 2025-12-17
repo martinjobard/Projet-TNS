@@ -13,10 +13,10 @@ INSERT INTO Clients (idc, nom, prenom, email, telephone, secteur, dernier_contac
 -- Intervenants (Parents)
 -- ------------------------------
 INSERT INTO Intervenants (idi, role, nb_heure, dispo, nom, prenom, date_inscription) VALUES
-(101, 'Président', 35, 'Oui', 'dubois', 'marc', '03/09/2024'),
-(102, 'Développeur Senior', 30, 'Oui', 'lefevre', 'sophie', '12/11/2025'),
-(103, 'Designer UX/UI', 20, 'Non', 'martin', 'pierre', '05/03/2025'),
-(104, 'Consultant', 40, 'Oui', 'bernard', 'julie', '03/02/2024');
+(101, 'Président', 35, 'Oui', 'dubois', 'marc', '2024-09-02'),
+(102, 'Développeur Senior', 30, 'Oui', 'lefevre', 'sophie', '2025-12-11'),
+(103, 'Designer UX/UI', 20, 'Non', 'martin', 'pierre', '2025-03-05'),
+(104, 'Consultant', 40, 'Oui', 'bernard', 'julie', '2024-02-11');
 
 -- ------------------------------
 -- Compétences (Parents)
