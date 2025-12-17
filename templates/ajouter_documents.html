@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Ajouter un document</h1>
+    <form method="POST" action="{{ url_for('ajouter_documents') }}" enctype="multipart/form-data">
+        
+        <label class="label">Pour quel projet ?</label>
+        <select name="id_projet" class="select" required>
+            <option value="" disabled selected>Choisir un projet</option>
+            {% for p in projets %}
+                <option value="{{ p['idp']}}">{{ p['titre_projet'] }}</option>
+            {% endfor %}
+        </select>
+
+        <label class="label">Votre fichier :</label>
+        <input type="file" name="fichier" class="control" required>
+
+        <button type="submit" class="btn-primary">Envoyer</button>
+        <a href="{{ url_for('Missions_réalisées') }}" class="btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}
