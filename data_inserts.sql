@@ -90,3 +90,12 @@ INSERT INTO InteractionClient (idic, idc, idp, date_interaction, type_interactio
 (3002, 1, 1001, '2025-03-15', 'Email', 'Relance concernant les accès au serveur FTP pour commencer le déploiement.'),
 (3003, 3, 1004, '2025-03-16', 'Appel', 'Le client demande si on peut ajouter une option multilingue. Devis complémentaire à prévoir.'), 
 (3004, 1, 1003, '2025-03-16', 'Appel', 'Le client demande si on peut ajouter une option multilingue. Devis complémentaire à prévoir.');
+
+-- ------------------------------
+-- ProjetNecessite (Référence Competence et Projets)
+-- ------------------------------
+INSERT INTO ProjetNecessite (idp, idcomp, niveau_requis) VALUES
+(1001, 1, 'Expert'),
+(1001, 2, 'Intermédiaire'),
+(1001, 3, 'Debutant'),
+(1002, 5, 'Avancé');
