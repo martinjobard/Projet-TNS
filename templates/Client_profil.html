@@ -37,6 +37,50 @@
        </p>
         
 </li>
+<li>{% if interactions_done %}
+    PROJET TERMINÉS:
+    {% for idp, liste_messages in interactions_done.items() %}
+   <div class="projet-section">
+        <h3>Projet : {{ idp }}</h3>
+        
+        <ul>
+        {% for m in liste_messages %}
+            <p>
+                <strong>[{{ m.date }}] {{ m.type }} :</strong> 
+                {{ m.contenu }}
+            </p>
+                
+            
+        {% endfor %}
+        </ul>
+    {% endfor %}
+    </div>
+    {% endif %}
+
+
+
+     
+    {% if interactions %}
+    PROJETS NON TERMINÉS:
+    {% for idp, liste_messages in interactions.items() %}
+   <div class="projet-section">
+        <h3>Projet : {{ idp }}</h3>
+        
+        <ul>
+        {% for m in liste_messages %}
+            <li>
+                <strong>[{{ m.date }}] {{ m.type }} :</strong> 
+                {{ m.contenu }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+    </div>
+    {% endif %}
+
+
+
+</li>
 
 {% if session.get('fonction') == 'admin' %}
 

@@ -1,5 +1,6 @@
 -- Nettoyage complet (y compris les potentiels noms au singulier des anciens essais)
 DROP TABLE IF EXISTS Documents;
+DROP TABLE IF EXISTS InteractionClient;
 DROP TABLE IF EXISTS Historique;
 DROP TABLE IF EXISTS Utilisateur_Intervenant;
 DROP TABLE IF EXISTS PossedeCompetence;
@@ -10,6 +11,8 @@ DROP TABLE IF EXISTS Clients;
 DROP TABLE IF EXISTS Intervenants;
 DROP TABLE IF EXISTS Intervenant; 
 DROP TABLE IF EXISTS Competences;
+
+
 
 -- Création des tables PARENTS (sans dépendances)
 
@@ -105,3 +108,20 @@ CREATE TABLE Documents (
     FOREIGN KEY (idi) REFERENCES Intervenants(idi),
     FOREIGN KEY (idp) REFERENCES Projets(idp)
 );
+
+
+CREATE TABLE InteractionClient (
+    idic INTEGER PRIMARY KEY,
+    idc INTEGER,
+    idp INTEGER,
+    date_interaction TEXT, 
+    type_interaction TEXT,
+    contenu TEXT NOT NULL, 
+    FOREIGN KEY (idc) REFERENCES Clients(idc),
+    FOREIGN KEY (idp) REFERENCES Projets(idp)
+);
+
+
+
+
+
