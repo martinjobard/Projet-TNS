@@ -55,7 +55,7 @@ INSERT INTO PossedeCompetence (idi, idcomp, niveau) VALUES
 (101, 5, 'Expert'),
 (101, 2, 'Intermédiaire'),
 (102, 1, 'Expert'),
-(102, 3, 'Avancé'),
+(102, 3, 'Debutant'),
 (103, 4, 'Expert'),
 (104, 6, 'Avancé');
 
@@ -80,3 +80,13 @@ INSERT INTO Historique (idh, date, idc, idi, interaction_text) VALUES
 INSERT INTO Documents (idDoc, idi, idp, type, chemin, upload) VALUES
 (2001, 101, 1002, 'CR1 PPII', 'documents/CR_PPII_24_11_25__.pdf', '2025-11-24'),
 (2002, 102, 1002, 'CR2 PPII', 'documents/CR_PPII_01_12_25.pdf', '2025-12-01');
+
+-- ------------------------------
+-- ProjetNecessite (Référence Competence et Projets)
+-- ------------------------------
+INSERT INTO ProjetNecessite (idp, idcomp, niveau_requis) VALUES
+(1001, 1, 'Expert'),
+(1001, 2, 'Intermédiaire'),
+(1001, 3, 'Debutant'),
+(1002, 5, 'Avancé');
+

@@ -15,6 +15,9 @@ def load_sql_from_file(filename):
 
 def initialize_database(db_name, schema_sql, data_sql):
     """Crée et initialise la base de données."""
+    if os.path.exists(db_name):
+        os.remove(db_name)
+        print(f"🗑️  Ancienne base de données '{db_name}' supprimée.")
     conn = None
     try:
         conn = sqlite3.connect(db_name)

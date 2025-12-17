@@ -118,7 +118,7 @@ def Projets():
 
     db=get_db()
     sql="""
-    SELECT p.idp, p.etat, c.nom as client_nom, p.budget, p.deb, p.fin 
+    SELECT p.idp, p.etat, c.nom as client_nom, p.budget, p.deb, p.fin, p.titre_projet 
     FROM Projets p LEFT JOIN Clients c ON p.idc=c.idc
     """
     liste_projets=db.execute(sql).fetchall()
@@ -127,6 +127,25 @@ def Projets():
     liste_en_attente=[p for p in liste_projets if p['etat']=='En attente']
     return render_template('Projets.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle, tous_les_projets=liste_projets, 
                            projets_en_cours=liste_en_cours, projets_termines=liste_termines, projets_attente=liste_en_attente)
+
+@app.route('/details_projet/<int:id_projet>')
+def details_projet(id_projet):
+    redirect_if_needed = require_login()
+    if redirect_if_needed:
+        return redirect_if_needed
+    
+    db = get_db()
+    sql_projet="SELECT p.*, c.nom_entreprise, c.nom as nom_client, c.prenom as prenom_client FROM Projets p LEFT JOIN Clients c ON p.idc=c.idc WHERE p.idp=?"
+    projet=db.execute(sql_projet, (id_projet,)).fetchone()
+
+    if not projet :
+        return "Projet introuvable"
+    
+    sql_docs="SELECT * FROM Documents WHERE idp=?"
+    documents=db.execute(sql_docs, (id_projet,)).fetchall()
+    candidats_suggeres=algorythme_matching(id_projet)
+    return render_template('details_projet.html', p=projet, docs=documents, candidats=candidats_suggeres)
+
 
 @app.route('/Intervenants')
 def Intervenants():
@@ -1721,7 +1740,7 @@ def ajouter_documents():
             date_upload=date.today()
             id_connecte = session.get('user_id')
 
-            sql="""INSERT INTO Documents (idi, idp, type, chemin, upload) VALUES (?, ?, ?, ?, ?)"""
+            sql="INSERT INTO Documents (idi, idp, type, chemin, upload) VALUES (?, ?, ?, ?, ?)"
             db.execute(sql, (id_connecte, id_projet, 'Autre', chemin_bdd, date_upload))
             db.commit()
 
@@ -1729,6 +1748,78 @@ def ajouter_documents():
 
     projets=db.execute("SELECT idp, titre_projet FROM Projets").fetchall()
     return render_template('ajouter_documents.html', projets=projets)
+
+def algorythme_matching(id_projet):
+    db=get_db()
+
+    sql_projet="SELECT p.*, c.secteur FROM Projets p LEFT JOIN Clients c ON p.idc=c.idc WHERE p.idp=?"
+    projet_cible=db.execute(sql_projet, (id_projet,)).fetchone()
+
+    if not projet_cible:
+        return []
+
+    secteur_vise=projet_cible['secteur']
+
+    valeur_niveau={ 'Debutant':1, 'Intermédiaire':2, 'Avancé':3, 'Expert':4 }
+    sql_besoins="SELECT idcomp, niveau_requis FROM ProjetNecessite WHERE idp=?"
+    rows_besoins=db.execute(sql_besoins, (id_projet,)).fetchall()
+    
+    besoins_dict={}
+    for row in rows_besoins:
+        niveau_clean = row['niveau_requis'] if row['niveau_requis'] else 'Debutant'
+        besoins_dict[row['idcomp']] = valeur_niveau.get(niveau_clean, 1)
+    
+    intervenants=db.execute("SELECT i.idi, i.nom, i.prenom, ui.status FROM Intervenants i LEFT JOIN Utilisateur_Intervenant ui ON i.idi=ui.idi")
+    resultats=[]
+
+    for personne in intervenants:
+        idi=personne['idi']
+        score=0
+        details=[]
+        if besoins_dict:
+            sql_skills="SELECT idcomp, niveau FROM PossedeCompetence WHERE idi=?"
+            competences=db.execute(sql_skills, (idi,)).fetchall()
+            for competence in competences:
+                idcomp=competence['idcomp']
+                if idcomp in besoins_dict:
+                    niveau_requis=besoins_dict[idcomp]
+                    niveau_possede=valeur_niveau.get(competence['niveau'],1)
+                    nom_comp=db.execute('SELECT competence FROM Competences WHERE idcomp=?', (idcomp,)).fetchone()[0]
+                    if niveau_possede >= niveau_requis:
+                        score+=20
+                        details.append(f"Competence validée: {nom_comp}")
+                    else :
+                        score+=10
+                        details.append(f"Competence acquise mais niveau juste: {nom_comp}")
+
+        sql_exp="SELECT p.titre_projet, c.secteur FROM Participation pa LEFT JOIN Projets p ON pa.idp=p.idp LEFT JOIN Clients c on p.idc=c.idc WHERE pa.idi=? AND p.etat='Terminé'"
+        historique=db.execute(sql_exp, (idi,)).fetchall()
+        nbProjetMmSecteur=0
+        for ancienp in historique :
+            if ancienp['secteur']==secteur_vise:
+                score+=15
+                nbProjetMmSecteur+=1
+                details.append(f"Expert dans le secteur {secteur_vise} grâce a l'ancien projet {ancienp['titre_projet']}")
+            else :
+                score+=5
+                details.append(f"Bonus d'experience")
+
+        if personne['status']==1:
+            score+=100
+            details.append(f"Est disponible")
+        elif personne['status']==0:
+            details.append("Actuellement indisponible")
+
+        if score>0:
+            resultats.append({
+                'idi':idi, 
+                'nom_complet':f"{personne['prenom']} {personne['nom']}", 
+                'score':score,
+                'details':details,
+            })
+    return sorted(resultats, key=lambda x: x['score'], reverse=True)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
