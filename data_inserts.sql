@@ -55,7 +55,7 @@ INSERT INTO PossedeCompetence (idi, idcomp, niveau) VALUES
 (101, 5, 'Expert'),
 (101, 2, 'Intermédiaire'),
 (102, 1, 'Expert'),
-(102, 3, 'Avancé'),
+(102, 3, 'Debutant'),
 (103, 4, 'Expert'),
 (104, 6, 'Avancé');
 

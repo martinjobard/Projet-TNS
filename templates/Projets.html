@@ -47,40 +47,18 @@
         </ul>          
     </div>
 
-
-
-    <h2>Détails des Projets :</h2>
-    {% for projet in tous_les_projets %}
-        <div class="projet-card">
-            <h3>Projet #{{ projet.idp }} :</h3>
-	<p><strong>Client :</strong> {{ projet.client_nom }}</p>
-            <p><strong>État :</strong> 
-                {% if projet.etat == 'En cours' %}
-                    <span style="color: orange;">{{ projet.etat }}</span>
-                {% elif projet.etat=='Terminé' %}
-                    <span style="color: green;">{{ projet.etat }}</span>
-                {% else %}
-                    <span style="color: blue;">{{ projet.etat }}</span>
-                {% endif %}
-            </p>
-            <p><strong>Budget :</strong> 
-                {% if projet.budget %}
-                    {{ projet.budget }} €
-                {% else %}
-                    Non défini
-                {% endif %}
-            </p>
-            <p><strong>Période :</strong> 
-                {% if projet.deb and projet.fin %}
-                    {{ projet.deb }} ➝ {{ projet.fin }}
-                {% elif projet.deb %}
-                    Depuis le {{ projet.deb }}
-                {% else %}
-                    Date à définir
-                {% endif %}
-            </p>
-        </div>
-    {% endfor %}
-
-</div>
+<hr> <h2>Détails projets :</h2>
+    
+    <ul>
+        {% for projet in tous_les_projets %}
+            <li>
+                <a href="{{ url_for('details_projet', id_projet=projet.idp) }}">
+                    Projet #{{ projet.idp }} ({{ projet.titre_projet }})
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    </div>
 {% endblock %}
+
+   
