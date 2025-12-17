@@ -4,10 +4,10 @@ PRAGMA foreign_keys = ON;
 -- ------------------------------
 -- Clients (Parents)
 -- ------------------------------
-INSERT INTO Clients (idc, nom, prenom, email, telephone, secteur, dernier_contact, nom_entreprise) VALUES
-(1, 'jobart', 'alice', 'alice@techcorp.com', '0123456789', 'IT', '2025-11-20', 'TechCorp'),
-(2, 'cipres', 'bob', 'bob@innov.com', '0987654321', 'Finance', '2025-12-01', 'InnovSolutions'),
-(3, 'dubois', 'charlie', 'charlie@green.org', '0611223344', 'Environnement', '2025-10-15', 'GreenFuture');
+INSERT INTO Clients (idc, nom, prenom, email, telephone, secteur, dernier_contact, nom_entreprise, adresse, lattitude, longitude) VALUES
+(1, 'jobart', 'alice', 'alice@techcorp.com', '0123456789', 'IT', '2025-11-20', 'TechCorp', '55 Rue du Faubourg Saint-Honoré, 75008 Paris', 48.87062, 2.31693),
+(2, 'cipres', 'bob', 'bob@innov.com', '0987654321', 'Finance', '2025-12-01', 'InnovSolutions', '10 Rue de la République, 69002 Lyon', 45.76014, 4.83556),
+(3, 'dubois', 'charlie', 'charlie@green.org', '0611223344', 'Environnement', '2025-10-15', 'GreenFuture', '3 Avenue des Champs-Élysées, 75008 Paris', 48.8698, 2.3075);
 
 -- ------------------------------
 -- Intervenants (Parents)

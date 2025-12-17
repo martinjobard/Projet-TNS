@@ -2,6 +2,8 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from flask import Flask, render_template, request, url_for, session, redirect, g, Response, flash, jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
 import sqlite3
 import os
 import unicodedata
@@ -47,6 +49,23 @@ def close_db(e=None):
     db = g.pop('db', None) 
     if db is not None:
         db.close()
+
+# Fonction utilitaire pour trouver les coordonnées
+def geocode_adresse(adresse_texte):
+    try:
+        # IMPORTANT : Tu dois donner un nom unique à user_agent (ex: le nom de ton projet)
+        # Sinon OpenStreetMap bloquera tes requêtes.
+        geolocator = Nominatim(user_agent="TNS_Gestion_App_V1")
+        
+        location = geolocator.geocode(adresse_texte, timeout=10)
+        
+        if location:
+            return location.latitude, location.longitude
+        else:
+            return None, None
+    except Exception as e:
+        print(f"Erreur de géocodage : {e}")
+        return None, None
 
 
 @app.route('/')
@@ -356,7 +375,7 @@ def Stats():
         if role is None:
             role = "Indéfini"
         date = line['deb']
-        if date is "":
+        if date == "":
             date = "Indéfinie"
         table_data.append({
             "client": line['nom_entreprise'],
@@ -1012,12 +1031,13 @@ def Inscription():
             
             # --- 5A. Insertion dans Intervenants (Profil Personnel) ---
             # Récupérer l'idi généré
+            date_inscription = datetime.now().strftime('%d/%m/%Y')
             sql_intervenant = """
-                INSERT INTO Intervenants (nom, prenom) 
-                VALUES (?, ?)
+                INSERT INTO Intervenants (nom, prenom, date_inscription) 
+                VALUES (?, ?, ?)
             """
-            cursor.execute(sql_intervenant, (nom, prenom))
-            idi = cursor.lastrowid # ⬅️ On récupère la clé primaire du nouvel Intervenant
+            cursor.execute(sql_intervenant, (nom, prenom, date_inscription))
+            idi = cursor.lastrowid
 
             for competence_nom, niveau_val in zip(liste_competences, liste_niveaux):
             
@@ -1049,10 +1069,11 @@ def Inscription():
                     INSERT INTO PossedeCompetence (idi, idcomp, niveau) 
                     VALUES (?, ?, ?)
                 """
-                # Notez que 'idi' doit avoir été récupéré plus haut (lors de la création de l'intervenant)
+
                 cursor.execute(sql_possede, (idi, idcomp, niveau_val))
 
             # --- 5D. Insertion dans Utilisateur_Intervenant (Compte de Connexion) ---
+            
             sql_utilisateur = """
                 INSERT INTO Utilisateur_Intervenant 
                 (mdp_haché, idi, nom_utilisateur, pdp_url, email_utilisateur, fonction, status) 
@@ -1062,7 +1083,7 @@ def Inscription():
             pdp_default = ''
             cursor.execute(sql_utilisateur, (hashed_password, idi, username, pdp_default, email))
 
-            db.commit() # ⬅️ Valide toutes les insertions en même temps
+            db.commit() 
 
         except sqlite3.Error as e:
             # En cas d'erreur de BDD, on annule tout
@@ -1556,6 +1577,7 @@ def refuser_utilisateur(id):
     result = cursor.fetchone()
     id_intervenant = result['idi'] if result else None
     if id_intervenant:
+        db.execute("DELETE FROM PossedeCompetence WHERE idi = ?", (id_intervenant,))
         db.execute("DELETE FROM Intervenants WHERE idi = ?", (id_intervenant,))
     db.execute("DELETE FROM Utilisateur_Intervenant WHERE idu = ?", (id,))    
     db.commit()
@@ -1592,6 +1614,79 @@ def definir_role(id_intervenant):
         flash(f"Erreur lors de la mise à jour : {e}", "error")
     return redirect(url_for('Accueil'))
 
+import json
+
+@app.route('/carte_clients')
+def carte_clients():
+    if 'logged_in' not in session:
+        return redirect(url_for('Connexion'))
+    
+    db = get_db()
+    cursor = db.cursor()
+    
+    # On récupère uniquement les clients qui ont une latitude et une longitude définies
+    sql = """
+    SELECT nom, prenom, nom_entreprise, adresse, lattitude, longitude 
+    FROM Clients 
+    WHERE lattitude IS NOT NULL AND longitude IS NOT NULL
+    """
+    cursor.execute(sql)
+    clients_data = cursor.fetchall()
+    
+    clients_list = []
+    for client in clients_data:
+        clients_list.append({
+            "nom": f"{client['nom']} {client['prenom']}",
+            "entreprise": client['nom_entreprise'],
+            "adresse": client['adresse'],
+            "lat": client['lattitude'],
+            "lon": client['longitude']
+        })
+    
+    return render_template('carte_clients.html', clients=clients_list)
+
+@app.route('/ajouter_client', methods=['GET', 'POST'])
+def ajouter_client():
+    # 1. SÉCURITÉ : On vérifie si c'est un admin
+    if session.get('fonction') != 'admin':
+        flash("Accès refusé. Vous devez être administrateur.", "error")
+        return redirect(url_for('Clients')) # Ou Accueil
+
+    if request.method == 'POST':
+        # 2. Récupération des données du formulaire
+        nom = request.form.get('nom')
+        prenom = request.form.get('prenom')
+        entreprise = request.form.get('entreprise')
+        secteur = request.form.get('secteur')
+        email = request.form.get('email')
+        telephone = request.form.get('telephone')
+        adresse = request.form.get('adresse')
+        
+        # 3. GÉOCODAGE AUTOMATIQUE (Pour la carte)
+        # On utilise la fonction qu'on a créée précédemment
+        lat, lon = None, None
+        if adresse:
+            lat, lon = geocode_adresse(adresse)
+        
+        # 4. Enregistrement en Base de Données
+        try:
+            db = get_db()
+            sql = """
+                INSERT INTO Clients (nom, prenom, nom_entreprise, secteur, email, telephone, adresse, lattitude, longitude)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """
+            db.execute(sql, (nom, prenom, entreprise, secteur, email, telephone, adresse, lat, lon))
+            db.commit()
+            
+            flash(f"Le client {entreprise} a été ajouté avec succès !", "success")
+            return redirect(url_for('Clients'))
+            
+        except Exception as e:
+            flash(f"Erreur lors de l'ajout : {e}", "error")
+            return redirect(url_for('ajouter_client'))
+
+    # Si c'est un GET, on affiche juste le formulaire
+    return render_template('ajouter_client.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

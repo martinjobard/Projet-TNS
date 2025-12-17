@@ -390,3 +390,4 @@ function afficherResultats(profils) {
     });
     container.appendChild(ul);
 }
+
