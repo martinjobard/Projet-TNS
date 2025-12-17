@@ -95,6 +95,18 @@ CREATE TABLE Documents (
     FOREIGN KEY (idp) REFERENCES Projets(idp)
 );
 
+CREATE TABLE InteractionClient (
+    idic INTEGER PRIMARY KEY,
+    idc INTEGER,
+    idp INTEGER,
+    date_interaction TEXT, 
+    type_interaction TEXT,
+    contenu TEXT NOT NULL, 
+    FOREIGN KEY (idc) REFERENCES Clients(idc),
+    FOREIGN KEY (idp) REFERENCES Projets(idp)
+);
+
+
 CREATE TABLE ProjetNecessite (
     idp INTEGER,
     idcomp INTEGER,

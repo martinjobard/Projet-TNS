@@ -81,6 +81,17 @@ INSERT INTO Documents (idDoc, idi, idp, type, chemin, upload) VALUES
 (2001, 101, 1002, 'CR1 PPII', 'documents/CR_PPII_24_11_25__.pdf', '2025-11-24'),
 (2002, 102, 1002, 'CR2 PPII', 'documents/CR_PPII_01_12_25.pdf', '2025-12-01');
 
+
+-- ------------------------------
+-- InteractionClient (Référence Clients et Projets)
+-- ------------------------------
+INSERT INTO InteractionClient (idic, idc, idp, date_interaction, type_interaction, contenu) VALUES
+(3001, 2, 1002, '2025-03-10', 'Réunion', 'Débriefing sur le cahier des charges. Validation des fonctionnalités de paiement.'),
+(3002, 1, 1001, '2025-03-15', 'Email', 'Relance concernant les accès au serveur FTP pour commencer le déploiement.'),
+(3003, 3, 1004, '2025-03-16', 'Appel', 'Le client demande si on peut ajouter une option multilingue. Devis complémentaire à prévoir.'), 
+(3004, 1, 1003, '2025-03-16', 'Appel', 'Le client demande si on peut ajouter une option multilingue. Devis complémentaire à prévoir.');
+
+
 -- ------------------------------
 -- ProjetNecessite (Référence Competence et Projets)
 -- ------------------------------
