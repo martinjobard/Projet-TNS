@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, date
 from jinja2 import Environment, FileSystemLoader
 from flask import Flask, render_template, request, url_for, session, redirect, g, Response, flash, jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut
 import sqlite3
@@ -407,7 +408,7 @@ def Missions_réalisées():
     titre_site = "Site interne TNS"
 
     db=get_db()
-    sql = """SELECT p.idp, p.etat, c.nom as client_nom, p.budget, p.deb, p.fin, p.titre_projet, d.chemin as doc_ul, GROUP_CONCAT(d.chemin) as docs
+    sql = """SELECT p.idp, p.etat, c.nom as client_nom, p.budget, p.deb, p.fin, p.titre_projet, d.chemin as doc_ul, GROUP_CONCAT(DISTINCT d.chemin) as docs
     FROM Projets p LEFT JOIN Clients c ON p.idc=c.idc LEFT JOIN Documents d ON p.idp=d.idp GROUP BY p.idp"""
     liste_projets=db.execute(sql).fetchall()
     missions_finies=[p for p in liste_projets if p['etat']=='Terminé']
@@ -622,18 +623,22 @@ def login():
         
         db = sqlite3.connect(DATABASE)
         c = db.cursor()
-        sql = "SELECT mdp_haché, pdp_url, fonction, status FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+        sql = "SELECT idi, mdp_haché, pdp_url, fonction, status FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
         c.execute(sql, (username,))
         result = c.fetchone()
         db.close()
         if result:
-            mdp_hash = result[0]
-            pdp_url = result[1]
-            fonction = result[2]
-            status = result[3]
+            id_recupere=result[0]
+            mdp_hash = result[1]
+            pdp_url = result[2]
+            fonction = result[3]
+            status = result[4]
         else:
+            id_recupere=None
             mdp_hash = None
             pdp_url = None
+            fonction=None
+            status=None
         
         if mdp_hash and check_password_hash(mdp_hash, password):
             if status == 0:
@@ -642,6 +647,7 @@ def login():
             # Succès ! Stocker les informations
             session['logged_in'] = True
             session['username'] = username
+            session['user_id']=id_recupere
             session['pdp_url'] = pdp_url # On stocke l'URL dans la session !
             session['fonction'] = fonction if fonction else 'user' # Rôle par défaut 'user'
             return redirect(url_for('Accueil'))
@@ -1687,6 +1693,42 @@ def ajouter_client():
 
     # Si c'est un GET, on affiche juste le formulaire
     return render_template('ajouter_client.html')
+
+@app.route('/ajouter_documents', methods=['GET', 'POST'])
+def ajouter_documents():
+    redirect_if_needed = require_login()
+    if redirect_if_needed:
+        return redirect_if_needed
+    
+    db=get_db()
+
+    if request.method=='POST':
+        if 'fichier' not in request.files :
+            return "Aucun fichier détecté"
+        
+        file=request.files['fichier']
+        id_projet=request.form.get('id_projet')
+
+        if file.filename=='':
+            return "Aucun fichier sélectionné"
+        
+        if file :
+            nom_fichier=secure_filename(file.filename)
+            sauveguarde=os.path.join('static', 'documents')
+            chemin_complet=os.path.join(sauveguarde, nom_fichier)
+            file.save(chemin_complet)
+            chemin_bdd=f"documents/{nom_fichier}"
+            date_upload=date.today()
+            id_connecte = session.get('user_id')
+
+            sql="""INSERT INTO Documents (idi, idp, type, chemin, upload) VALUES (?, ?, ?, ?, ?)"""
+            db.execute(sql, (id_connecte, id_projet, 'Autre', chemin_bdd, date_upload))
+            db.commit()
+
+            return redirect(url_for('Missions_réalisées'))
+
+    projets=db.execute("SELECT idp, titre_projet FROM Projets").fetchall()
+    return render_template('ajouter_documents.html', projets=projets)
 
 if __name__ == '__main__':
     app.run(debug=True)

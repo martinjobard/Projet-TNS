@@ -69,6 +69,7 @@
                         <li><a href="{{ url_for('Import_Export') }}">Import-Export</a></li>
                         <li><a href="{{ url_for('tinder_like') }}">Tinder Like</a></li>
                         <li><a href="{{ url_for('carte_clients') }}">Carte Clients</a></li>
+                        <li><a href="{{ url_for('ajouter_documents') }}">Ajouter un document</a></li>
                         {% if session.get('fonction') == 'admin' %}
                             <li ><a href="{{ url_for('admin_validation') }}">Validation des inscriptions</a></li>
                         {% endif %}
