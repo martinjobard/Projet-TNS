@@ -121,7 +121,14 @@ CREATE TABLE InteractionClient (
     FOREIGN KEY (idp) REFERENCES Projets(idp)
 );
 
-
+CREATE TABLE ProjetNecessite (
+    idp INTEGER,
+    idcomp INTEGER,
+    niveau_requis TEXT,
+    PRIMARY KEY (idp, idcomp),
+    FOREIGN KEY (idp) REFERENCES Projets(idp),
+    FOREIGN KEY (idcomp) REFERENCES Competences(idcomp)
+);
 
 
 
