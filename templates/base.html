@@ -61,18 +61,19 @@
                 </li>
 
                 <li><a href="{{ url_for('Missions_réalisées') }}">Missions</a></li>
-
+                
                 <li>
                     <a href="#" class="sidebar-title" onclick="toggleSidebarItem(this)">Outils ▾</a>
                     <ul class="sidebar-submenu">
                         <li><a href="{{ url_for('Stats') }}">Stats</a></li>
                         <li><a href="{{ url_for('Import_Export') }}">Import-Export</a></li>
                         <li><a href="{{ url_for('tinder_like') }}">Tinder Like</a></li>
+                        <li><a href="{{ url_for('carte_clients') }}">Carte Clients</a></li>
+                        {% if session.get('fonction') == 'admin' %}
+                            <li ><a href="{{ url_for('admin_validation') }}">Validation des inscriptions</a></li>
+                        {% endif %}
                     </ul>
                 </li>
-                {% if session.get('fonction') == 'admin' %}
-                    <li ><a href="{{ url_for('admin_validation') }}">Validation des inscriptions</a></li>
-                {% endif %}
             </ul>
         </nav>
     </aside>

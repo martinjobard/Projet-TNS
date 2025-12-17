@@ -24,5 +24,15 @@
 <div id="resultats-secteur">
     </div>
 
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Ajout de Clients</h1>
+    
+    {% if session.get('fonction') == 'admin' %}
+        <a href="{{ url_for('ajouter_client') }}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Ajouter un Client
+        </a>
+    {% endif %}
+</div>
+
 {% endblock %}
 

@@ -5,23 +5,26 @@ DROP TABLE IF EXISTS Utilisateur_Intervenant;
 DROP TABLE IF EXISTS PossedeCompetence;
 DROP TABLE IF EXISTS Participation;
 DROP TABLE IF EXISTS Projets;
-DROP TABLE IF EXISTS Projet; -- Suppression de sécurité
+DROP TABLE IF EXISTS Projet; 
 DROP TABLE IF EXISTS Clients;
 DROP TABLE IF EXISTS Intervenants;
-DROP TABLE IF EXISTS Intervenant; -- Suppression de sécurité
+DROP TABLE IF EXISTS Intervenant; 
 DROP TABLE IF EXISTS Competences;
 
 -- Création des tables PARENTS (sans dépendances)
 
 CREATE TABLE Clients (
-     idc INTEGER PRIMARY KEY,
-     nom TEXT NOT NULL,
-     prenom TEXT,
-     email TEXT,
-     telephone TEXT,
-     secteur TEXT,
-     dernier_contact TEXT,
-     nom_entreprise TEXT
+    idc INTEGER PRIMARY KEY,
+    nom TEXT NOT NULL,
+    prenom TEXT,
+    email TEXT,
+    telephone TEXT,
+    secteur TEXT,
+    dernier_contact TEXT,
+    nom_entreprise TEXT,
+    adresse TEXT,
+    lattitude REAL,
+    longitude REAL
 );
 
 CREATE TABLE Intervenants (
@@ -57,8 +60,8 @@ CREATE TABLE Participation (
     idi INTEGER,
     role TEXT,
     PRIMARY KEY (idp,idi),
-    FOREIGN KEY (idp) REFERENCES Projets(idp),       -- Correction: "Projets" avec un S
-    FOREIGN KEY (idi) REFERENCES Intervenants(idi)   -- Correction: "Intervenants" avec un S
+    FOREIGN KEY (idp) REFERENCES Projets(idp),
+    FOREIGN KEY (idi) REFERENCES Intervenants(idi)
 );
 
 CREATE TABLE PossedeCompetence (
@@ -66,7 +69,7 @@ CREATE TABLE PossedeCompetence (
     idcomp INTEGER,
     niveau TEXT,
     PRIMARY KEY (idi, idcomp),
-    FOREIGN KEY (idi) REFERENCES Intervenants(idi),  -- Correction: "Intervenants" avec un S
+    FOREIGN KEY (idi) REFERENCES Intervenants(idi),  
     FOREIGN KEY (idcomp) REFERENCES Competences(idcomp)
 );
 
@@ -79,7 +82,7 @@ CREATE TABLE Utilisateur_Intervenant (
     email_utilisateur TEXT,
     fonction TEXT Default 'user',
     status INTEGER DEFAULT 0,
-    FOREIGN KEY (idi) REFERENCES Intervenants(idi)   -- Correction: "Intervenants" avec un S
+    FOREIGN KEY (idi) REFERENCES Intervenants(idi)  
 );
 
 CREATE TABLE Historique (
@@ -89,7 +92,7 @@ CREATE TABLE Historique (
     idi INTEGER,
     interaction_text TEXT,
     FOREIGN KEY (idc) REFERENCES Clients(idc),
-    FOREIGN KEY (idi) REFERENCES Intervenants(idi)   -- Correction: "Intervenants" avec un S
+    FOREIGN KEY (idi) REFERENCES Intervenants(idi)
 );
 
 CREATE TABLE Documents (
@@ -99,6 +102,6 @@ CREATE TABLE Documents (
     type TEXT,
     chemin TEXT,
     upload TEXT,
-    FOREIGN KEY (idi) REFERENCES Intervenants(idi),  -- Correction: "Intervenants" avec un S
-    FOREIGN KEY (idp) REFERENCES Projets(idp)        -- Correction: "Projets" avec un S
+    FOREIGN KEY (idi) REFERENCES Intervenants(idi),
+    FOREIGN KEY (idp) REFERENCES Projets(idp)
 );
