@@ -45,6 +45,37 @@
        
 
         <li>
+           Bienvenue !!      
+           <h5>
+            
+            {% if honors2|length == 1 %}                
+            
+                {% for ind in honors2 %}
+                TNS est très heureux d'accueillir {{ind}} ! 
+                {% endfor %}
+           
+
+            
+
+            {% elif honors2|length == 2 %}   
+            
+            TNS est très heureux d'accueillir ses deux nouveaux membres: 
+            
+                {% for ind in honors2 %}
+            
+                 {{ind}}
+            
+            {% endfor %}
+            .
+            {% endif %}
+            </h5>
+        </li>
+
+
+
+
+
+        <li>
             En plein décollage : nouveau projet      
            <h5>
             {% if honors3|length == 0%}
