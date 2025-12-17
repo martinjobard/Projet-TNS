@@ -221,6 +221,43 @@ def Intervenants():
         
     else: 
        pass 
+
+# ACCUEILLIR LES NOUVEAUX INSCRITS À TNS
+    sql2="""
+    SELECT nom, prenom, date_inscription
+    FROM Intervenants
+    ORDER BY date_inscription DESC
+    LIMIT 3  
+    """
+
+    c.execute(sql2)
+    top_3 = c.fetchall()
+    
+
+    if len(top_3) > 0:
+    
+    # Le meilleur score 
+        date_min = top_3[0][2] 
+    
+    # On compte combien de gens ont ce score max dans notre liste de 3
+    # (On crée une liste temporaire avec tous les gagnants ex-aequo)
+    gagnants = [p for p in top_3 if p[2] == date_min]
+    
+    nb_gagnants = len(gagnants)
+        
+    if nb_gagnants == 1:
+        
+        p = gagnants[0]
+        honors2 = [f"{p[0]} {p[1]}"]
+        
+    elif nb_gagnants == 2:
+        p1 = gagnants[0]
+        p2 = gagnants[1]
+        honors2=[]
+        honors2.append(f"{p1[0]} {p1[1]} et {p2[0]} {p2[1]} ")
+        
+    else: 
+       pass  
   
 #BON COURAGE POUR LE PROJET QUI VIENT DE SE FINIR
     sql3="""SELECT Intervenants.nom, Intervenants.prenom 
@@ -268,7 +305,7 @@ def Intervenants():
 
     return render_template('Intervenants.html', titre=titre_site,
                             titre_page_actuelle=titre_page_actuelle, intervenants=intervenants, 
-                            honors1=honors1, honors3=honors3,
+                            honors1=honors1, honors2=honors2, honors3=honors3,
                             honors4=honors4)
 
 @app.route('/Import-Export')
@@ -991,6 +1028,43 @@ def Client_profil(nomcomplet=None):
                 "etat": row["etat"]
             })
 
+
+    sql1="""
+    SELECT IC.date_interaction, IC.type_interaction, IC.contenu, IC.idp, P.etat
+    FROM InteractionClient IC
+    LEFT JOIN Clients C ON C.idc = IC.idc
+    LEFT JOIN Projets P ON P.idp = IC.idp
+    WHERE C.nom = ? AND C.prenom = ?
+    ORDER BY IC.idp, IC.date_interaction DESC
+    """
+    c.execute(sql1, (name_search, surname_search))
+    rows = c.fetchall()
+
+    interactions = {}
+    interactions_done = {}
+
+
+    for row in rows:
+        date_interaction, type_interaction, contenu, idp, etat = row
+        if etat=='Terminé':
+            if idp not in interactions_done:
+                interactions_done[idp] = []
+            
+            interactions_done[idp].append({
+                'date': date_interaction,
+                'type': type_interaction,
+                'contenu': contenu,
+                'etat': etat  })
+        else:
+            if idp not in interactions:
+                interactions[idp] = []
+            
+            interactions[idp].append({
+                'date': date_interaction,
+                'type': type_interaction,
+                'contenu': contenu,
+                'etat': etat })
+
     return render_template('Client_profil.html',
                            id_clients = id_clients,
                            nom=nom_affiche, 
@@ -1000,7 +1074,8 @@ def Client_profil(nomcomplet=None):
                            dernier_contact=dernier_contact,
                            email=email,
                            projets=projets,
-                           titre_page_actuelle="Profil Client"
+                           titre_page_actuelle="Profil Client",
+                           interactions = interactions, interactions_done=interactions_done
                            )
 
 
