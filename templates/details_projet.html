@@ -45,26 +45,48 @@
         {% endfor %}
     </ul>
     
-    <a href="{{ url_for('ajouter_documents') }}" class="btn">Ajouter un document</a>
+    <a href="{{ url_for('ajouter_documents', id_projet=p.idp) }}" class="btn">Ajouter un document</a>
     
+    {% if p.etat != 'En attente' %}
+    
+        <div>
+            <strong>Équipe sur le projet :</strong>
+            {% if equipe %}
+                <ul>
+                    {% for membre in equipe %}
+                        <li>{{ membre.prenom }} {{ membre.nom }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <span style="color: grey; font-style: italic;">Aucun intervenant assigné.</span>
+            {% endif %}
+        </div>
+
+    {% endif %}
     <hr>
 
-    <h3>Suggestion de recrutement :</h3>
+    <hr>
+
+    {% if p.etat=='En attente' %}
+
+        <h3>Suggestion de recrutement :</h3>
     
-    {% if candidats %}
-        <ul>
-            {% for c in candidats %}
-                <li style="margin-bottom: 20px;">
-                    <strong>{{ c.nom_complet }}</strong> - <span style="color:blue;">{{ c.score }} points</span>
-                    <ul style="font-size: 0.9em; color: grey;">
-                        {% for detail in c.details %}
-                            <li>{{ detail }}</li>
-                        {% endfor %} </ul>
-                </li>
-            {% endfor %} </ul>
-    {% else %}
-        <p>Aucun candidat trouvé pour les compétences demandées.</p>
-    {% endif %}
+        {% if candidats %}
+            <ul>
+                {% for c in candidats %}
+                    <li style="margin-bottom: 20px;">
+                        <strong>{{ c.nom_complet }}</strong> - <span style="color:blue;">{{ c.score }} points</span>
+                        <ul style="font-size: 0.9em; color: grey;">
+                            {% for detail in c.details %}
+                                <li>{{ detail }}</li>
+                            {% endfor %} </ul>
+                    </li>
+                {% endfor %} </ul>
+        {% else %}
+            <p>Aucun candidat trouvé pour les compétences demandées.</p>
+        {% endif %}
+    
+        {% endif %}
 
 </div>
 {% endblock %}

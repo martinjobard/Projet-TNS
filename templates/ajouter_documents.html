@@ -7,9 +7,11 @@
         
         <label class="label">Pour quel projet ?</label>
         <select name="id_projet" class="select" required>
-            <option value="" disabled selected>Choisir un projet</option>
+        <option value="" disabled {% if not pre_select %}selected{% endif %}>Choisir un projet</option>
             {% for p in projets %}
-                <option value="{{ p['idp']}}">{{ p['titre_projet'] }}</option>
+               <option value="{{ p['idp'] }}" {% if pre_select and pre_select == p['idp']|string %}selected{% endif %}>
+                    {{ p['titre_projet'] }}
+                </option>
             {% endfor %}
         </select>
 
