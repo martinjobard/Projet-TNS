@@ -327,30 +327,121 @@ def Import_Export():
                            titre_page_actuelle=titre_page_actuelle,
                            liste_clients=liste_clients)
 
+@app.route('/save_swipe', methods=['POST'])
+def save_swipe():
+    if 'username' not in session:
+        return jsonify({'status': 'error'}), 403
+
+    data = request.get_json()
+    client_id = data.get('client_id')
+    action = data.get('action') # 'like' ou 'dislike'
+
+    db = get_db()
+    username = session['username']
+    
+    sql_user = "SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+    user_data = db.execute(sql_user, (username,)).fetchone()
+
+    if not user_data:
+        return redirect(url_for('logout'))
+    
+    mon_idi = user_data['idi']
+    
+    today = date.today().isoformat()
+
+    if action == 'like':
+        sql_exist = "SELECT 1 FROM Historique WHERE idc = ? AND interaction_text = 'TINDER_LIKE'"
+        exist = db.execute(sql_exist, (client_id,)).fetchone()
+        if not exist:
+            sql_not_exist = "INSERT INTO Historique (date, idc, idi, interaction_text) VALUES (?, ?, ?, 'TINDER_LIKE')"
+            db.execute(sql_not_exist, (today, client_id, mon_idi))
+            db.commit()
+            return jsonify({'status': 'success'})
+    
+    elif action == 'dislike':
+        sql_dislike = "INSERT INTO Historique (date, idc, idi, interaction_text) VALUES (?, ?, ?, 'TINDER_DISLIKE')"
+        db.execute(sql_dislike, (today, client_id, mon_idi))
+        db.commit()
+        return jsonify({'status': 'success'})
+
+    return jsonify({'status': 'error'})
+
+@app.route('/annuler_match/<int:client_id>', methods=['POST'])
+def annuler_match(client_id):
+    if 'username' not in session:
+        return redirect(url_for('Connexion'))
+
+    db = get_db()
+    username = session['username']
+
+    sql_user = "SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+    user_data = db.execute(sql_user, (username,)).fetchone()
+
+    if not user_data:
+        return redirect(url_for('logout'))
+    
+    mon_idi = user_data['idi']
+    
+    sql_annuler_match = "DELETE FROM Historique WHERE idc = ? AND idi = ? AND interaction_text = 'TINDER_LIKE'"
+    db.execute(sql_annuler_match,(client_id, mon_idi))
+    db.commit()
+
+    return redirect(url_for('tinder_like'))
+
+@app.route('/reset_dislikes')
+def reset_dislikes():
+    if 'username' not in session:
+        return redirect(url_for('Connexion'))
+    
+    db = get_db()
+    username = session['username']
+    
+    sql_user = "SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
+    user_data = db.execute(sql_user, (username,)).fetchone()
+
+    if not user_data:
+        return redirect(url_for('logout'))
+    
+    mon_idi = user_data['idi']
+
+    sql_reset_dislike = "DELETE FROM Historique WHERE idi = ? AND interaction_text = 'TINDER_DISLIKE'"
+    db.execute(sql_reset_dislike, (mon_idi,))
+    db.commit()
+
+    return redirect(url_for('tinder_like'))
 
 @app.route('/tinder_like')
 def tinder_like():
     redirect_if_needed = require_login()
     if redirect_if_needed:
         return redirect_if_needed
+    
     titre_site = "Site interne TNS"
     db = get_db()
     username = session['username']
+    
     sql_user = "SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
     user_data = db.execute(sql_user, (username,)).fetchone()
+
     if not user_data:
         return redirect(url_for('logout'))
     
     mon_idi = user_data['idi']
 
-    sql_noms_entreprises = "SELECT DISTINCT Clients.idc, Clients.nom_entreprise FROM Clients LEFT JOIN Projets ON Clients.idc = Projets.idc LEFT JOIN Participation ON Projets.idp = Participation.idp WHERE Participation.idi = ?"
-    clients_data = db.execute(sql_noms_entreprises, (mon_idi,)).fetchall()
+    sql_cartes = "SELECT DISTINCT idc, nom_entreprise FROM Clients WHERE idc NOT IN (SELECT idc FROM Historique WHERE interaction_text IN ('TINDER_LIKE', 'TINDER_DISLIKE'))"
+    clients_data = db.execute(sql_cartes).fetchall()
+    clients_list = [{'id': row['idc'], 'nom': row['nom_entreprise']} for row in clients_data] if clients_data else []
 
-    clients_list = []
-    if clients_data:
-        clients_list = [{'id': row['idc'], 'nom': row['nom_entreprise']} for row in clients_data]
-    titre_page_actuelle = "Tinder Like"
-    return render_template('tinder_like.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle, clients=clients_list)
+    sql_mes_clients = "SELECT Clients.idc, Clients.nom_entreprise, Clients.secteur, Clients.email, Clients.telephone FROM Clients LEFT JOIN Historique ON Clients.idc = Historique.idc WHERE Historique.idi = ? AND Historique.interaction_text = 'TINDER_LIKE'"
+    mes_clients_data = db.execute(sql_mes_clients, (mon_idi,)).fetchall()
+
+    return render_template(
+        'tinder_like.html', 
+        titre=titre_site, 
+        titre_page_actuelle="Tinder Like", 
+        clients=clients_list,       
+        mes_clients=mes_clients_data 
+    )
 
 @app.route('/Stats')
 def Stats():

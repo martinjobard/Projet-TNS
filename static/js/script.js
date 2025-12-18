@@ -191,9 +191,12 @@ if (tinderContainer) { // <--- C'est cette ligne qui empêche le crash sur les a
     function handleSwipe(deltaX) {
         const sensitivity = 80; 
         if(Math.abs(deltaX) > sensitivity){
+            const direction = deltaX > 0 ? 'like' : 'dislike'; 
             currentCard.style.transition = "transform 0.4s ease-out, opacity 0.4s ease-out";
             currentCard.style.transform = `translateX(${deltaX > 0 ? 1000 : -1000}px) rotate(${deltaX > 0 ? 45 : -45}deg)`;
             currentCard.style.opacity = 0;
+            const clientId = currentCard.dataset.clientId; 
+            sendSwipe(clientId, direction);
             setTimeout(()=>{
                 currentCard.remove();
                 const nextCard = getTopCard();
@@ -208,6 +211,22 @@ if (tinderContainer) { // <--- C'est cette ligne qui empêche le crash sur les a
             currentCard.style.transform = "translateX(0) rotate(0)";
             currentCard = null; 
         }
+    }
+    function sendSwipe(clientId, action) {
+        fetch('/save_swipe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ client_id: clientId, action: action })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Swipe enregistré", data);
+            // Si c'est un like, on recharge la page pour voir le tableau se remplir !
+            if (action === 'like' && data.status === 'success') {
+                setTimeout(() => location.reload(), 500);
+            }
+        })
+        .catch(err => console.error("Erreur swipe", err));
     }
 }
 
