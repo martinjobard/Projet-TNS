@@ -3,11 +3,63 @@
 {% block content %}
     <div class="centering-wrapper">
         <h1>Tinderprise</h1>
-        <div class ="card-container" id="card-container">
+
+        <div class="action-text left-text">Pas intéressé</div>
+        <div class="action-text right-text">À contacter</div>
+
+        <div class="card-container" id="card-container">
+            {% if not clients %}
+            <div class="message-plus-de-cartes">
+                <h3>Aucun profil à valider</h3>
+                <p>Soit tout est attribué, soit vous avez tout refusé !</p>
+                
+                <div style="margin-top: 20px;">
+                    <a href="{{ url_for('reset_dislikes') }}" class="reset-dislikes">
+                        Revoir les entreprises ignorées
+                    </a>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
-    <div class="action-text left-text">Pas intéressé</div>
-    <div class="action-text right-text">À contacter</div>
+    
+    <div class="prospects-wrapper">
+        {% if mes_clients %}
+        <h2 style="margin-bottom: 15px;">Mes entreprises attribuées</h2>
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>Entreprise</th>
+                    <th>Secteur</th>
+                    <th>Email</th>
+                    <th>Tel</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for client in mes_clients %}
+                <tr>
+                    <td>{{ client.nom_entreprise }}</td>
+                    <td>{{ client.secteur }}</td>
+                    <td>{{ client.email }}</td>
+                    <td>{{ client.telephone }}</td>
+                    <td>
+                    <form action="{{ url_for('annuler_match', client_id=client.idc) }}" method="post">
+                        <button type="submit" class="annuler-like">
+                            Annuler ↺
+                        </button>
+                    </form>
+                </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class = "tinderboard">
+            <p>Aucune entreprise attribuée pour le moment.</p>
+            <p><strong>Swipez à droite</strong> pour en ajouter !</p>
+        </div>
+        {% endif %}
+    </div>
     <script>
         const dbClients = {{ clients | tojson }};
     </script>
