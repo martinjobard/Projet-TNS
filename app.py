@@ -143,8 +143,12 @@ def details_projet(id_projet):
     
     sql_docs="SELECT * FROM Documents WHERE idp=?"
     documents=db.execute(sql_docs, (id_projet,)).fetchall()
+
+    sql_equipe="SELECT i.nom, i.prenom, i.idi FROM Intervenants i JOIN Participation pa ON i.idi = pa.idi WHERE pa.idp = ?"
+    equipe=db.execute(sql_equipe, (id_projet,)).fetchall()
+
     candidats_suggeres=algorythme_matching(id_projet)
-    return render_template('details_projet.html', p=projet, docs=documents, candidats=candidats_suggeres)
+    return render_template('details_projet.html', p=projet, docs=documents, candidats=candidats_suggeres, equipe=equipe)
 
 
 @app.route('/Intervenants')
@@ -1913,7 +1917,8 @@ def ajouter_documents():
             return redirect(url_for('Missions_réalisées'))
 
     projets=db.execute("SELECT idp, titre_projet FROM Projets").fetchall()
-    return render_template('ajouter_documents.html', projets=projets)
+    pre_select = request.args.get('id_projet')
+    return render_template('ajouter_documents.html', projets=projets, pre_select=pre_select )
 
 def algorythme_matching(id_projet):
     db=get_db()
@@ -1922,6 +1927,9 @@ def algorythme_matching(id_projet):
     projet_cible=db.execute(sql_projet, (id_projet,)).fetchone()
 
     if not projet_cible:
+        return []
+    
+    if projet_cible['etat'] != 'En attente':
         return []
 
     secteur_vise=projet_cible['secteur']
@@ -1939,6 +1947,8 @@ def algorythme_matching(id_projet):
     resultats=[]
 
     for personne in intervenants:
+        if personne['status'] != 1:
+            continue
         idi=personne['idi']
         score=0
         details=[]
@@ -1969,12 +1979,6 @@ def algorythme_matching(id_projet):
             else :
                 score+=5
                 details.append(f"Bonus d'experience")
-
-        if personne['status']==1:
-            score+=100
-            details.append(f"Est disponible")
-        elif personne['status']==0:
-            details.append("Actuellement indisponible")
 
         if score>0:
             resultats.append({
