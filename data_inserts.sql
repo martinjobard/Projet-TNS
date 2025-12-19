@@ -95,7 +95,7 @@ INSERT INTO InteractionClient (idic, idc, idp, date_interaction, type_interactio
 -- ProjetNecessite (Référence Competence et Projets)
 -- ------------------------------
 INSERT INTO ProjetNecessite (idp, idcomp, niveau_requis) VALUES
-(1001, 1, 'Expert'),
-(1001, 2, 'Intermédiaire'),
-(1001, 3, 'Debutant'),
+(1003, 1, 'Expert'),
+(1003, 2, 'Intermédiaire'),
+(1003, 3, 'Debutant'),
 (1002, 5, 'Avancé');
