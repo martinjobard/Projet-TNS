@@ -417,34 +417,83 @@ def reset_dislikes():
 @app.route('/tinder_like')
 def tinder_like():
     redirect_if_needed = require_login()
-    if redirect_if_needed:
-        return redirect_if_needed
+    if redirect_if_needed: return redirect_if_needed
     
-    titre_site = "Site interne TNS"
+    titre_site = "Prospection TNS"
     db = get_db()
+    
     username = session['username']
-    
-    sql_user = "SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
-    user_data = db.execute(sql_user, (username,)).fetchone()
-
-    if not user_data:
-        return redirect(url_for('logout'))
-    
+    user_data = db.execute("SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?", (username,)).fetchone()
+    if not user_data: return redirect(url_for('logout'))
     mon_idi = user_data['idi']
+    
+    attribution_finale = {}
 
-    sql_cartes = "SELECT DISTINCT idc, nom_entreprise FROM Clients WHERE idc NOT IN (SELECT idc FROM Historique WHERE interaction_text IN ('TINDER_LIKE', 'TINDER_DISLIKE'))"
-    clients_data = db.execute(sql_cartes).fetchall()
-    clients_list = [{'id': row['idc'], 'nom': row['nom_entreprise']} for row in clients_data] if clients_data else []
+    sql_projets = "SELECT P.idp, P.idc, P.titre_projet, C.nom_entreprise, C.secteur FROM Projets P LEFT JOIN Clients C ON P.idc = C.idc WHERE P.etat = 'En attente'"
+    tous_les_projets = db.execute(sql_projets).fetchall()
 
-    sql_mes_clients = "SELECT Clients.idc, Clients.nom_entreprise, Clients.secteur, Clients.email, Clients.telephone FROM Clients LEFT JOIN Historique ON Clients.idc = Historique.idc WHERE Historique.idi = ? AND Historique.interaction_text = 'TINDER_LIKE'"
-    mes_clients_data = db.execute(sql_mes_clients, (mon_idi,)).fetchall()
+    for projet in tous_les_projets:
+        projet_id = projet['idp']
+        client_id = projet['idc']
+        est_deja_pris_sql = "SELECT 1 FROM Historique WHERE idc = ? AND interaction_text = 'TINDER_LIKE'"
+        est_deja_pris = db.execute(est_deja_pris_sql,(client_id,)).fetchone()
+        if est_deja_pris:
+            continue 
+
+        classement = algorythme_matching(projet_id) 
+        
+        candidat_retenu = None
+        score_retenu = 0
+
+        for candidat in classement:
+            candidat_idi = candidat['idi']
+            
+            # Vérifie si Dislike
+            a_refuse_sql = "SELECT 1 FROM Historique WHERE idc = ? AND idi = ? AND interaction_text = 'TINDER_DISLIKE'"
+            a_refuse = db.execute(a_refuse_sql, (client_id, candidat_idi)).fetchone()
+            if not a_refuse:
+                candidat_retenu = candidat_idi
+                score_retenu = candidat['score']
+                break 
+        
+        # Si le client a plusieurs projets en attente
+        if candidat_retenu:
+            if client_id not in attribution_finale:
+                attribution_finale[client_id] = {
+                    'gagnant_idi': candidat_retenu,
+                    'score': score_retenu,
+                    'info_client': projet 
+                }
+            else:
+                # On garde le projet qui rapporte le plus de points
+                if score_retenu > attribution_finale[client_id]['score']:
+                    attribution_finale[client_id] = {
+                        'gagnant_idi': candidat_retenu,
+                        'score': score_retenu,
+                        'info_client': projet
+                    }
+    
+    cartes_proposées = []
+    
+    for cid, data in attribution_finale.items():
+        if data['gagnant_idi'] == mon_idi:
+            projet_info = data['info_client']
+            cartes_proposées.append({
+                'id': cid,
+                'nom': projet_info['nom_entreprise'],
+                'secteur': projet_info['secteur'],
+                'projet_concerne': projet_info['titre_projet']
+            })
+
+    sql_potentiels_clients = "SELECT Clients.idc, Clients.nom_entreprise, Clients.secteur, Clients.email, Clients.telephone FROM Clients LEFT JOIN Historique ON Clients.idc = Historique.idc WHERE Historique.idi = ? AND Historique.interaction_text = 'TINDER_LIKE'"
+    potentiels_clients = db.execute(sql_potentiels_clients, (mon_idi,)).fetchall()
 
     return render_template(
         'tinder_like.html', 
         titre=titre_site, 
-        titre_page_actuelle="Tinder Like", 
-        clients=clients_list,       
-        mes_clients=mes_clients_data 
+        titre_page_actuelle="Tinder Like",
+        clients=cartes_proposées,
+        mes_clients=potentiels_clients
     )
 
 @app.route('/Stats')
