@@ -1,49 +1,65 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <h1>Historique des Missions Réalisées :</h1>
-
-    <table class="table">
-        <tr>
-            <th>Date début</th>
-            <th>Date fin</th>
-            <th>Client</th>
-            <th>Sujet</th>
-            <th>Budget</th>
-            <th>Documents</th> 
-        </tr>
-
-        {% for projet in projets %}
-        <tr>
-            <td>{{ projet['deb'] }}</td>
-            <td>{{ projet['fin'] }}</td>
-            <td>{{ projet['client_nom'] }}</td>
-            <td>{{ projet['titre_projet'] }}</td>
-            <td>{{ projet['budget'] }}</td>
-            <td>
-                {% if projet['docs'] %}
-                    {% set liste_docs=projet['docs'].split(',') %}
-                    {% for doc in liste_docs %}
-                        <a href="{{ url_for('static', filename=doc) }}">Voir le doc</a>
-                    {% endfor %}
-                {% else %}
-                    
-                {% endif %}
-            </td>
-            <td><form action="{{ url_for('export_mission', id_projet=projet['idp']) }}" method="POST">
-        
-        <button type="submit" style="background-color: rgb(39, 157, 242); color: white; padding: 10px; border: none; cursor: pointer;">
-            Télécharger le dossier mission de {{ projet['titre_projet'] }}
-        </button>
-        </form>
-        </td>
-        </tr>
-        {% endfor %}
-    </table>
+<div class="conteneur">
     
-    {% if not projets %}
-    Aucune mission terminée dans l'historique pour le moment
-    {% endif %}
+    <div class="entete">
+        <h1>Historique des Missions Réalisées</h1>
+    </div>
+
+    <div class="tabeleau" style="padding: 0; overflow: hidden;">
+        
+        <table class="tableau-style">
+            <thead>
+                <tr>
+                    <th>Période</th>
+                    <th>Client</th>
+                    <th>Sujet</th>
+                    <th>Budget</th>
+                    <th>Documents</th> 
+                    <th>Action</th> </tr>
+            </thead>
+
+            <tbody>
+                {% for projet in projets %}
+                <tr>
+                    <td>Du {{ projet['deb'] }}<br>au {{ projet['fin'] }}</td>
+                    
+                    <td><strong>{{ projet['client_nom'] }}</strong></td>
+                    <td>{{ projet['titre_projet'] }}</td>
+                    <td>{{ projet['budget'] }} €</td>
+                    
+                    <td>
+                        {% if projet['docs'] %}
+                            {% set liste_docs=projet['docs'].split(',') %}
+                            {% for doc in liste_docs %}
+                                <a href="{{ url_for('static', filename=doc) }}" class="lien-doc" target="_blank">
+                                    Voir le doc
+                                </a><br>
+                            {% endfor %}
+                        {% else %}
+                            <span class="gris">-</span>
+                        {% endif %}
+                    </td>
+                    
+                    <td>
+                        <form action="{{ url_for('export_mission', id_projet=projet['idp']) }}" method="POST">
+                            <button type="submit" class="bouton-download">
+                                Télécharger le dossier complet
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding: 20px;" class="gris">
+                            Aucune mission terminée dans l'historique pour le moment.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 </div>
 {% endblock %}

@@ -1,25 +1,40 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <h1>Ajouter un document</h1>
-    <form method="POST" action="{{ url_for('ajouter_documents') }}" enctype="multipart/form-data">
+<div class="conteneur">
+    
+    <div class="entete">
+        <h1>Ajouter un document</h1>
+    </div>
+
+    <div class="selection">
         
-        <label class="label">Pour quel projet ?</label>
-        <select name="id_projet" class="select" required>
-        <option value="" disabled {% if not pre_select %}selected{% endif %}>Choisir un projet</option>
-            {% for p in projets %}
-               <option value="{{ p['idp'] }}" {% if pre_select and pre_select == p['idp']|string %}selected{% endif %}>
-                    {{ p['titre_projet'] }}
-                </option>
-            {% endfor %}
-        </select>
+        <form method="POST" action="{{ url_for('ajouter_documents') }}" enctype="multipart/form-data">
+            
+            <div class="choix-projet">
+                <label class="label-gras">Pour quel projet ?</label>
+                <select name="id_projet" class="style-input" required>
+                    <option value="" disabled {% if not pre_select %}selected{% endif %}>Choisir un projet</option>
+                    {% for p in projets %}
+                       <option value="{{ p['idp'] }}" {% if pre_select and pre_select == p['idp']|string %}selected{% endif %}>
+                            {{ p['titre_projet'] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <label class="label">Votre fichier :</label>
-        <input type="file" name="fichier" class="control" required>
+            <div class="choix-fichier">
+                <label class="label-gras">Votre fichier :</label>
+                <input type="file" name="fichier" class="style-input" required>
+            </div>
 
-        <button type="submit" class="btn-primary">Envoyer</button>
-        <a href="{{ url_for('Missions_réalisées') }}" class="btn-secondary">Annuler</a>
-    </form>
+            <div class="boutons-action">
+                <button type="submit" class="mon-bouton">Envoyer</button>
+                <a href="{{ url_for('Missions_réalisées') }}" class="bouton-annuler">Annuler</a>
+            </div>
+
+        </form>
+    </div>
+
 </div>
 {% endblock %}

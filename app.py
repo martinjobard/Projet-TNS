@@ -1963,7 +1963,7 @@ def ajouter_documents():
             db.execute(sql, (id_connecte, id_projet, 'Autre', chemin_bdd, date_upload))
             db.commit()
 
-            return redirect(url_for('Missions_réalisées'))
+            return redirect(url_for('details_projet', id_projet=id_projet))
 
     projets=db.execute("SELECT idp, titre_projet FROM Projets").fetchall()
     pre_select = request.args.get('id_projet')
@@ -1992,11 +1992,11 @@ def algorythme_matching(id_projet):
         niveau_clean = row['niveau_requis'] if row['niveau_requis'] else 'Debutant'
         besoins_dict[row['idcomp']] = valeur_niveau.get(niveau_clean, 1)
     
-    intervenants=db.execute("SELECT i.idi, i.nom, i.prenom, ui.status FROM Intervenants i LEFT JOIN Utilisateur_Intervenant ui ON i.idi=ui.idi")
+    intervenants=db.execute("SELECT idi, nom, prenom, dispo FROM Intervenants")
     resultats=[]
 
     for personne in intervenants:
-        if personne['status'] != 1:
+        if personne['dispo'] != 'Oui':
             continue
         idi=personne['idi']
         score=0

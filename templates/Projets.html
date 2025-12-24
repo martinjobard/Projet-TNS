@@ -1,64 +1,64 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <h1>Tableau de bord des Projets :</h1>
+<div class="conteneur">
 
-    <a href="{{ url_for('ajouter_documents') }}" class="btn">Ajouter un document</a>
-	
-    <div class="stats">
-	<h3>Nombre de Projets :</h3>
-	<p>{{ tous_les_projets|length }}</p>
+    <div class="entete">
+        <h1>Tableau de bord des Projets</h1>
+        <a href="{{ url_for('ajouter_documents') }}" class="mon-bouton">Ajouter un document</a>
+    </div>
 
-	<h3><span style="color: orange;">Projets en cours :</span></h3>
-        <ul>
-            {% for projet in projets_en_cours %}
+    <div class="resume-projets">
+        
+        <div class="carte-stat bordure-orange">
+            <h3 class="sous-titre texte-orange">En cours ({{ projets_en_cours|length }})</h3>
+            <ul class="petite-liste">
+                {% for projet in projets_en_cours %}
+                    <li><strong>#{{ projet.idp }}</strong> - {{ projet.client_nom }}</li>
+                {% else %}
+                    <li class="gris">Aucun projet</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="carte-stat bordure-vert">
+            <h3 class="sous-titre texte-vert">Terminés ({{ projets_termines|length }})</h3>
+            <ul class="petite-liste">
+                {% for projet in projets_termines %}
+                    <li><strong>#{{ projet.idp }}</strong> - {{ projet.client_nom }}</li>
+                {% else %}
+                    <li class="gris">Aucun projet</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="carte-stat bordure-bleu">
+            <h3 class="sous-titre texte-bleu">En attente ({{ projets_attente|length }})</h3>
+            <ul class="petite-liste">
+                {% for projet in projets_attente %}
+                    <li><strong>#{{ projet.idp }}</strong> - {{ projet.client_nom }}</li>
+                {% else %}
+                    <li class="gris">Aucun projet</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="details-projets">
+        <h3 class="titre">Liste complète des projets ({{ tous_les_projets|length }})</h3>
+        
+        <ul class="liste-liens">
+            {% for projet in tous_les_projets %}
                 <li>
-                    <strong>#{{ projet.idp }}</strong> - {{ projet.client_nom }}
+                    <a href="{{ url_for('details_projet', id_projet=projet.idp) }}">
+                        <span class="id-projet">#{{ projet.idp }}</span> 
+                        {{ projet.titre_projet }}
+                    </a>
                 </li>
-            {% else %}
-                <li>Aucun projet en cours</li>
             {% endfor %}
         </ul>
-	
-
-	<h3><span style="color: green;">Projets terminés :</span></h3>
-        <ul>   
-            {% for projet in projets_termines %}
-                <li>
-                    <strong>#{{ projet.idp }}</strong> - {{ projet.client_nom }}
-                </li>
-            {% else %}
-                <li>Aucun projet terminé</li>
-            {% endfor %}
-        </ul>          
     </div>
 
-
-	<h3><span style="color: blue;">Projets en attente :</span></h3>
-        <ul>   
-            {% for projet in projets_attente %}
-                <li>
-                    <strong>#{{ projet.idp }}</strong> - {{ projet.client_nom }}
-                </li>
-            {% else %}
-                <li>Aucun projet en attente</li>
-            {% endfor %}
-        </ul>          
-    </div>
-
-<hr> <h2>Détails projets :</h2>
-    
-    <ul>
-        {% for projet in tous_les_projets %}
-            <li>
-                <a href="{{ url_for('details_projet', id_projet=projet.idp) }}">
-                    Projet #{{ projet.idp }} ({{ projet.titre_projet }})
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
-    </div>
+</div>
 {% endblock %}
-
-   
