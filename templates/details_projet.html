@@ -1,92 +1,98 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
+<div class="conteneur">
     
-    <h1>{{ p.titre_projet }} <span style="font-size:0.6em; color:grey;">#{{ p.idp }}</span></h1>
-    <p>Client : <strong>{{ p.nom_entreprise }}</strong> ({{ p.prenom_client }} {{ p.nom_client }})</p>
-    
-    <p><strong>État :</strong> 
-        {% if p.etat == 'En cours' %}
-            <span style="color: orange;">{{ p.etat }}</span>
-        {% elif p.etat == 'Terminé' %}
-            <span style="color: green;">{{ p.etat }}</span>
-        {% else %}
-            <span style="color: blue;">{{ p.etat }}</span>
-        {% endif %}
-    </p>
-
-    <p><strong>Budget :</strong> 
-        {% if p.budget %} {{ p.budget }} € {% else %} Non défini {% endif %}
-    </p>
-
-    <p><strong>Période :</strong>
-        {% if p.deb and p.fin %}
-            {{ p.deb }} ➝ {{ p.fin }}
-        {% elif p.deb %}
-            Depuis le {{ p.deb }}
-        {% else %}
-            Date à définir
-        {% endif %}
-    </p>
-
-    <hr>
-
-    <div class="doc"><strong>Documents du projet :</strong></div>
-    <ul>
-        {% for doc in docs %}
-        <li>
-            <a href="{{ url_for('static', filename=doc.chemin) }}">
-                {{ doc.chemin.split('/')[-1] }}
-            </a>
-        </li> 
-        {% else %}
-            <li>Aucun document</li>
-        {% endfor %}
-    </ul>
-    
-    <a href="{{ url_for('ajouter_documents', id_projet=p.idp) }}" class="btn">Ajouter un document</a>
-    
-    {% if p.etat != 'En attente' %}
-    
-        <div>
-            <strong>Équipe sur le projet :</strong>
-            {% if equipe %}
-                <ul>
-                    {% for membre in equipe %}
-                        <li>{{ membre.prenom }} {{ membre.nom }}</li>
-                    {% endfor %}
-                </ul>
+    <div class="entete">
+        <h1>{{ p.titre_projet }} <span class="id-gris">#{{ p.idp }}</span></h1>
+        
+        <div class="etat-projet">
+            État : 
+            {% if p.etat == 'En cours' %}
+                <span class="texte-orange">{{ p.etat }}</span>
+            {% elif p.etat == 'Terminé' %}
+                <span class="texte-vert">{{ p.etat }}</span>
             {% else %}
-                <span style="color: grey; font-style: italic;">Aucun intervenant assigné.</span>
+                <span class="texte-bleu">{{ p.etat }}</span>
             {% endif %}
         </div>
+    </div>
 
+    <div class="info">
+        <p><strong>Client :</strong> {{ p.nom_entreprise }} ({{ p.prenom_client }} {{ p.nom_client }})</p>
+        
+        <p><strong>Budget :</strong> 
+            {% if p.budget %} {{ p.budget }} € {% else %} Non défini {% endif %}
+        </p>
+
+        <p><strong>Période :</strong>
+            {% if p.deb and p.fin %}
+                {{ p.deb }} au {{ p.fin }}
+            {% elif p.deb %}
+                Depuis le {{ p.deb }}
+            {% else %}
+                Date à définir
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="docs">
+        <h3 class="titre">Documents du projet</h3>
+        
+        <ul class="liste">
+            {% for doc in docs %}
+            <li>
+                <a href="{{ url_for('static', filename=doc.chemin) }}" target="_blank">
+                    {{ doc.chemin.split('/')[-1] }}
+                </a>
+            </li> 
+            {% else %}
+                <li class="gris">Aucun document.</li>
+            {% endfor %}
+        </ul>
+        
+        <br>
+        <a href="{{ url_for('ajouter_documents', id_projet=p.idp) }}" class="mon-bouton">Ajouter un document</a>
+    </div>
+    
+    {% if p.etat != 'En attente' %}
+    <div class="intervenants">
+        <h3 class="titre">Équipe sur le projet</h3>
+        
+        {% if equipe %}
+            <ul class="liste">
+                {% for membre in equipe %}
+                    <li>{{ membre.prenom }} {{ membre.nom }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <span class="gris">Aucun intervenant assigné.</span>
+        {% endif %}
+    </div>
     {% endif %}
-    <hr>
 
-    <hr>
-
-    {% if p.etat=='En attente' %}
-
-        <h3>Suggestion de recrutement :</h3>
+    {% if p.etat == 'En attente' %}
+    <div class="suggestion">
+        <h3 class="titre">Suggestions de recrutement</h3>
     
         {% if candidats %}
-            <ul>
+            <div>
                 {% for c in candidats %}
-                    <li style="margin-bottom: 20px;">
+                    <div class="candidat">
                         <strong>{{ c.nom_complet }}</strong> - <span style="color:blue;">{{ c.score }} points</span>
-                        <ul style="font-size: 0.9em; color: grey;">
+                        <ul>
                             {% for detail in c.details %}
                                 <li>{{ detail }}</li>
-                            {% endfor %} </ul>
-                    </li>
-                {% endfor %} </ul>
+                            {% endfor %} 
+                        </ul>
+                    </div>
+                {% endfor %} 
+            </div>
         {% else %}
-            <p>Aucun candidat trouvé pour les compétences demandées.</p>
+            <p class="gris">Aucun candidat trouvé.</p>
         {% endif %}
-    
-        {% endif %}
+    </div>
+    {% endif %}
 
 </div>
 {% endblock %}
