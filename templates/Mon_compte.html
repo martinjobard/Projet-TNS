@@ -1,167 +1,165 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Mon compte</h1> 
+<div class="conteneur-principal">
 
-<div class="user-info-container">
-    <div> Nom : {{nom_utilisateur}} </div> 
-    <div> Email : {{email_utilisateur}} </div>
-    <img src="{{ url_for('static', filename=pdp_actuelle or 'images/default-avatar.png') }}" alt="Photo de profil" style="max-width:150px;">
+    <h1 class="titre-page">Mon Compte</h1>
 
-    <button id="btn_modifier_pdp">Modifier photo de profil</button> 
-</div>
+    <div class="section-compte">
+        <h2 class="sous-titre-section">Mes Informations</h2>
 
-<div id="pdp_modifier_block" style="display:none;"> 
-    <form action="/upload_profile_pic" method="POST" enctype="multipart/form-data">
-        <label for="pdp_file_input">Sélectionner une photo :</label>
-        <input type="file" id="pdp_file_input" name="pdp_file" accept="image/*" required>
-        <br>
-        <button type="submit">Enregistrer la nouvelle photo</button>
-    </form>
-</div>
-
-<button id="btn_modifier_profil">Modifier profil (Nom & Email)</button> 
-<button id="btn_modifier_mdp">Modifier mot de passe</button> 
-
-
-<div id="nom_email_modifier_block" style="display:none;">
-    <form action="/modifier_nom_email" method="POST">
-        <label for="nom_input">Choisir un nom :</label>
-        <input type="text" id="nom_input" name="nom" value="{{nom_utilisateur}}" >
-        <br>
-        <label for="email_input">Choisir un email :</label>
-        <input type="email" id="email_input" name="email" value="{{email_utilisateur}}" >
-        <br>
-        <button type="submit">Enregistrer les modifications</button>
-    </form>
-</div>
-
-
-<div id="mdp_modifier_block" style="display:none;">
-    <form action="/modifier_mdp" method="POST">
-        <label for="ancien_mdp_input">Ancien mot de passe :</label>
-        <input type="password" id="ancien_mdp_input" name="ancien_mdp" required>
-        <br>
-        <label for="nouveau_mdp_input">Nouveau mot de passe :</label>
-        <input type="password" id="nouveau_mdp_input" name="nouveau_mdp" required>
-        <br>
-        <label for="conf_mdp_input">Confirmer le nouveau mot de passe :</label>
-        <input type="password" id="conf_mdp_input" name="conf_nouveau_mdp" required>
-        <button type="submit">Enregistrer le nouveau mot de passe</button>
-    </form>
-</div>
-
-<div class="dispo-container" style="border: 1px solid #ddd; padding: 15px; margin: 20px 0; border-radius: 8px; background-color: #f9f9f9;">
-    <h3>Ma Disponibilité</h3>
-    
-    <p>
-        Statut actuel : 
-        {% if dispo == 'Oui' %}
-            <span style="color: green; font-weight: bold; font-size: 1.2em;">● DISPONIBLE</span>
-        {% else %}
-            <span style="color: red; font-weight: bold; font-size: 1.2em;">● INDISPONIBLE</span>
-        {% endif %}
-    </p>
-
-    <form action="{{ url_for('modifier_disponibilite') }}" method="POST">
-        <label style="margin-right: 15px; cursor: pointer;">
-            <input type="radio" name="dispo" value="Oui" {% if dispo == 'Oui' %}checked{% endif %}> 
-            Je suis disponible
-        </label>
+        <div class="ligne-information">
+            <span class="etiquette-info">Photo :</span>
+            <div class="contenu-info">
+                <img src="{{ url_for('static', filename=pdp_actuelle or 'images/default-avatar.png') }}" alt="Photo de profil" class="image-profil-carree">
+            </div>
+            <button id="btn_modifier_pdp" class="bouton-modifier">Modifier</button>
+        </div>
         
-        <label style="margin-right: 15px; cursor: pointer;">
-            <input type="radio" name="dispo" value="Non" {% if dispo == 'Non' %}checked{% endif %}> 
-            Je ne suis pas disponible
-        </label>
+        <div id="pdp_modifier_block" class="bloc-formulaire-cache" style="display:none;">
+            <form action="/upload_profile_pic" method="POST" enctype="multipart/form-data">
+                <label>Sélectionner une photo :</label>
+                <input type="file" name="pdp_file" accept="image/*" required>
+                <button type="submit" class="bouton-valider-form">Enregistrer</button>
+            </form>
+        </div>
 
-        <button type="submit" style="padding: 5px 10px; cursor: pointer;">Mettre à jour</button>
-    </form>
-</div>
+        <hr class="separateur-fin">
 
-<hr> <h3>Mes Missions</h3>
-
-<div class="missions-container">
-    {% if liste_missions %}
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-            <thead>
-                <tr style="background-color: #f2f2f2; text-align: left;">
-                    <th style="padding: 10px; border: 1px solid #ddd;">Projet</th>
-                    <th style="padding: 10px; border: 1px solid #ddd;">Mon Rôle</th>
-                    <th style="padding: 10px; border: 1px solid #ddd;">État</th>
-                    <th style="padding: 10px; border: 1px solid #ddd;">Dates</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for mission in liste_missions %}
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd;">
-                        <strong>{{ mission.titre_projet }}</strong>
-                    </td>
-                    <td style="padding: 10px; border: 1px solid #ddd;">
-                        {{ mission.role }}
-                    </td>
-                    <td style="padding: 10px; border: 1px solid #ddd;">
-                        {% if mission.etat == 'En cours' %}
-                            <span style="color: green; font-weight: bold;">{{ mission.etat }}</span>
-                        {% elif mission.etat == 'Terminé' %}
-                            <span style="color: gray;">{{ mission.etat }}</span>
-                        {% else %}
-                            <span style="color: orange;">{{ mission.etat }}</span>
-                        {% endif %}
-                    </td>
-                    <td style="padding: 10px; border: 1px solid #ddd;">
-                        {{ mission.deb }} 
-                        {% if mission.fin %} - {{ mission.fin }} {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p><em>Vous ne participez à aucune mission pour le moment.</em></p>
-    {% endif %}
-</div>
-
-
-<div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
-    
-    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
-        <span style="font-weight: bold; min-width: 120px;">Statistiques :</span>
+        <div class="ligne-information">
+            <span class="etiquette-info">Identité :</span>
+            <div class="contenu-info">
+                <strong>{{ nom_utilisateur }}</strong><br>
+                <span class="texte-secondaire">{{ email_utilisateur }}</span>
+            </div>
+            <button id="btn_modifier_profil" class="bouton-modifier">Modifier</button>
+        </div>
         
-        <a href="{{ url_for('Stats') }}" 
-           style="background-color: #f0f0f0; color: #333; border: 1px solid #ccc; padding: 6px 15px; text-decoration: none; border-radius: 3px; font-size: 14px; display: inline-block; cursor: pointer;">
-           <i class="fas fa-chart-bar" style="margin-right: 5px;"></i> Voir les stats de {{nom_utilisateur}}
-        </a>
+        <div id="nom_email_modifier_block" class="bloc-formulaire-cache" style="display:none;">
+            <form action="/modifier_nom_email" method="POST">
+                <input type="text" name="nom" value="{{nom_utilisateur}}" placeholder="Nom">
+                <input type="email" name="email" value="{{email_utilisateur}}" placeholder="Email">
+                <button type="submit" class="bouton-valider-form">Enregistrer</button>
+            </form>
+        </div>
+
+        <hr class="separateur-fin">
+
+        <div class="ligne-information">
+            <span class="etiquette-info">Sécurité :</span>
+            <div class="contenu-info">Mot de passe</div>
+            <button id="btn_modifier_mdp" class="bouton-modifier">Modifier</button>
+        </div>
+        
+        <div id="mdp_modifier_block" class="bloc-formulaire-cache" style="display:none;">
+            <form action="/modifier_mdp" method="POST">
+                <input type="password" name="ancien_mdp" placeholder="Ancien mot de passe" required>
+                <input type="password" name="nouveau_mdp" placeholder="Nouveau mot de passe" required>
+                <input type="password" name="conf_nouveau_mdp" placeholder="Confirmer mot de passe" required>
+                <button type="submit" class="bouton-valider-form">Enregistrer</button>
+            </form>
+        </div>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 15px;">
-        {% if lien_intervenant %}
-            <span style="font-weight: bold; min-width: 120px;">Profil public :</span>
-            
-            <a href="{{ url_for('Inter_profil', nomcomplet=lien_intervenant) }}" 
-               style="background-color: #f0f0f0; color: #333; border: 1px solid #ccc; padding: 6px 15px; text-decoration: none; border-radius: 3px; font-size: 14px; display: inline-block; cursor: pointer;">
-                <i class="fas fa-eye" style="margin-right: 5px;"></i> Voir le profil de {{nom_utilisateur}}
+    <div class="section-compte">
+        <h2 class="sous-titre-section">Ma Disponibilité</h2>
+        
+        <div class="bloc-disponibilite">
+            <p class="statut-dispo">
+                Statut actuel : 
+                {% if dispo == 'Oui' %}
+                    <span class="badge-vert">● DISPONIBLE</span>
+                {% else %}
+                    <span class="badge-rouge">● INDISPONIBLE</span>
+                {% endif %}
+            </p>
+
+            <form action="{{ url_for('modifier_disponibilite') }}" method="POST" class="formulaire-dispo">
+                <label class="choix-radio">
+                    <input type="radio" name="dispo" value="Oui" {% if dispo == 'Oui' %}checked{% endif %}> 
+                    Je suis disponible
+                </label>
+                <label class="choix-radio">
+                    <input type="radio" name="dispo" value="Non" {% if dispo == 'Non' %}checked{% endif %}> 
+                    Je ne suis pas disponible
+                </label>
+                <button type="submit" class="bouton-action-simple">Mettre à jour</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="section-compte">
+        <h2 class="sous-titre-section">Mes Missions</h2>
+        {% if liste_missions %}
+            <table class="tableau-donnees">
+                <thead>
+                    <tr>
+                        <th>Projet</th>
+                        <th>Rôle</th>
+                        <th>État</th>
+                        <th>Dates</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mission in liste_missions %}
+                    <tr>
+                        <td><strong>{{ mission.titre_projet }}</strong></td>
+                        <td>{{ mission.role }}</td>
+                        <td>
+                            {% if mission.etat == 'En cours' %}
+                                <span class="texte-orange">{{ mission.etat }}</span>
+                            {% elif mission.etat == 'Terminé' %}
+                                <span class="texte-vert">{{ mission.etat }}</span>
+                            {% elif mission.etat == 'En attente' %}
+                                <span class="texte-bleu">{{ mission.etat }}</span>
+                            {% else %}
+                                <span class="texte-gris">{{ mission.etat }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ mission.deb }} {% if mission.fin %} - {{ mission.fin }} {% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="texte-vide">Vous ne participez à aucune mission pour le moment.</p>
+        {% endif %}
+    </div>
+
+    {% if fonction_utilisateur == 'admin' %}
+    <div class="section-compte section-admin-speciale">
+        <h2 class="sous-titre-admin">Administration</h2>
+        <p>Vous avez les droits d'administrateur.</p>
+        <div class="actions-admin">
+            <a href="{{ url_for('admin_validation') }}" class="bouton-acces-admin">
+                Gérer les inscriptions en attente
             </a>
-        {% else %}
-            <span style="font-weight: bold; min-width: 120px;">Profil public :</span>
-            <span style="color: #777; font-style: italic;">Votre compte n'est pas lié à une fiche intervenant publique.</span>
-        {% endif %}
+        </div>
     </div>
+    {% endif %}
 
-</div>
+    <div class="section-compte">
+        <h2 class="sous-titre-section">Actions Diverses</h2>
+        
+        <div class="liste-liens-utiles">
+            <a href="{{ url_for('Stats') }}" class="lien-simple">Voir mes statistiques</a>
+            
+            {% if lien_intervenant %}
+                <a href="{{ url_for('Inter_profil', nomcomplet=lien_intervenant) }}" class="lien-simple">Voir mon profil public</a>
+            {% else %}
+                <span class="texte-gris-italique">Pas de profil public lié.</span>
+            {% endif %}
+        </div>
 
-<div style="margin-top: 20px; display: flex; gap: 10px; align-items: center;">
-    
-    <a href="{{ url_for('telecharger_donnees') }}" 
-       style="background-color: #17a2b8; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; border: none; display: inline-block;">
-       Télécharger mes données
-    </a>
-
-    <a href="{{ url_for('supprimer_compte') }}" 
-       onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement votre compte ? Cette action est irréversible.');"
-       style="background-color: #dc3545; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; border: none; display: inline-block;">
-       Supprimer le compte
-    </a>
+        <div class="zone-danger">
+            <a href="{{ url_for('telecharger_donnees') }}" class="bouton-telecharger">Télécharger mes données</a>
+            <a href="{{ url_for('supprimer_compte') }}" 
+               onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement votre compte ? Cette action est irréversible.');" 
+               class="bouton-danger">
+               Supprimer le compte
+            </a>
+        </div>
+    </div>
 
 </div>
 

@@ -655,6 +655,7 @@ def Mon_compte():
         UI.nom_utilisateur, 
         UI.email_utilisateur, 
         UI.pdp_url, 
+        UI.fonction,
         I.nom, 
         I.prenom,
         I.dispo
@@ -688,6 +689,7 @@ def Mon_compte():
     email = "Inconnu"
     pdp_url = None
     lien_formatte = None # C'est la variable pour ton URL
+    fonction_recuperee = ""
 
     if data:
         # 1. Infos du compte utilisateur
@@ -695,6 +697,7 @@ def Mon_compte():
         email = data['email_utilisateur']
         pdp_url = data['pdp_url']
         dispo_actuelle = data['dispo']
+        fonction_recuperee = data['fonction']
         
         # 2. Infos de l'intervenant pour construire le lien
         # On vérifie que les champs existent bien
@@ -711,7 +714,8 @@ def Mon_compte():
         lien_intervenant=lien_formatte,
         liste_missions=missions_data,
         dispo=dispo_actuelle,
-        titre_page_actuelle=titre_page_actuelle
+        titre_page_actuelle=titre_page_actuelle,
+        fonction_utilisateur=fonction_recuperee
     )
 
 # --- NOUVELLES ROUTES ---
@@ -1783,14 +1787,20 @@ def export_mission(id_projet):
 
 @app.route('/admin/utilisateurs_en_attente')
 def admin_validation():
-    # 1. Sécurité (Comme vu précédemment)
-    if session.get('fonction') != 'admin':
-        return redirect(url_for('Accueil'))
+    # On récupère le nom de l'utilisateur connecté
+    username = session.get('username')
+    if not username:
+        return redirect(url_for('Connexion')) # Si pas connecté, on renvoie au login
     
     db = get_db()
     cursor = db.cursor()
     
-    # On cherche uniquement ceux qui ne sont pas validés (0)
+    cursor.execute("SELECT fonction FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?", (username,))
+    user_info = cursor.fetchone()
+
+    if not user_info or user_info['fonction'] != 'admin':
+        return redirect(url_for('Accueil'))
+    
     cursor.execute("SELECT * FROM Utilisateur_Intervenant WHERE status = 0")
     utilisateurs_en_attente = cursor.fetchall()
     
