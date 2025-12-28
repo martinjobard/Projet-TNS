@@ -1137,3 +1137,55 @@ footer a:hover {
     font-style: italic;
     font-size: 0.9rem;
 }
+
+
+/* PAGE INTERVENANTS */
+
+.titre_page_intervenants {
+    color:#2c3e50;
+
+    font-style:oblique;
+    font-size: larger;
+
+}
+
+.searchFormI input {
+  /* Ce style s'appliquera aux DEUX champs */
+  flex: 1;
+  padding: 10px;
+  border: none;
+  font-family: sans-serif;
+}
+
+
+.mentions_honorables{
+    text-align:right
+}
+
+
+/* Le conteneur qui englobe tout */
+.layout-global {
+  display: flex; /* Aligne la bannière et le contenu côte à côte */
+  flex-direction: row-reverse; /* <--- AJOUTE CETTE LIGNE */
+  align-items: flex-start; /* Aligne le haut de la bannière et du contenu au même niveau */
+}
+
+/* La bannière verticale */
+.side-banner {
+  width: 250px; /* Largeur de ta bannière */
+  background-color: #3c1515; /* On garde ton thème de couleur */
+  color: white;
+  padding: 20px;
+  margin-top: 0;       /* <--- ON FORCE le contact avec le haut */
+  /* Optionnel : fixe la bannière pour qu'elle ne bouge pas au scroll */
+  position: sticky;
+  top: 0;
+  right: 0;
+  height: 100vh;
+ 
+}
+
+.liste-intervenants li {
+    margin-bottom: 8px; 
+    color: #3adf92;
+}

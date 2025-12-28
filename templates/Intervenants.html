@@ -1,27 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<h1>
+<div>
+    <h1 class="titre_page_intervenants">
     Veuillez chercher le nom de l'intervenant qui vous intéresse pour accéder à son profil:
 </h1>
+</div>
 
-<form id="searchForm" action="/recherche" method="get">
+<div>
+    <form id="searchForm" class="searchFormI" action="/recherche" method="get">
     <input type="text" name="nom" placeholder="Nom" required>
     <input type="text" name="prenom" placeholder="Prénom" required>
     <button type="submit">Rechercher</button>
 </form>
+</div>
 
-<h2>
+<div class="liste-intervenants">
+    <h2>
     Tous nos intervenants:
-</h2>
-{% for int in intervenants %}
-<li> <a href= "/Intervenants/{{int.lien}}" > {{int.nom}} {{int.prenom}} </a>
- </li>
+    </h2>
+    {% for int in intervenants %}
+    <li> <a href= "/Intervenants/{{int.lien}}" > {{int.nom}} {{int.prenom}} </a>
+    </li>
+</div>
+
 
 {% endfor %}
 
-<div >
+<div class="layout-global">
+    
+    <aside class="side-banner">   
     <h3>Mentions honorables </h3>
+    <p class="contenu">
+
+   
 
 
         <li>
@@ -126,8 +137,8 @@
             {% endif %}
             </h5>
         </li>
-
-
+    </p>
+    </aside>
 </div>
 
 {% endblock %}
