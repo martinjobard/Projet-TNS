@@ -1173,14 +1173,16 @@ padding: 40px; /* Un peu d'air autour du contenu */
 }
 
 .side-banner {
-width: 280px;
+   
+width: 45%; /* La bannière prendra 30% de la largeur totale */
+min-width: 250px; /* Sécurité : elle ne descendra jamais sous 250px */
 background-color: #4a589d;
 color: white;
-padding: 30px 0px;
+padding: 0;
 position: sticky;
 top: 25px ;
-height: 100vh; /* Fixe la hauteur à celle de l'écran */
 overflow-y: auto; /* Permet de scroller dans la bannière si elle est trop longue */
+padding-bottom: 0; /* Colle le contenu au bord bas */
 }
 
 .searchFormI {
@@ -1200,8 +1202,9 @@ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, A
 font-size: 1.8rem; 
 font-weight: 700; 
 line-height: 1.4; 
-margin-top: 0px; 
 margin-bottom: 20px; 
+margin-top: 0;    /* Supprime la marge au-dessus du titre */
+padding-top: 10px; /* Ajuste précisément si tu veux un petit décalage */
 letter-spacing: -0.5px
 }
 
@@ -1253,11 +1256,41 @@ font-style:normal
 }
 
 .Mentions_honorables{
-color:#ffffff
-}
-.mention_description{
-color:#17a2b8;
-font-style: italic;
+    text-align: center;
+    color:#ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    margin: 0 ;          /* Supprime les marges par défaut */
+    padding-top: 30px;      /* Ajoute du vide à l'intérieur pour que le texte ne touche pas le plafond */
+    background-color: #4a589d; 
+    width: 100%;        /* S'assure qu'il prend toute la largeur */
+    box-sizing: border-box; /* Pour que le padding ne fasse pas déborder le titre */
+ }
 
+.side-banner h5 {
+    font-weight: 600;       
+    color: #c0e1f0;         
+    margin-top: 5px;
+    
 }
+
+.contenu {
+    padding: 20px;      /* C'est ici qu'on remet l'espace que tu avais avant */
+   list-style: none;
+}
+.side-banner p {
+    padding: 20px;
+    font-size: 0.9rem;
+    color: #ffffff;
+    opacity: 0.9;
+}
+.side-banner li {
+    padding: 20px;
+    list-style: none;
+    margin-top: 25px; 
+}
+
+
+.mention_description{
+font-size: 10px;}
 
