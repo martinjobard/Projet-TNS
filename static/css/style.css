@@ -618,6 +618,23 @@ footer a:hover {
     background-color: #ecf0f1;
     color: #333;
 }
+/* --Page carte_clients-- */
+
+.bloc-carte {
+    background-color: #ffffff; 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    padding: 25px; 
+    margin-top: 30px; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.titre-carte {
+    margin-top: 0; 
+    padding-bottom: 15px; 
+    border-bottom: 2px solid #16a085; 
+    color: #333;
+}
 
 /* --Page Projets-- */
 
@@ -1000,6 +1017,7 @@ footer a:hover {
 .texte-orange { color: #e67e22; font-weight: bold; }
 .texte-vert   { color: #27ae60; font-weight: bold; }
 .texte-bleu   { color: #2980b9; font-weight: bold; }
+.texte-noir   { color: #0c1621; }
 .texte-gris   { color: #7f8c8d; }
 .texte-vide   { font-style: italic; color: #999; }
 
