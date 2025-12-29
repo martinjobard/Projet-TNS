@@ -590,7 +590,7 @@ def Stats():
         "Stats.html",
         nb_clients=nb_clients, 
         nb_projects=nb_projects,
-        monthly_labels=["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Octo", "Nov", "Dec"],
+        monthly_labels=["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
         monthly_projects=projets_par_mois,
         sector_labels=liste_labels, 
         sector_values=liste_values,
