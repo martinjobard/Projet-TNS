@@ -1,144 +1,129 @@
 {% extends 'base.html' %}
 {% block content %}
-<div>
-    <h1 class="titre_page_intervenants">
-    Veuillez chercher le nom de l'intervenant qui vous intéresse pour accéder à son profil:
+
+<div class="layout-global">
+<main>
+
+<h1 class="titre_page_intervenants">
+Accédez au profil de l'intervenant de votre choix
 </h1>
-</div>
 
 <div>
-    <form id="searchForm" class="searchFormI" action="/recherche" method="get">
-    <input type="text" name="nom" placeholder="Nom" required>
-    <input type="text" name="prenom" placeholder="Prénom" required>
-    <button type="submit">Rechercher</button>
+<form id="searchForm" class="searchFormI" action="/recherche" method="get">
+<input type="text" name="nom" placeholder="Nom" required>
+<input type="text" name="prenom" placeholder="Prénom" required>
+<button type="submit">Rechercher</button>
 </form>
 </div>
 
 <div class="liste-intervenants">
-    <h2>
-    Tous nos intervenants:
-    </h2>
-    {% for int in intervenants %}
-    <li> <a href= "/Intervenants/{{int.lien}}" > {{int.nom}} {{int.prenom}} </a>
-    </li>
-</div>
-
-
+<h2>
+Tous nos intervenants:
+</h2>
+{% for int in intervenants %}
+<li> <a href= "/Intervenants/{{int.lien}}" > {{int.nom}} {{int.prenom}} </a>
+</li>
 {% endfor %}
 
-<div class="layout-global">
-    
-    <aside class="side-banner">   
-    <h3>Mentions honorables </h3>
-    <p class="contenu">
+</div>
+</main>
 
-   
+<aside class="side-banner"> 
+<h3 class="Mentions_honorables">Mentions honorables </h3>
+<p class="contenu">
 
 
-        <li>
-            L'infatigable 
-            {% if honors1|length == 1 %}                
-            <h5>
-                {% for ind in honors1 %}
-                Bravo à {{ind}} depuis son inscription.
-                {% endfor %}
-            
+<li>
+<h4 class="titre_mention">
+L'infatigable 
+</h4>
+{% if honors1|length == 1 %} 
+<h5 class="mention_description">
+{% for ind in honors1 %}
+Bravo à {{ind}} depuis son inscription.
+{% endfor %}
 
-            {% endif %}
-            {% if honors1|length == 2 %}        
-                {% for ind in honors1 %}
-            
-                {{ind}} est un des deux intervenants a complété le plus de projets. 
-            </h5>
-            {% endfor %}
-            {% endif %}
-        </li>
-       
+{% endif %}
+{% if honors1|length == 2 %} 
+{% for ind in honors1 %}
+{{ind}} est un des deux intervenants a complété le plus de projets. 
+</h5>
+{% endfor %}
+{% endif %}
+</li>
 
-        <li>
-           Bienvenue !!      
-           <h5>
-            
-            {% if honors2|length == 1 %}                
-            
-                {% for ind in honors2 %}
-                TNS est très heureux d'accueillir {{ind}} ! 
-                {% endfor %}
-           
+<li>
+<h4 class="titre_mention">
+Bienvenue !! 
+</h4>
+<h5 class=" mention_description">
+{% if honors2|length == 1 %} 
+{% for ind in honors2 %}
+TNS est très heureux d'accueillir {{ind}} ! 
+{% endfor %}
 
-            
 
-            {% elif honors2|length == 2 %}   
-            
-            TNS est très heureux d'accueillir ses deux nouveaux membres: 
-            
-                {% for ind in honors2 %}
-            
-                 {{ind}}
-            
-            {% endfor %}
-            .
-            {% endif %}
-            </h5>
-        </li>
+{% elif honors2|length == 2 %} 
+TNS est très heureux d'accueillir ses deux nouveaux membres: 
+{% for ind in honors2 %}
+{{ind}}
+{% endfor %}
+.
+{% endif %}
+</h5>
+</li>
 
 
 
 
+<li>
+<h4 class="titre_mention">
+En plein décollage : nouveau projet
+</h4>
+<h5 class="mention_description">
+{% if honors3|length == 0%}
+help
+{% endif %}
 
-        <li>
-            En plein décollage : nouveau projet      
-           <h5>
-            {% if honors3|length == 0%}
-                help
-            {% endif %}
-
-            {% if honors3|length == 1 %}                
-            
-                {% for ind in honors3 %}
-                Bon courage à {{ind}} pour son nouveau projet! 
-                {% endfor %}
-           
-
-            
-
-            {% else %}        
-            Bon courage à l'équipe composée de 
-                {% for ind in honors3 %}
-            
-                {{ind}},
-            
-            {% endfor %}
-            pour leur nouveau projet! 
-            {% endif %}
-            </h5>
-        </li>
+{% if honors3|length == 1 %} 
+{% for ind in honors3 %}
+Bon courage à {{ind}} pour son nouveau projet! 
+{% endfor %}
 
 
-        <li>
-            Mission Accomplie!!    
-            <h5>
-                {% if honors4|length == 1 %}                
-    
-                {% for ind in honors4 %}
-              Félicitations à {{ind}} pour la clôture de son dernier projet! 
-                
-                {% endfor %}
+{% else %} 
+Bon courage à l'équipe composée de 
+{% for ind in honors3 %}
+{{ind}},
+{% endfor %}
+pour leur nouveau projet! 
+{% endif %}
+</h5>
+</li>
+
+<li>
+<h4 class="titre_mention">
+Mission Accomplie!! 
+
+</h4>
+<h5 class="mention_description">
+{% if honors4|length == 1 %} 
+{% for ind in honors4 %}
+Félicitations à {{ind}} pour la clôture de son dernier projet! 
+{% endfor %}
 
 
-            
-
-            {% else %}    
-            Félicitations à l'équipe composée de    
-                {% for ind in honors4 %}
-                {{ind}},
-            {% endfor %}
-            pour la clôture de leur dernier projet.
-            {% endif %}
-            </h5>
-        </li>
-    </p>
-    </aside>
+{% else %} 
+Félicitations à l'équipe composée de 
+{% for ind in honors4 %}
+{{ind}},
+{% endfor %}
+pour la clôture de leur dernier projet.
+{% endif %}
+</h5>
+</li>
+</p>
+</aside>
 </div>
 
 {% endblock %}
