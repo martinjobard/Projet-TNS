@@ -401,7 +401,7 @@ function afficherResultats(profils) {
         const nom_lien = parts[parts.length - 1]; // ex: dupont.jean
     
         a.href = link; 
-        a.textContent = nom_lien.replace('.', ' ').toUpperCase(); // Optionnel : rend le texte plus joli (DUPONT JEAN)
+        a.textContent = nom_lien.replace('.', ' '); // Optionnel : rend le texte plus joli (DUPONT JEAN)
         a.target = "_blank";
         
         li.appendChild(a);

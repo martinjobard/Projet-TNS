@@ -1376,3 +1376,14 @@ letter-spacing: -0.5px
     padding-left:180px;
     margin-bottom:10px;
 }
+
+#resultats-secteur li {
+    list-style-type: circle;
+    list-style-position: inside;
+    text-transform:capitalize;
+    color:#38447a
+}
+
+.statut_blanc{
+    margin-left: 50px;
+    }
