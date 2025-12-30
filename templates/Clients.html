@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1>
+<h1 class="titre_page_intervenants">
     Veuillez chercher le nom du client qui vous intéresse pour accéder à son profil:
 </h1>
 
-<form id="searchFormClient" action="/recherche" method="get">
+<form id="searchFormClient" class="searchFormI" action="/recherche" method="get">
     <input type="text" name="nom" placeholder="Nom" required>
     <input type="text" name="prenom" placeholder="Prénom" required>
     <button type="submit">Rechercher</button>
 </form>
 
-<h1>
+<h1 class="titre_page_intervenants">
     Chercher un client selon son secteur de travail: 
 </h1>
 
-<form id="SearchFormSecteurClient"> 
+<form id="SearchFormSecteurClient" class="searchFormI"> 
     <input type="text" id="secteur-input" name="secteur" placeholder="Secteur" required>
     <button type="submit">Rechercher</button>
 </form>
@@ -28,9 +28,9 @@
   
     
     {% if session.get('fonction') == 'admin' %}
-        <h1>Ajout de Clients</h1>
+        <h1 class="titre_page_intervenants">Ajout de Clients </h1>
         <a href="{{ url_for('ajouter_client') }}" class="btn btn-success">
-            <i class="fas fa-plus-circle"></i> Ajouter un Client
+            <i class="fas fa-plus-circle"></i> <div class ="liste-intervenants"> <li>Ajouter un client</li></div>
         </a>
     {% endif %}
 </div>
