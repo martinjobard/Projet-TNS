@@ -1,90 +1,98 @@
 {% extends 'base.html' %}
 {% block content %}
 <body>
-    <h1>
-        Page de {{nom}} {{prenom}}
+    
+    <h1 class="titre_profil_intervenants">
+        Page de
+        <span class="accent_maj"> {{nom}} {{prenom}}</span>
     </h1>
 
-<li>
-    Secteur : {{secteur}}
+    <div class="user-info-container">
+        <u><strong> Secteur : </strong></u><li class="statut">{{secteur}}</li>
+    </div>
+
+
+    <div class="user-info-container">
+        <u><strong>Contact: </strong></u>
+        <li class="liste_competences">
+        Adresse mail: <li class="information_precises"> {{email}}</li>
+        </li>
+        <li class="liste_competences">
+        Téléphone: <li class="information_precises"> {{telephone}}</li>
+        </li>
+        </li>
+    </div>  
     
-</li>
-<li>
-    Contact: 
-    <p>
-        adresse mail: {{email}}
-    </p>
-    <p>
-        téléphone: {{telephone}}
-    </p>
 
-</li>
-<li>
-    Historique:
-
-       <p>
+     <div class="user-info-container">
+        <u><strong>Historique: </strong></u>
+        <li class="liste_competences">
         Date du dernier contact: {{dernier_contact}}
-       </p> 
-
-       <p>
+        </li>
+        <li class="liste_competences">
         Projets :
+        <li class="information_precises"
         {% for proj in projets %}
         <p>
             Projet n° {{proj.idp}} : {{proj.etat}}
         </p>
         
         {% endfor %}
-       </p>
-        
-</li>
-<li>{% if interactions_done %}
-    PROJET TERMINÉS:
-    {% for idp, liste_messages in interactions_done.items() %}
-   <div class="projet-section">
-        <h3>Projet : {{ idp }}</h3>
-        
-        <ul>
-        {% for m in liste_messages %}
-            <p>
-                <strong>[{{ m.date }}] {{ m.type }} :</strong> 
-                {{ m.contenu }}
-            </p>
-                
+        </li>
+        </li>
+    </div>  
+
+    
+
+<div class="user-info-container">
+    
+    <div class="projets-termines-wrapper">
+        {% if interactions_done %}
+            <u><strong>Projets terminés :</strong></u>
+
+            {% for idp, liste_messages in interactions_done.items() %}
+            <div class="projet-section">
+                <h4 class="statut">Projet : {{ idp }}</h4>
+                <ul>
+                    {% for m in liste_messages %}
+                    <li class="liste_competences">
+                        <strong>[{{ m.date }}] {{ m.type }} :</strong> 
+                        {{ m.contenu }}
+                    </li>          
+                    {% endfor %}
+                </ul>
+            </div> {% endfor %}
+        {% endif %}
+    </div> 
+
+    <div class="projets-en-cours-wrapper">
+        {% if interactions %}
+            <u><strong>Projets non terminés :</strong></u>
             
-        {% endfor %}
-        </ul>
-    {% endfor %}
+            {% for idp, liste_messages in interactions.items() %}
+            <div class="projet-section">
+                <h4 class="statut">Projet : {{ idp }}</h4>
+                <ul>
+                    {% for m in liste_messages %}
+                    <li class="liste_competences">
+                        <strong>[{{ m.date }}] {{ m.type }} :</strong> 
+                        {{ m.contenu }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div> {% endfor %}
+        {% endif %} 
     </div>
-    {% endif %}
+
+</div>
+
+    
 
 
-
-     
-    {% if interactions %}
-    PROJETS NON TERMINÉS:
-    {% for idp, liste_messages in interactions.items() %}
-   <div class="projet-section">
-        <h3>Projet : {{ idp }}</h3>
-        
-        <ul>
-        {% for m in liste_messages %}
-            <li>
-                <strong>[{{ m.date }}] {{ m.type }} :</strong> 
-                {{ m.contenu }}
-            </li>
-        {% endfor %}
-        </ul>
-    {% endfor %}
-    </div>
-    {% endif %}
-
-
-
-</li>
 
 {% if session.get('fonction') == 'admin' %}
 
-    <div style="background-color: #ffffff; border: 1px solid #ddd; border-radius: 8px; padding: 25px; margin-top: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background-color: #edeff4; border: 1px solid #ddd; border-radius: 8px; padding: 25px; margin-top: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         
         <h3 style="margin-top: 0; padding-bottom: 15px; border-bottom: 2px solid #007bff; color: #333; font-size: 1.25rem;">
             <i class="fas fa-user-shield"></i> Administration Client

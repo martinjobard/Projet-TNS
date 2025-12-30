@@ -1191,7 +1191,6 @@ padding: 40px;
 }
 
 .side-banner {
-   
 width: 45%; 
 min-width: 250px; 
 background-color: #4a589d;
@@ -1268,8 +1267,6 @@ border-left: 4px solid #38447a; }
 .titre_mention{
 color:#ffffff;
 font-style:normal
-
-
 }
 
 .Mentions_honorables{
@@ -1373,4 +1370,9 @@ margin-bottom: 20px;
 margin-top: 0;    
 padding-top: 10px; 
 letter-spacing: -0.5px
+}
+
+.information_precises{
+    padding-left:180px;
+    margin-bottom:10px;
 }
