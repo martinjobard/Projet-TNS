@@ -152,6 +152,22 @@ main {
     color: #2c3e50; /* Le texte devient bleu */
 }
 
+.login-page {
+    background: #f4f6f8;
+    padding: 40px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    margin: auto;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;   /* espace entre chaque élément */
+}
+
 /* 2. Conteneur Profil (pour ancrer le menu déroulant) */
 .profile-container {
     position: relative; /* Indispensable pour que le menu se place par rapport à ça */
@@ -532,6 +548,24 @@ footer a:hover {
 
 .mon-bouton:hover {
     background-color: #16a085; 
+}
+
+.bouton-creercompte {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #17a2b8;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
+    font-size: 0.9rem;
+}
+
+.bouton-creercompte:hover {
+    background-color: #0f6a78; 
 }
 
 .texte-orange { color: #e67e22; font-weight: bold; }
