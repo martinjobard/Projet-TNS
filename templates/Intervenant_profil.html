@@ -3,44 +3,59 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
 </head>
 {% block content %}
-<h1>
-PROFIL DE {{nom}} {{prenom}}
+<h1 class="titre_profil_intervenants">
+    Profil de
+    <span class="accent_maj"> {{nom}} {{prenom}}</span>
 </h1>
+
 <div class="user-info-container">
-    <div> Nom : {{nom_utilisateur}} </div> 
-    <div> Email : {{email_utilisateur}} </div>
-    <img src="{{ url_for('static', filename=pdp_actuelle or 'images/default-avatar.png') }}" alt="Photo de profil" style="max-width:150px;">
+    <u><strong>Nom :</strong></u>
+    <li class="statut">  {{nom_utilisateur}} </li> 
+    <u><strong>Email :</strong></u> 
+    <li class="statut"> {{email_utilisateur}} </li>
+    <img src="{{ url_for('static', filename=pdp_actuelle or 'images/default-avatar.png') }}" class="photo_profil"alt="Photo de profil" style="max-width:150px;">
 </div>
-<h3 style="margin-top: 0;">
-        Statut : 
-        {% if dispo == 'Oui' %}
+<div style="margin-top: 0;" class="user-info-container">
+         <u>
+        <strong>Statut :</strong> 
+    </u>
+        <li class="statut">
+            {% if dispo == 'Oui' %}
             <span style="color: green;">● Disponible</span>
         {% else %}
             <span style="color: red;">● Indisponible</span>
         {% endif %}
-</h3>
-<h3>
-Compétences:
-{% for comp in competences %}
-<li>{{ comp.nom }} : {{ comp.niveau }}</li>
+        </li>
+        
+    </div>
+<div class="user-info-container">
+    
+     <u>
+        <strong>  Compétences: </strong> 
+    </u>
+        {% for comp in competences %}
+        <li class="liste_competences">{{ comp.nom }} : {{ comp.niveau }}</li>
+        {% endfor %}
+</div>
 
-{% endfor %}
-</h3>
 
 
-
-<div style="margin: 20px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
-    <strong>Poste actuel :</strong> 
-    {% if role %}
+<div class="user-info-container">
+    <u>
+        <strong>Poste actuel :</strong> 
+    </u>
+    <li class="statut">
+        {% if role %}
         <span class="badge bg-secondary">{{ role }}</span>
     {% else %}
         <span class="text-muted">Non spécifié</span>
     {% endif %}
+    </li>
 </div>
 
 {% if session.get('fonction') == 'admin' %}
 
-    <div style="background-color: #ffffff; border: 1px solid #ddd; border-radius: 8px; padding: 25px; margin-top: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background-color: #edeff4; border: 1px solid #ddd; border-radius: 8px; padding: 25px; margin-top: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         
         <h3 style="margin-top: 0; padding-bottom: 15px; border-bottom: 2px solid #007bff; color: #333; font-size: 1.25rem;">
             <i class="fas fa-user-cog"></i> Administration Intervenant

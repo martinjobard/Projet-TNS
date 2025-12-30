@@ -1325,3 +1325,52 @@ font-size: 10px;}
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
 }
+
+
+/* PROFIL INTERVENANTS */
+
+.accent_maj{
+    text-transform: capitalize;
+}
+.user-info-container{
+    list-style: none;
+    margin-bottom: 12px;
+    padding: 10px;
+    background: #edeff4;
+    border-radius: 5px;
+    border-left: 4px solid #38447a;
+}
+.liste_competences{
+    list-style:circle;
+    list-style-position: inside; 
+    margin-left: 50px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #edeff4;
+}
+.statut{
+    list-style-position: inside; 
+    margin-left: 50px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #edeff4;
+}
+.photo_profil{
+    display: block;    /* On dit à l'image de se comporter comme un bloc entier */
+    margin-left: auto; /* Pousse à gauche */
+    
+}
+
+
+.titre_profil_intervenants{
+color:#2c3e50;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+font-size: 1.8rem; 
+text-align: center;
+font-weight: 700; 
+line-height: 1.4; 
+margin-bottom: 20px; 
+margin-top: 0;    
+padding-top: 10px; 
+letter-spacing: -0.5px
+}
