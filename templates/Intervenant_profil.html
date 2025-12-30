@@ -3,14 +3,16 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
 </head>
 {% block content %}
-<h1 class="titre_page_intervenants">
+<h1 class="titre_profil_intervenants">
     Profil de
     <span class="accent_maj"> {{nom}} {{prenom}}</span>
 </h1>
 
 <div class="user-info-container">
-    <li class="statut"> <u><strong>Nom :</strong></u> {{nom_utilisateur}} </li> 
-    <li class="statut"> <u><strong>Email :</strong></u> {{email_utilisateur}} </li>
+    <u><strong>Nom :</strong></u>
+    <li class="statut">  {{nom_utilisateur}} </li> 
+    <u><strong>Email :</strong></u> 
+    <li class="statut"> {{email_utilisateur}} </li>
     <img src="{{ url_for('static', filename=pdp_actuelle or 'images/default-avatar.png') }}" class="photo_profil"alt="Photo de profil" style="max-width:150px;">
 </div>
 <div style="margin-top: 0;" class="user-info-container">

@@ -1360,3 +1360,17 @@ font-size: 10px;}
     margin-left: auto; /* Pousse à gauche */
     
 }
+
+
+.titre_profil_intervenants{
+color:#2c3e50;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+font-size: 1.8rem; 
+text-align: center;
+font-weight: 700; 
+line-height: 1.4; 
+margin-bottom: 20px; 
+margin-top: 0;    
+padding-top: 10px; 
+letter-spacing: -0.5px
+}
