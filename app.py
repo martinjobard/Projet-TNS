@@ -597,7 +597,8 @@ def Stats():
         table_data=table_data,
         intervenants=tous_les_intervenants,
         selected_id=id_a_analyser,
-        selected_year=selected_year if selected_year else 'all' 
+        selected_year=selected_year if selected_year else 'all', 
+        titre_page_actuelle="Stats" 
     )
 
 @app.route('/Missions_réalisées')
@@ -1804,7 +1805,7 @@ def admin_validation():
     cursor.execute("SELECT * FROM Utilisateur_Intervenant WHERE status = 0")
     utilisateurs_en_attente = cursor.fetchall()
     
-    return render_template('admin_validation.html', utilisateurs=utilisateurs_en_attente)
+    return render_template('admin_validation.html', utilisateurs=utilisateurs_en_attente, titre_page_actuelle="Validations en attente")
 
 @app.route('/admin/valider/<int:id>', methods=['POST'])
 def valider_utilisateur(id):
@@ -1897,7 +1898,7 @@ def carte_clients():
             "lon": client['longitude']
         })
     
-    return render_template('carte_clients.html', clients=clients_list)
+    return render_template('carte_clients.html', clients=clients_list, titre_page_actuelle="Carte Clients")
 
 @app.route('/ajouter_client', methods=['GET', 'POST'])
 def ajouter_client():
@@ -1977,7 +1978,7 @@ def ajouter_documents():
 
     projets=db.execute("SELECT idp, titre_projet FROM Projets").fetchall()
     pre_select = request.args.get('id_projet')
-    return render_template('ajouter_documents.html', projets=projets, pre_select=pre_select )
+    return render_template('ajouter_documents.html', projets=projets, pre_select=pre_select, titre_page_actuelle="Ajouter_documents")
 
 def algorythme_matching(id_projet):
     db=get_db()
