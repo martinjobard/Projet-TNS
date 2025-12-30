@@ -1181,26 +1181,26 @@ footer a:hover {
 
 .layout-global {
 display: flex;
-align-items: stretch; /* Force les colonnes à avoir la même hauteur */
-min-height: 100vh; /* Prend toute la hauteur de l'écran */
+align-items: stretch; 
+min-height: 100vh; 
 }
 
 .main-content {
-flex: 1; /* Prend tout l'espace restant à gauche */
-padding: 40px; /* Un peu d'air autour du contenu */
+flex: 1; 
+padding: 40px; 
 }
 
 .side-banner {
    
-width: 45%; /* La bannière prendra 30% de la largeur totale */
-min-width: 250px; /* Sécurité : elle ne descendra jamais sous 250px */
+width: 45%; 
+min-width: 250px; 
 background-color: #4a589d;
 color: white;
 padding: 0;
 position: sticky;
 top: 25px ;
-overflow-y: auto; /* Permet de scroller dans la bannière si elle est trop longue */
-padding-bottom: 0; /* Colle le contenu au bord bas */
+overflow-y: auto; 
+padding-bottom: 0; 
 }
 
 .searchFormI {
@@ -1211,7 +1211,7 @@ max-width: 700px;
 background: #ffffff;
 padding: 15px;
 border-radius: 12px;
-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Ombre légère */
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); 
 }
 
 .titre_page_intervenants{
@@ -1221,8 +1221,8 @@ font-size: 1.8rem;
 font-weight: 700; 
 line-height: 1.4; 
 margin-bottom: 20px; 
-margin-top: 0;    /* Supprime la marge au-dessus du titre */
-padding-top: 10px; /* Ajuste précisément si tu veux un petit décalage */
+margin-top: 0;    
+padding-top: 10px; 
 letter-spacing: -0.5px
 }
 
@@ -1232,12 +1232,12 @@ padding: 12px 15px;
 border: 3px solid #38447a;
 border-radius: 8px;
 font-size: 16px;
-transition: all 0.3s ease; /* Animation fluide */
+transition: all 0.3s ease; 
 outline: none;
 }
 
 .searchFormI input:focus {
-border-color: #4a589d; /* Change de couleur au clic */
+border-color: #4a589d; 
 box-shadow: 0 0 0 3px rgba(74, 88, 157, 0.1);
 }
 
@@ -1246,7 +1246,7 @@ padding: 12px 25px;
 background-color: #4a589d;
 color: white;
 border: 1px solid #e0e0e0;
-border-radius: 50px; /* Donne une forme de pilule très moderne */ 
+border-radius: 50px; 
 font-weight: bold;
 cursor: pointer;
 transition: transform 0.2s, background-color 0.2s;
@@ -1263,8 +1263,7 @@ margin-bottom: 12px;
 padding: 10px;
 background: #fdfdfd;
 border-radius: 5px;
-border-left: 4px solid #38447a; /* Petite barre de couleur sur le côté */
-}
+border-left: 4px solid #38447a; }
 
 .titre_mention{
 color:#ffffff;
@@ -1278,11 +1277,11 @@ font-style:normal
     color:#ffffff;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 18px;
-    margin: 0 ;          /* Supprime les marges par défaut */
-    padding-top: 30px;      /* Ajoute du vide à l'intérieur pour que le texte ne touche pas le plafond */
+    margin: 0 ;          
+    padding-top: 30px;  
     background-color: #4a589d; 
-    width: 100%;        /* S'assure qu'il prend toute la largeur */
-    box-sizing: border-box; /* Pour que le padding ne fasse pas déborder le titre */
+    width: 100%;        
+    box-sizing: border-box; 
  }
 
 .side-banner h5 {
@@ -1291,12 +1290,12 @@ font-style:normal
     font-weight: 300;
     font-size: 0.9rem;
     opacity: 0.9;
-    margin-bottom: 25px; /* Espace entre chaque mention */
+    margin-bottom: 25px; 
     
 }
 
 .contenu {
-    padding: 20px;      /* C'est ici qu'on remet l'espace que tu avais avant */
+    padding: 20px;      
    list-style: none;
 }
 .side-banner p {
@@ -1315,3 +1314,14 @@ font-style:normal
 .mention_description{
 font-size: 10px;}
 
+
+/* PAGE CLIENTS */
+
+
+.btn-success{
+    font-size: 18px;
+    color:#38447a;
+    padding:30px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+}
