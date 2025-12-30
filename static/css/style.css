@@ -1109,6 +1109,37 @@ footer a:hover {
     border-radius: 4px;
     font-weight: bold;
 }
+/* --Page Inscription-- */
+
+.form-group {
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    margin-bottom: 15px; 
+}
+
+.form-group label {
+    width: 200px;       /* Ajuste cette valeur selon la longueur de tes textes */
+    flex-shrink: 0;     /* Empêche le label de rétrécir */
+}
+
+.form-group input, 
+.form-group select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.competence-row {
+    display: flex;
+    gap: 10px; 
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ccc; 
+    padding-bottom: 10px;
+}
+
+
 
 /* --Page Accueil-- */
 

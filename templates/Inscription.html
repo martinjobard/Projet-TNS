@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>Inscription d'un nouvel intervenant</h2>
+    <h2 class="titre-page">Inscription d'un nouvel intervenant</h2>
 
     {% if erreur %}
         <div style="color: red; border: 1px solid red; padding: 10px;">
@@ -12,40 +12,52 @@
     <form action="{{ url_for('Inscription') }}" method="POST">
         
         <fieldset>
-            <legend>Informations de Connexion</legend>
+            <legend class="sous-titre-section">Informations de Connexion</legend>
             
-            <label for="username">Nom d'utilisateur :</label>
-            <input type="text" id="username" name="nom_utilisateur" required>
+            <div class="form-group">
+                <label class="label-gras" for="username">Nom d'utilisateur :</label>
+                <input type="text" id="username" name="nom_utilisateur" required>
+            </div>
 
-            <label for="email">Email :</label>
-            <input type="email" id="email" name="email" required>
+            <div class="form-group">
+                <label class="label-gras" for="email">Email :</label>
+                <input type="email" id="email" name="email" required>
+            </div>
 
-            <label for="password">Mot de passe :</label>
-            <input type="password" id="password" name="mot_de_passe" required>
+            <div class="form-group">
+                <label class="label-gras" for="password">Mot de passe :</label>
+                <input type="password" id="password" name="mot_de_passe" required>
+            </div>
 
-            <label for="confirm_password">Confirmer le mot de passe :</label>
-            <input type="password" id="confirm_password" name="confirmation_mdp" required>
+            <div class="form-group">
+                <label class="label-gras" for="confirm_password">Confirmer le mot de passe :</label>
+                <input type="password" id="confirm_password" name="confirmation_mdp" required>
+            </div>
         </fieldset>
 
         <fieldset>
             <legend>Informations Personnelles</legend>
             
-            <label for="prenom">Prénom :</label>
-            <input type="text" id="prenom" name="prenom" required>
+            <div class="form-group">
+                <label class="label-gras" for="prenom">Prénom :</label>
+                <input type="text" id="prenom" name="prenom" required>
+            </div>
 
-            <label for="nom">Nom :</label>
-            <input type="text" id="nom" name="nom" required>
+            <div class="form-group">
+                <label class="label-gras" for="nom">Nom :</label>
+                <input type="text" id="nom" name="nom" required>
+            </div>
         </fieldset>
 
         <fieldset>
             <legend>Compétences</legend>
             
             <div id="competences-container">
-                <div class="competence-row" style="margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
-                    <label>Compétence :</label>
+                <div class="competence-row">
+                    <label class="label-gras">Compétence :</label>
                     <input type="text" name="competence[]" required placeholder="Ex: Python, Cuisine...">
 
-                    <label>Niveau :</label>
+                    <label class="label-gras">Niveau :</label>
                     <select name="niveau[]" required>
                         <option value="" disabled selected>Choisir...</option>
                         <option value="Expert">Expert</option>
@@ -60,12 +72,12 @@
 
             <button type="button" id="btn-add-competence" style="margin-top: 10px; background-color: #e0f7fa;">+ Ajouter une compétence</button>
         </fieldset>
-        <button type="submit">Créer le compte</button>
+        <button class="mon-bouton" type="submit">Créer le compte</button>
     </form>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 
     <div class="login-link">
-    <p>Vous avez déjà un compte ?</p>
-    <a href="{{ url_for('Connexion') }}" class="register-button">Se connecter</a>
+    <p class="label-gras">Vous avez déjà un compte ?</p>
+    <a href="{{ url_for('Connexion') }}" class="bouton-creercompte">Se connecter</a>
     </div>
 {% endblock %}
