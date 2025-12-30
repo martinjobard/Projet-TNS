@@ -1387,3 +1387,17 @@ letter-spacing: -0.5px
 .statut_blanc{
     margin-left: 50px;
     }
+
+
+/* PAGE CONTACT */
+
+
+.logo_contact{
+    display: block;    /* On dit à l'image de se comporter comme un bloc entier */
+    margin-left: auto; 
+    width:80px;
+    height: 80px;
+    
+
+    
+}

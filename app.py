@@ -1941,7 +1941,7 @@ def ajouter_client():
             return redirect(url_for('ajouter_client'))
 
     # Si c'est un GET, on affiche juste le formulaire
-    return render_template('ajouter_client.html')
+    return render_template('ajouter_client.html', titre_page_actuelle="Ajouter client")
 
 @app.route('/ajouter_documents', methods=['GET', 'POST'])
 def ajouter_documents():
