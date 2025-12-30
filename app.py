@@ -1153,7 +1153,7 @@ def Client_profil(nomcomplet=None):
 
     # 4. Vérification : Si la liste est vide, c'est que la personne n'existe vraiment pas
     if not rows:
-       return render_template("error_client.html", message="Nous n'avons pas encore travaillé avec cette personne, vérifiez peut-être l'orthographe ")
+       return render_template("error_client.html", message1="Client non trouvé", message2="Nous n'avons pas encore travaillé avec cette personne, vérifiez peut-être l'orthographe. ")
 
     # 5. On récupère les infos de base (sur la première ligne)
     id_clients = rows[0]['idc']
