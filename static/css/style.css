@@ -471,6 +471,21 @@ main {
     height: 600px;
     margin: 20px auto;
 }
+.mon-bouton-stats {
+    display: inline-block;
+    background-color: #1abc9c; 
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
+    font-size: 0.9rem;
+}
+
+.mon-bouton-stats:hover {
+    background-color: #16a085; 
+}
 
 .stats-table {
     width: 100%;
