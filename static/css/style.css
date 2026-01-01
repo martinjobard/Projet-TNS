@@ -550,6 +550,12 @@ footer a:hover {
     background-color: #16a085; 
 }
 
+form > .mon-bouton {
+    display: block;
+    margin: 30px auto 10px auto; 
+    min-width: 200px;            
+}
+
 .bouton-creercompte {
     display: inline-flex;
     justify-content: center;
@@ -1132,14 +1138,52 @@ footer a:hover {
 
 .competence-row {
     display: flex;
-    gap: 10px; 
+    gap: 15px; 
     align-items: center;
     margin-bottom: 15px;
-    border-bottom: 1px solid #ccc; 
-    padding-bottom: 10px;
+    border-bottom: 1px solid #eee; 
+    padding-bottom: 15px;
 }
 
+.competence-row input {
+    flex: 2; /* Le champ nom est plus large */
+}
 
+.competence-row select {
+    flex: 1; /* Le champ niveau est plus petit */
+}
+
+.sous-titre-section-inscription {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    padding: 0 10px;
+    margin-bottom: 15px;
+    border-bottom: none; /* On laisse le fieldset gérer la bordure */
+}
+
+fieldset {
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.login-link {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;    
+    justify-content: center;
+    margin-top: 40px;       
+    padding-top: 20px;
+    border-top: 1px solid #eee; 
+}
+
+.login-link p {
+    margin-bottom: 10px;    
+}
 
 /* --Page Accueil-- */
 
@@ -1462,7 +1506,4 @@ letter-spacing: -0.5px
     margin-left: auto; 
     width:80px;
     height: 80px;
-    
-
-    
 }
