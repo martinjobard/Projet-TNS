@@ -33,6 +33,7 @@
                     <th>Secteur</th>
                     <th>Email</th>
                     <th>Tel</th>
+                    <th>Annuler</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,12 +44,12 @@
                     <td>{{ client.email }}</td>
                     <td>{{ client.telephone }}</td>
                     <td>
-                    <form action="{{ url_for('annuler_match', client_id=client.idc) }}" method="post">
-                        <button type="submit" class="annuler-like">
-                            Annuler ↺
-                        </button>
-                    </form>
-                </td>
+                        <form action="{{ url_for('annuler_match', client_id=client.idc) }}" method="post">
+                            <button type="submit" class="annuler-like">
+                                Annuler ↺
+                            </button>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

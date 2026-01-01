@@ -284,38 +284,54 @@ main {
 }
 
 .card {
-    /* Style et positionnement absolu */
     position: absolute;
     width: 100%;
     height: 100%;
     top: 0;
     left: 0;
-    
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 50px;
     color: rgba(255, 255, 255, 0.9);
     user-select: none;
     cursor: grab;
     transition: transform 0.3s ease, opacity 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    font-weight: 600;         
+    font-size: 2rem;                     
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .card:not(:last-child) {
     top: 5px;
     transform: scale(0.95);
 }
-.left-text {
-    color: #f00;
-    left: auto; 
+
+.action-text {
+    position: absolute;
+    top: 55%;                /* Aligné verticalement au niveau des cartes */
+    transform: translateY(-50%);
+    font-family: inherit;    /* Utilise la police du site */
+    font-weight: bold;
+    font-size: 1.5rem;       /* Taille adaptée pour être lisible */
+    z-index: 10;             /* Pour rester au-dessus du décor */
+    white-space: nowrap;
 }
 
+/* Positionnement à gauche (Rouge) */
+.left-text {
+    left: 10%;               /* Ajuste selon la largeur de ton écran */
+    color: #ff4b4b;          /* Un rouge plus moderne */
+}
+
+/* Positionnement à droite (Vert) */
 .right-text {
-    position: absolute;
-    color: #008000;
-    right: 50px; 
+    right: 10%;              /* Ajuste selon la largeur de ton écran */
+    color: #27ae60;          /* Le même vert que tes boutons valider */
 }
 
 .tinderboard {
@@ -358,6 +374,43 @@ main {
     font-size: 0.9em;
 }
 
+.stats-table .annuler-like:hover {
+    background-color: #d43f3f; /* Assombrit légèrement au survol */
+}
+
+/* Centre tout le contenu des cellules verticalement */
+.stats-table td {
+    vertical-align: middle;
+    text-align: center; /* Optionnel : centre aussi le texte horizontalement */
+}
+.stats-table td:last-child {
+    width: 120px;            /* Largeur fixe pour la colonne action */
+    padding: 5px;
+    text-align: center;
+}
+
+.stats-table .annuler-like {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    font-size: 0.85rem;      /* Plus petit pour mieux s'intégrer */
+    margin: 0;               /* Supprime les décalages */
+    border-radius: 4px;
+    background-color: #ff4b4b;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Supprime les marges du formulaire pour éviter les sauts de ligne */
+.stats-table td form {
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Page stats --- */
 .stats-container {
     padding: 20px;
 }
@@ -417,6 +470,21 @@ main {
     width: 500px; 
     height: 600px;
     margin: 20px auto;
+}
+.mon-bouton-stats {
+    display: inline-block;
+    background-color: #1abc9c; 
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
+    font-size: 0.9rem;
+}
+
+.mon-bouton-stats:hover {
+    background-color: #16a085; 
 }
 
 .stats-table {
@@ -548,6 +616,12 @@ footer a:hover {
 
 .mon-bouton:hover {
     background-color: #16a085; 
+}
+
+form > .mon-bouton {
+    display: block;
+    margin: 30px auto 10px auto; 
+    min-width: 200px;            
 }
 
 .bouton-creercompte {
@@ -1132,14 +1206,52 @@ footer a:hover {
 
 .competence-row {
     display: flex;
-    gap: 10px; 
+    gap: 15px; 
     align-items: center;
     margin-bottom: 15px;
-    border-bottom: 1px solid #ccc; 
-    padding-bottom: 10px;
+    border-bottom: 1px solid #eee; 
+    padding-bottom: 15px;
 }
 
+.competence-row input {
+    flex: 2; /* Le champ nom est plus large */
+}
 
+.competence-row select {
+    flex: 1; /* Le champ niveau est plus petit */
+}
+
+.sous-titre-section-inscription {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    padding: 0 10px;
+    margin-bottom: 15px;
+    border-bottom: none; /* On laisse le fieldset gérer la bordure */
+}
+
+fieldset {
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.login-link {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;    
+    justify-content: center;
+    margin-top: 40px;       
+    padding-top: 20px;
+    border-top: 1px solid #eee; 
+}
+
+.login-link p {
+    margin-bottom: 10px;    
+}
 
 /* --Page Accueil-- */
 
