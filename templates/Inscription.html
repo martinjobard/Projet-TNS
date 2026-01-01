@@ -12,7 +12,7 @@
     <form action="{{ url_for('Inscription') }}" method="POST">
         
         <fieldset>
-            <legend class="sous-titre-section">Informations de Connexion</legend>
+            <legend class="sous-titre-section-inscription">Informations de Connexion</legend>
             
             <div class="form-group">
                 <label class="label-gras" for="username">Nom d'utilisateur :</label>
@@ -36,7 +36,7 @@
         </fieldset>
 
         <fieldset>
-            <legend>Informations Personnelles</legend>
+            <legend class="sous-titre-section-inscription">Informations Personnelles</legend>
             
             <div class="form-group">
                 <label class="label-gras" for="prenom">Prénom :</label>
@@ -50,7 +50,7 @@
         </fieldset>
 
         <fieldset>
-            <legend>Compétences</legend>
+            <legend class="sous-titre-section-inscription">Compétences</legend>
             
             <div id="competences-container">
                 <div class="competence-row">
@@ -58,7 +58,7 @@
                     <input type="text" name="competence[]" required placeholder="Ex: Python, Cuisine...">
 
                     <label class="label-gras">Niveau :</label>
-                    <select name="niveau[]" required>
+                    <select name="niveau[]" required class="boutons-stats-selection">
                         <option value="" disabled selected>Choisir...</option>
                         <option value="Expert">Expert</option>
                         <option value="Avancé">Avancé</option>
@@ -70,7 +70,7 @@
                 </div>
             </div>
 
-            <button type="button" id="btn-add-competence" style="margin-top: 10px; background-color: #e0f7fa;">+ Ajouter une compétence</button>
+            <button type="button" id="btn-add-competence" class="bouton-action-simple">+ Ajouter une compétence</button>
         </fieldset>
         <button class="mon-bouton" type="submit">Créer le compte</button>
     </form>
