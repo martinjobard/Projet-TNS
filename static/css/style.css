@@ -1458,11 +1458,41 @@ letter-spacing: -0.5px
 
 
 .logo_contact{
-    display: block;    /* On dit à l'image de se comporter comme un bloc entier */
+    display: block;    
     margin-left: auto; 
     width:80px;
     height: 80px;
-    
+}
 
-    
+
+
+/* PAGE PARTENAIRES */
+
+
+.logo_partenaires{
+    display: block;
+    width: 25%;     
+    margin: 0 auto; 
+    padding-top: 10px;}
+
+
+.titre_partenaires{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 800; /* Très gras */
+    letter-spacing: -0.5px; /* Resserre un tout petit peu les lettres pour un effet "logo" */
+    text-align: center;
+    color:#233342;
+    font-size: 25px;
+    text-decoration: none;
+}
+
+.information_partenaires{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size:14px;
+    margin-top: 12px;
+    margin-bottom: 15px;
+    font-style: inherit;
+
+
+
 }

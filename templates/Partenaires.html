@@ -1,74 +1,96 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <p> 
-        <a href="https://telecomnancy.univ-lorraine.fr/">Télécom Nancy</a>
-        <img src="{{ url_for('static', filename='images/telecom_nancy.png') }}">
-        <div>
+<div class="user-info-container">
+
+    <li> 
+        <a href="https://telecomnancy.univ-lorraine.fr/" class="titre_partenaires">Télécom Nancy </a>
+        <img src="{{ url_for('static', filename='images/telecom_nancy.png') }}" class="logo_partenaires" alt="logo">
+        <div class="information_partenaires">
             
             L'école nous fournit le cadre académique et l'expertise technique de ses étudiants-ingénieurs, 
             spécialisés dans les domaines de l'informatique, des réseaux et des systèmes d'information. 
             Ce lien très étroit assure la qualité et l'innovation des prestations proposées par TNS.
         </div>
-       
-    </p>
-    <p> 
-        <a href="https://www.lcl.fr/">LCL</a>
-        <img src="{{ url_for('static', filename='images/lcl.png') }}">
+    
+    </li>
+</div>
+
+
+<div class="user-info-container">
+
+    
+    <li> 
+        <a href="https://www.lcl.fr/" class="titre_partenaires">LCL</a>
+        <img src="{{ url_for('static', filename='images/lcl.png') }}" class="logo_partenaires" alt="logo">
         <div>
             
             Notre relation avec un des acteurs majeurs du secteur bancaire est cruciale pour l'employabilité de nos étudiants. 
             Le secteur bancaire est très intéressant pour des stages ou futurs emplois car il demande des compétences élevées en cybersécurité des transactions, développement d'applications mobiles bancaires et transformation numérique des services clients.
         </div>
-    </p>
+    </li>
+</div>
 
-    <p> 
-        <a href="https://iaemetz.univ-lorraine.fr/fr">IAE Metz École universitaire de management </a>
-        <img src="{{ url_for('static', filename='images/iae.png') }}">
+<div class="user-info-container">
+
+    <li> 
+        <a href="https://iaemetz.univ-lorraine.fr/fr" class="titre_partenaires">IAE Metz École universitaire de management </a>
+        <img src="{{ url_for('static', filename='images/iae.png') }}" class="logo_partenaires" alt="logo">
         <div>
             
             Le partenariat avec l'IAE Metz enrichit notre offre par l'interdisciplinarité. Tandis que TNS
             apporte l'expertise technique en ingénierie du numérique, l'IAE apporte  l'expertise en marketing, finance et stratégie d'entreprise. .
         </div>
         
-    </p>
+    </li>
+</div>
 
-    <p> 
-        <a href="https://www.societegenerale.com/">Société générale</a>
-        <img src="{{ url_for('static', filename='images/societe_generale.png') }}">
+<div class="user-info-container">
+
+    <li> 
+        <a href="https://www.societegenerale.com/" class="titre_partenaires">Société générale</a>
+        <img src="{{ url_for('static', filename='images/societe_generale.png') }}"class="logo_partenaires" alt="logo">
         <div>
             
             Notre relation avec un des acteurs majeurs du secteur bancaire est cruciale pour l'employabilité de nos étudiants. 
             Le secteur bancaire est très intéressant pour des stages ou futurs emplois car il demande des compétences élevées 
             en cybersécurité des transactions, développement d'applications mobiles bancaires et transformation numérique des services clients.
         </div>
-    </p>
+    </li>
+</div>
 
-    <p> 
-        <a href="https://www.transalliance.eu/">Transalliance</a> 
-        <img src="{{ url_for('static', filename='images/transalliance.png') }}"  alt="logo" >
+<div class="user-info-container">
+
+    <li> 
+        <a href="https://www.transalliance.eu/" class="titre_partenaires">Transalliance</a> 
+        <img src="{{ url_for('static', filename='images/transalliance.png') }}"  alt="logo" class="logo_partenaires">
 
         <div>
             
             La collaboration avec Transalliance illustre l'application des technologies numériques au 
             secteur de la logistique et du transport. 
         </div>
-    </p>
+    </li>
+</div>
+<div class="user-info-container">
 
-    <p> 
-        <a href="https://www.wigfrance.fr/">WIG France Entreprise</a>
-        <img src="{{ url_for('static', filename='images/wig.png') }}"  alt="logo" >
+    <li> 
+        <a href="https://www.wigfrance.fr/" class="titre_partenaires">WIG France Entreprise</a>
+        <img src="{{ url_for('static', filename='images/wig.png') }}"  alt="logo" class="logo_partenaires">
         <div>
             
             Le partenariat avec WIG France Entreprise, souvent lié aux infrastructures de télécommunication, est essentiel pour les projets impliquant l'ingénierie des réseaux et le déploiement de solutions de connectivité. 
             Les intervenants peuvent alors gagner de l'expérience sur les défis concrets de la couverture réseau, de l'optimisation des flux et de la mise en œuvre d'architectures de communication complexes pour le compte de leurs clients.
 
         </div>
-    </p>
+    </li>
+</div>
 
-    <p> 
-         <a href="https://www.univ-lorraine.fr/">Université de Lorraine</a>
-        <img src="{{ url_for('static', filename='images/universite_de_lorraine.png') }}" alt="logo" >
+<div class="user-info-container">
+
+    <li> 
+         <a href="https://www.univ-lorraine.fr/" class="titre_partenaires">Université de Lorraine</a>
+        <img src="{{ url_for('static', filename='images/universite_de_lorraine.png') }}" alt="logo" class="logo_partenaires">
         <div>
            
 
@@ -77,11 +99,14 @@
             
         </div>
 
-    </p>
+    </li>
+</div>
 
-    <p> 
-        <a href="https://www.inria.fr/fr">INRIA</a> 
-        <img src="{{ url_for('static', filename='images/inria.png') }}" alt="logo">
+<div class="user-info-container">
+
+    <li> 
+        <a href="https://www.inria.fr/fr" class="titre_partenaires">INRIA</a> 
+        <img src="{{ url_for('static', filename='images/inria.png') }}" alt="logo" class="logo_partenaires">
         <div>
             
             Notre collaboration avec l'INRIA est stratégique, non seulement par la proximité géographique
@@ -92,29 +117,40 @@
             A noter, certains de professeurs-chercheurs travaillent à l'INRIA!
 
         </div>
-    </p>
+    </li>
+</div>
+<div class="user-info-container">
 
-    <p> 
-        <a href="https://otelo.univ-lorraine.fr/"> OTELO (Observatoire Terre et environnement de Lorraine)</a>
-        <img src="{{ url_for('static', filename='images/osul.png') }}" alt="logo">
+
+    <li> 
+        <a href="https://otelo.univ-lorraine.fr/" class="titre_partenaires"> OTELO (Observatoire Terre et environnement de Lorraine)</a>
+        <img src="{{ url_for('static', filename='images/osul.png') }}" alt="logo" class="logo_partenaires">
         <div>
            
             Le partenariat avec l'OSUL est particulièrement pertinent pour les projets impliquant le traitement de données massives (Big Data), la modélisation et les applications liées aux sciences de la Terre et de l'Univers
         </div>
-    </p>
+    </li>
 
-    <p> 
-        <a href="https://www.rte-france.com/">RTE (Réseau de Transport d'Électricité) </a> 
-        <img src="{{ url_for('static', filename='images/rte.png') }}" alt = "Logo">
+</div>
+
+<div class="user-info-container">
+
+
+    <li> 
+        <a href="https://www.rte-france.com/" class="titre_partenaires">RTE (Réseau de Transport d'Électricité) </a> 
+        <img src="{{ url_for('static', filename='images/rte.png') }}" alt = "Logo" class="logo_partenaires">
         <div>
             
             Le partenariat avec RTE, acteur essentiel de la transition énergétique, permet à nos étudiants de découvrir le travail sur des enjeux d'infrastructures critiques. Cela offre à nos intervenants une expérience dans le domaine de l'énergie, très demandeur.
         </div>
-    </p>
+    </li>
+</div>
 
-    <p> 
-         <a href="https://www.pasteur-sante.fr/"> Louis Pasteur Santé </a>
-        <img src="{{ url_for('static', filename='images/clinique_louis_pasteur.png') }}" alt = "Logo">
+<div class="user-info-container">
+
+    <li> 
+         <a href="https://www.pasteur-sante.fr/" class="titre_partenaires"> Louis Pasteur Santé </a>
+        <img src="{{ url_for('static', filename='images/clinique_louis_pasteur.png') }}" alt = "Logo" class="logo_partenaires">
         <div>
            
             Notre engagement auprès de Louis Pasteur Santé met en évidence l'application de l'ingénierie
@@ -122,11 +158,15 @@
             double-diplôme "Santé-numérique".
             
         </div>
-    </p>
+    </li>
+</div>
 
-    <p> 
-         <a href="https://ensgsi.univ-lorraine.fr/">ENSGSI (École Nationale Supérieure en Génie des Systèmes et de l'Innovation)</a> 
-         <img src="{{ url_for('static', filename='images/ensgsi.png') }}" alt = "Logo">
+<div class="user-info-container">
+
+
+    <li> 
+         <a href="https://ensgsi.univ-lorraine.fr/" class="titre_partenaires">ENSGSI (École Nationale Supérieure en Génie des Systèmes et de l'Innovation)</a> 
+         <img src="{{ url_for('static', filename='images/ensgsi.png') }}" alt = "Logo" class="logo_partenaires">
         <div>
            
             École d'ingénieur spécialisée en innovation, lintimement liée avec Télécom Nancy avec 
@@ -135,6 +175,6 @@
             seulement performantes techniquement, mais aussi parfaitement intégrées et alignées avec la stratégie globale du client.
             
         </div>
-    </p>
-
+    </li>
+</div>
 {% endblock %}
