@@ -114,7 +114,7 @@ if (tinderContainer) { // <--- C'est cette ligne qui empêche le crash sur les a
     let startX = 0;
     let currentCard = null;
 
-    const cardColors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#00FFFF", "#FF00FF", "#FFA500", "#800080", "#D3D3D3", "#000000"];
+    const cardColors = ["#7a1414ff", "#049504ff", "#21217bff", "#d7d724ff", "#2ba3a3ff", "#b10cb1ff", "#b37503ff", "#800080", "#d86666ff", "#262424ff"];
 
     function createCards() {
         // IMPORTANT : On vérifie si dbClients existe (défini dans le HTML)
