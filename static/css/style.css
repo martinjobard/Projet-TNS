@@ -57,26 +57,21 @@ body {
 }
 
 .fil_ariane{
-    color:#ffffff;
+    color:#cecfcf;
     size:18px;
     letter-spacing: 0.5;
-    margin-bottom: 5px;
+    padding-bottom: 0px;
+    padding-left: 10px;
 
-}
-.fleche{
-    color: #a09f9f;
-    font-size: 50px;
-    line-height: 0; /* Écrase la hauteur de ligne pour éviter le décalage */
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 5px; /* Petit ajustement manuel si elle paraît encore trop haute */
 }
 
 .debut_fil{
-    font-size:22px;
+    font-size:26px;
     letter-spacing: 0.5;
     color:#ffffff;
-    padding-bottom: 10px;
+    padding-bottom: 5px;
+    align-content: left ;
+    width:auto;
 
 }
 .username-display{
@@ -86,10 +81,9 @@ body {
 }
 
 .header_middle{
-    display: flex;
-    align-items: center; /* Aligne tout le monde sur le même axe central vertical */
-    justify-content: center; /* Garde le tout centré horizontalement dans le header */
-    gap: 10px;
+    display: block;
+    align-self: left;
+
 }
 main {
     /* C'est ici qu'on pousse le contenu vers le bas pour compenser le header fixe */
