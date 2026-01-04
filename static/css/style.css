@@ -83,8 +83,8 @@ body {
 .header_middle{
     display: block;
     align-self: left;
-
 }
+
 main {
     /* C'est ici qu'on pousse le contenu vers le bas pour compenser le header fixe */
     margin-top: 90px; /* 70px header + 20px espace */

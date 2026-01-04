@@ -24,6 +24,17 @@
 <div id="resultats-secteur" class="statut_blanc">
     </div>
 
+
+<div class="liste-intervenants">
+            <h2 class="titre_page_intervenants">
+                Tous nos intervenants:
+            </h2>
+            {% for cli in clients %}
+            <li> <a href= "/Clients/{{cli.lien}}" > {{cli.nom}} {{cli.prenom}} </a>
+            </li>
+            {% endfor %}
+
+        </div>    
 <div class="d-flex justify-content-between align-items-center mb-4">
   
     

@@ -106,7 +106,28 @@ def Clients():
         return redirect_if_needed
     titre_site = "Site interne TNS"
     titre_page_actuelle = "Clients"
-    return render_template('Clients.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle)
+    db = get_db()
+    c = db.cursor()
+    titre_site = "Site interne TNS"
+    titre_page_actuelle = "Intervenants"
+    
+    rows=[]
+    sql="SELECT nom, prenom FROM Clients "
+    c.execute(sql)
+    rows = c.fetchall()
+
+    clients = []
+    for row in rows:
+        nom=row["nom"]
+        prenom=row["prenom"]
+        lien=f"{nom}.{prenom}"
+        clients.append({
+            
+            "nom": nom, 
+            "prenom":prenom , 
+            "lien": lien
+        })
+    return render_template('Clients.html', titre=titre_site, titre_page_actuelle=titre_page_actuelle, clients=clients)
 
 @app.route('/Projets')
 def Projets():
