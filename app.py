@@ -109,7 +109,7 @@ def Clients():
     db = get_db()
     c = db.cursor()
     titre_site = "Site interne TNS"
-    titre_page_actuelle = "Intervenants"
+    titre_page_actuelle = "Clients"
     
     rows=[]
     sql="SELECT nom, prenom FROM Clients "
