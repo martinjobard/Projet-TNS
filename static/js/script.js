@@ -117,7 +117,6 @@ if (tinderContainer) { // <--- C'est cette ligne qui empêche le crash sur les a
     const cardColors = ["#7a1414ff", "#049504ff", "#21217bff", "#d7d724ff", "#2ba3a3ff", "#b10cb1ff", "#b37503ff", "#800080", "#d86666ff", "#262424ff"];
 
     function createCards() {
-        // IMPORTANT : On vérifie si dbClients existe (défini dans le HTML)
         if (typeof dbClients === 'undefined' || dbClients.length === 0) {
             console.log("Aucun client trouvé dans la BDD");
             return;
@@ -128,11 +127,30 @@ if (tinderContainer) { // <--- C'est cette ligne qui empêche le crash sur les a
             card.className = "card";
             card.style.backgroundColor = cardColors[index % cardColors.length];
             
-            // Stocker l'ID du client dans la carte (utile pour savoir qui on like/dislike plus tard)
+            
             card.dataset.clientId = client.id; 
             const cardContent = document.createElement("div"); 
             cardContent.className = "card-content";
-            cardContent.textContent = client.nom; 
+            
+            
+            cardContent.innerHTML = `
+            <div class="tinder-inner-content">
+                
+                <h2 class="tinder-company-name">${client.nom}</h2>
+                <p class="tinder-sector">${client.secteur}</p>
+                
+                <div class="tinder-stats-box">
+                    <p class="tinder-rank-score">
+                        Rang #${client.mon_rang !== undefined ? client.mon_rang : '-'} &nbsp;|&nbsp; Score : ${client.mon_score || 0}
+                    </p>
+                    <p class="tinder-project-name">
+                        ${client.projet_concerne || 'Projet non spécifié'}
+                    </p>
+                </div>
+
+            </div>
+        `;
+
             card.appendChild(cardContent);
             tinderContainer.appendChild(card);
         });

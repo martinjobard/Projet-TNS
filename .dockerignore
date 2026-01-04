@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+.git/
+.pytest_cache/
+tests/
+.DS_Store
+ppii.db
+gestion_projets_test.db

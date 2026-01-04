@@ -340,6 +340,68 @@ main {
     transform: scale(0.95);
 }
 
+/* --- NOUVEAUX STYLES POUR LE CONTENU DES CARTES --- */
+
+/* Le conteneur interne pour centrer et gérer les marges */
+.tinder-inner-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    color: white; /* Force le texte en blanc */
+}
+
+/* Le nom de l'entreprise */
+.tinder-company-name {
+    margin: 0 0 5px 0;
+    font-size: 1.6rem;    /* Taille adaptée */
+    line-height: 1.2;
+    font-weight: bold;
+    width: 100%;
+    word-wrap: break-word;      /* Coupe les mots très longs */
+    overflow-wrap: break-word; 
+}
+
+/* Le secteur d'activité */
+.tinder-sector {
+    margin: 0 0 20px 0;
+    font-size: 1rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+/* La boîte contenant le score et le rang */
+.tinder-stats-box {
+    background-color: rgba(0, 0, 0, 0.2); /* Fond sombre transparent */
+    padding: 10px 15px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 250px;
+    margin-top: auto; /* Pousse légèrement vers le bas si besoin */
+}
+
+/* Ligne Rang et Score */
+.tinder-rank-score {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Ligne Projet */
+.tinder-project-name {
+    margin: 5px 0 0 0;
+    font-size: 0.85rem;
+    font-style: italic;
+    opacity: 0.9;
+    white-space: nowrap;      /* Force sur une ligne... */
+    overflow: hidden;         /* ...et cache si ça dépasse */
+    text-overflow: ellipsis;  /* ...avec des "..." à la fin */
+}
+
 .action-text {
     position: absolute;
     top: 55%;                /* Aligné verticalement au niveau des cartes */
