@@ -56,6 +56,35 @@ body {
     width: 100%;
 }
 
+.fil_ariane{
+    color:#cecfcf;
+    size:18px;
+    letter-spacing: 0.5;
+    padding-bottom: 0px;
+    padding-left: 10px;
+
+}
+
+.debut_fil{
+    font-size:26px;
+    letter-spacing: 0.5;
+    color:#ffffff;
+    padding-bottom: 5px;
+    align-content: left ;
+    width:auto;
+
+}
+.username-display{
+    margin-right: 20px;
+    color:#607d9e;
+    font-style: italic;
+}
+
+.header_middle{
+    display: block;
+    align-self: left;
+
+}
 main {
     /* C'est ici qu'on pousse le contenu vers le bas pour compenser le header fixe */
     margin-top: 90px; /* 70px header + 20px espace */
