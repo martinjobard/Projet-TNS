@@ -1,10 +1,9 @@
 import sqlite3
 import os
 
-# --- Configuration ---
 DB_NAME = 'gestion_projets_test.db'
-SCHEMA_FILE = 'schema.sql' # Nom du fichier contenant le schéma
-DATA_FILE = 'data_inserts.sql' # Nom du fichier contenant les insertions (voir étape 4)
+SCHEMA_FILE = 'schema.sql' 
+DATA_FILE = 'data_inserts.sql'  
 
 def load_sql_from_file(filename):
     """Lit le contenu d'un fichier SQL."""
@@ -23,15 +22,12 @@ def initialize_database(db_name, schema_sql, data_sql):
         conn = sqlite3.connect(db_name)
         cursor = conn.cursor()
 
-        # 1. Activation des clés étrangères (ESSENTIEL en SQLite)
         cursor.execute("PRAGMA foreign_keys = ON;")
         print("✅ Clés étrangères activées.")
 
-        # 2. Exécution du Schéma (DROP et CREATE TABLE)
         print(f"🛠️ Exécution du schéma ({SCHEMA_FILE})...")
         cursor.executescript(schema_sql)
 
-        # 3. Insertion des données de Test
         print(f"⚙️ Insertion des données de test ({DATA_FILE})...")
         cursor.executescript(data_sql)
 
@@ -41,7 +37,7 @@ def initialize_database(db_name, schema_sql, data_sql):
     except sqlite3.Error as e:
         print(f"\n❌ Erreur SQLite lors de l'initialisation : {e}")
         if conn:
-            conn.rollback() # Annule les changements en cas d'erreur
+            conn.rollback() 
     except FileNotFoundError as e:
         print(f"\n❌ Erreur de fichier : {e}")
     finally:
@@ -50,14 +46,11 @@ def initialize_database(db_name, schema_sql, data_sql):
 
 if __name__ == "__main__":
     try:
-        # Charger le schéma
         schema_content = load_sql_from_file(SCHEMA_FILE)
         
-        # Charger les insertions de données
         data_content = load_sql_from_file(DATA_FILE)
         
         initialize_database(DB_NAME, schema_content, data_content)
         
     except FileNotFoundError:
-        # L'erreur est déjà affichée dans la fonction load_sql_from_file
         pass

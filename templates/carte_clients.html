@@ -6,15 +6,14 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <style>
-        /* Style de la carte */
         #map { 
             height: 600px; 
             width: 100%; 
             border-radius: 8px; 
-            border: 1px solid #ddd; /* Bordure fine grise */
+            border: 1px solid #ddd; 
             margin-top: 20px;
             margin-bottom: 20px;
-            z-index: 1; /* S'assure que la carte reste en dessous des menus déroulants */
+            z-index: 1; 
         }
     </style>
 
@@ -39,26 +38,20 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // A. Initialisation de la carte (Centrée sur la France)
             var map = L.map('map').setView([46.603354, 1.888334], 6);
 
-            // B. Fond de carte (OpenStreetMap)
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
 
-            // C. Récupération des données clients depuis le HTML
             var mapElement = document.getElementById('map');
             var clientsData = JSON.parse(mapElement.dataset.clients);
 
-            // D. Placement des marqueurs
             clientsData.forEach(function(client) {
-                // On vérifie que les coordonnées existent bien
                 if (client.lat && client.lon) {
                     var marker = L.marker([client.lat, client.lon]).addTo(map);
                     
-                    // Contenu de la bulle d'info
                     var popupContent = `
                         <div style="text-align:center; min-width: 150px;">
                             <strong style="color: #007bff; font-size: 1.1em;">${client.entreprise}</strong><br>
