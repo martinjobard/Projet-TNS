@@ -6,7 +6,6 @@ import shutil
 import sqlite3
 from werkzeug.security import generate_password_hash
 
-# Ajout du chemin pour trouver l'application
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app import app, get_db
 
@@ -17,7 +16,6 @@ def init_db_if_empty(db_path):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     try:
-        # On teste sur la VRAIE table de ton schéma
         cursor.execute("SELECT * FROM Utilisateur_Intervenant LIMIT 1")
     except sqlite3.OperationalError:
         print("⚠️ Tables manquantes. Initialisation via schema.sql...")
@@ -33,15 +31,12 @@ def init_db_if_empty(db_path):
 
 @pytest.fixture
 def client():
-    # 1. Gestion du fichier de BDD
     master_db_path = os.path.join(os.path.dirname(__file__), '..', NOM_FICHIER_DB_TEST)
     if not os.path.exists(master_db_path):
         open(master_db_path, 'a').close()
 
-    # 2. Auto-réparation si vide
     init_db_if_empty(master_db_path)
 
-    # 3. Copie temporaire (Isolation)
     db_fd, temp_db_path = tempfile.mkstemp()
     shutil.copy2(master_db_path, temp_db_path)
 
@@ -52,11 +47,8 @@ def client():
         with app.app_context():
             db = get_db()
             
-            # --- CRÉATION DE L'ADMIN DE TEST (ADAPTÉ À TON SCHÉMA) ---
             
-            # 1. On nettoie l'existant (pour éviter les doublons si le test relance)
             try:
-                # On récupère l'ID de l'intervenant lié à l'admin pour le supprimer aussi
                 cur = db.execute("SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = 'admin_test'")
                 row = cur.fetchone()
                 if row:
@@ -67,16 +59,12 @@ def client():
             except Exception:
                 pass 
 
-            # 2. CRÉATION OBLIGATOIRE D'UN INTERVENANT (Car clé étrangère idi)
-            # On insère d'abord un intervenant fictif pour l'admin
             cur = db.execute(
                 "INSERT INTO Intervenants (nom, prenom, role, nb_heure, dispo, date_inscription) VALUES (?, ?, ?, ?, ?, ?)",
                 ('ADMIN', 'System', 'Administrateur', 0, 'Non', '2025-01-01')
             )
-            id_intervenant = cur.lastrowid # On récupère l'ID généré (idi)
+            id_intervenant = cur.lastrowid 
 
-            # 3. CRÉATION DE L'UTILISATEUR (Lié à l'intervenant créé au-dessus)
-            # Note : Ta colonne mot de passe s'appelle 'mdp_haché' dans ton schéma !
             db.execute(
                 """
                 INSERT INTO Utilisateur_Intervenant 
@@ -89,14 +77,10 @@ def client():
             
         yield client
 
-    # 4. Nettoyage
     os.close(db_fd)
     os.unlink(temp_db_path)
 
-# --- HELPER DE CONNEXION ---
 def login(client, username, password):
-    # Ici on garde les names de ton HTML (identifiant / mot_de_passe)
-    # Ton code Python (app.py) fera le lien avec la BDD
     return client.post('/login', data={
         'identifiant': username,    
         'mot_de_passe': password    

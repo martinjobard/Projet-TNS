@@ -26,10 +26,7 @@ def require_login():
     return None
 
 def allowed_file(filename):
-    # 1. Vérifie si le nom de fichier contient un point
-    # 2. Sépare le nom au dernier point (rsplit('.', 1)) et met l'extension en minuscules
-    # 3. Vérifie si cette extension fait partie de notre ensemble ALLOWED_EXTENSIONS
-    return '.' in filename and \
+        return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
@@ -339,7 +336,7 @@ def Import_Export():
     if redirect_if_needed:
         return redirect_if_needed
     
-    db = get_db() # ⬅️ Connexion à la BDD
+    db = get_db() 
     cursor = db.cursor()
     
     # Exécution de la requête pour obtenir tous les clients
@@ -457,22 +454,18 @@ def tinder_like():
         projet_id = projet['idp']
         client_id = projet['idc']
 
-        # 1. Vérifier si le projet est déjà MATCHÉ par QUELQU'UN (Tinder Match = Historique LIKE)
         est_deja_pris_sql = "SELECT 1 FROM Historique WHERE idc = ? AND interaction_text = 'TINDER_LIKE'"
         est_deja_pris = db.execute(est_deja_pris_sql,(client_id,)).fetchone()
         if est_deja_pris:
             continue 
 
-        # 2. Vérifier si MOI (l'utilisateur connecté) j'ai déjà disliké ce projet
         a_refuse_sql = "SELECT 1 FROM Historique WHERE idc = ? AND idi = ? AND interaction_text = 'TINDER_DISLIKE'"
         a_refuse = db.execute(a_refuse_sql, (client_id, mon_idi)).fetchone()
         if a_refuse:
             continue
 
-        # 3. Calculer le matching
         classement = algorythme_matching(projet_id) 
         
-        # 4. Trouver mon rang et mon score
         mon_rang = None
         mon_score = 0
         
@@ -483,7 +476,6 @@ def tinder_like():
                 mon_score = candidat['score']
                 break
 
-        # Si je suis dans le classement (et score > 0 par sécurité)
         if mon_rang is not None and mon_score > 0:
             cartes_proposées.append({
                 'id': client_id,
@@ -491,10 +483,9 @@ def tinder_like():
                 'secteur': projet['secteur'],
                 'projet_concerne': projet['titre_projet'],
                 'mon_score': mon_score,
-                'mon_rang': mon_rang  # <--- On envoie cette nouvelle info au HTML
+                'mon_rang': mon_rang 
             })
 
-    # ... Reste du code pour récupérer 'mes_clients' (inchangé) ...
     sql_potentiels_clients = "SELECT Clients.idc, Clients.nom_entreprise, Clients.secteur, Clients.email, Clients.telephone FROM Clients LEFT JOIN Historique ON Clients.idc = Historique.idc WHERE Historique.idi = ? AND Historique.interaction_text = 'TINDER_LIKE'"
     potentiels_clients = db.execute(sql_potentiels_clients, (mon_idi,)).fetchall()
 
@@ -655,12 +646,9 @@ def Mon_compte():
     
     username = session.get('username')
     
-    # On utilise ta fonction get_db() qui est plus propre
     db = get_db()
     c = db.cursor()
 
-    # --- LA REQUÊTE AVEC JOINTURE ---
-    # On récupère les infos du compte ET les infos de l'intervenant lié par l'idi
     sql = """
     SELECT 
         UI.nom_utilisateur, 
@@ -678,7 +666,6 @@ def Mon_compte():
     c.execute(sql, (username,))
     data = c.fetchone()
 
-    # On joint Projets, Participation et Utilisateur_Intervenant pour recuperer les missions
     sql_missions = """
     SELECT 
         P.titre_projet, 
@@ -693,29 +680,24 @@ def Mon_compte():
     ORDER BY P.deb DESC
     """
     c.execute(sql_missions, (username,))
-    missions_data = c.fetchall() # On récupère toutes les lignes (liste de missions)
+    missions_data = c.fetchall() 
 
-    # Initialisation des variables
     nom_compte = "Inconnu"
     email = "Inconnu"
     pdp_url = None
-    lien_formatte = None # C'est la variable pour ton URL
+    lien_formatte = None 
     fonction_recuperee = ""
 
     if data:
-        # 1. Infos du compte utilisateur
         nom_compte = (data['nom_utilisateur'])
         email = data['email_utilisateur']
         pdp_url = data['pdp_url']
         dispo_actuelle = data['dispo']
         fonction_recuperee = data['fonction']
         
-        # 2. Infos de l'intervenant pour construire le lien
-        # On vérifie que les champs existent bien
         if data['nom'] and data['prenom']:
             nom_reel = normalize_text(data['nom'])
             prenom_reel = normalize_text(data['prenom'])
-            # On formate : "Nom.Prenom" pour que la route Inter_profil puisse faire le split('.')
             lien_formatte = f"{nom_reel}.{prenom_reel}"
     titre_page_actuelle = "Mon Compte"
     return render_template('Mon_compte.html', 
@@ -827,12 +809,9 @@ def Connexion():
     # Cette page doit être accessible à tous
     return render_template('Connexion.html', titre=titre_site, titre_page_actuelle="Connexion")
 
-# ... (votre fonction login() sécurisée que nous avons construite va ici) ...
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # 1. Vérifier si l'utilisateur a soumis le formulaire (POST)
     if request.method == 'POST':
-        # 2. Récupérer les données du formulaire
         username = request.form['identifiant']
         password = request.form['mot_de_passe']
         
@@ -859,45 +838,37 @@ def login():
             if status == 0:
                 erreur = "Compte inactif. Contactez l'administrateur."
                 return render_template('Connexion.html', erreur=erreur)
-            # Succès ! Stocker les informations
             session['logged_in'] = True
             session['username'] = username
             session['user_id']=id_recupere
-            session['pdp_url'] = pdp_url # On stocke l'URL dans la session !
-            session['fonction'] = fonction if fonction else 'user' # Rôle par défaut 'user'
+            session['pdp_url'] = pdp_url 
+            session['fonction'] = fonction if fonction else 'user' 
             return redirect(url_for('Accueil'))
         else:
-            # 4. Si les informations sont incorrectes, afficher un message d'erreur
             erreur = "Identifiant ou mot de passe incorrect."
             return render_template('Connexion.html', erreur=erreur)
-    # 3. Si c'est une requête GET, ou après une tentative non concluante, afficher le formulaire
     return render_template('Connexion.html')
 
-# ... (votre fonction logout() ci-dessus va ici) ...
 @app.route('/logout')
 def logout():
-    session.clear() # ⬅️ Efface toutes les clés de la session
-    return redirect(url_for('Connexion')) # Redirige vers la page de connexion
+    session.clear()
+    return redirect(url_for('Connexion')) 
 
 
 @app.route('/upload_profile_pic', methods=['POST'])
 def upload_profile_pic():
     file = request.files.get('pdp_file')
 
-    # Vérification unique et complète (existence + sécurité de l'extension)
     if file and file.filename != '' and allowed_file(file.filename):
         try:
-            # 1. Préparation du nom sécurisé (ex: admin.jpg)
             extension = file.filename.rsplit('.', 1)[1].lower()
             username = session['username']
             secure_filename = f"{username}.{extension}"
             
-            # 2. Sauvegarde du fichier sur le disque
             full_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename)
             file.save(full_path)
             
-            # 3. Mise à jour de la BDD
-            url_to_save = os.path.join('images/profiles', secure_filename) # Chemin relatif pour la BDD/HTML
+            url_to_save = os.path.join('images/profiles', secure_filename) 
             
             db = sqlite3.connect(DATABASE)
             c = db.cursor()
@@ -908,17 +879,13 @@ def upload_profile_pic():
             session['pdp_url'] = url_to_save
             db.close()
 
-            # Succès : Retour à la page de profil
             return redirect(url_for('Mon_compte'))
 
         except Exception as e:
-            # Gérer les erreurs (problème de BDD ou de disque)
             print(f"Erreur lors de l'upload ou de la mise à jour : {e}")
-            # Idéalement, utilisez un message flash ici
             return redirect(url_for('Mon_compte'))
             
     else:
-        # Échec de la vérification (pas de fichier soumis ou extension non autorisée)
         return redirect(url_for('Mon_compte'))
 
 # --- ROUTE : TÉLÉCHARGER SES DONNÉES (Export JSON) ---
@@ -931,11 +898,9 @@ def telecharger_donnees():
     
     try:
         db = sqlite3.connect(DATABASE)
-        # On configure la connexion pour récupérer les résultats sous forme de dictionnaire (plus facile pour le JSON)
         db.row_factory = sqlite3.Row 
         c = db.cursor()
         
-        # 1. Récupération des infos utilisateur
         sql = "SELECT UI.nom_utilisateur, UI.email_utilisateur, UI.pdp_url, I.role, I.prenom, I.nom, PC.niveau, C.competence FROM Utilisateur_Intervenant UI LEFT JOIN Intervenants I ON UI.idi = I.idi LEFT JOIN PossedeCompetence PC ON I.idi = PC.idi LEFT JOIN Competences C ON PC.idcomp = C.idcomp WHERE nom_utilisateur = ?"
         c.execute(sql, (username,))
         rows = c.fetchall()
@@ -944,7 +909,6 @@ def telecharger_donnees():
 
         if rows:
             first_row = rows[0]
-            # Agrégation des compétences
             liste_competences = []
             for row in rows:
                 if row['competence']:
@@ -952,7 +916,6 @@ def telecharger_donnees():
                         "competence": row['competence'],
                         "niveau": row['niveau']
                     })
-            # 2. Création du dictionnaire de données
             donnees = {
                 "profil": {
                     "nom_utilisateur": first_row['nom_utilisateur'],
@@ -968,10 +931,8 @@ def telecharger_donnees():
                 "date_export": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             
-            # 3. Conversion en JSON
             json_str = json.dumps(donnees, indent=4, ensure_ascii=False)
             
-            # 4. Création de la réponse "Fichier à télécharger"
             return Response(
                 json_str,
                 mimetype="application/json",
@@ -996,28 +957,21 @@ def supprimer_compte():
         db = get_db()
         cursor = db.cursor()
         
-        # ÉTAPE 1 : On récupère l'ID de l'intervenant (idi) avant de supprimer le compte
-        # Cela nous servira à supprimer aussi son profil "Physique" (Nom, Prénom)
         cursor.execute("SELECT idi FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?", (username,))
         result = cursor.fetchone()
         
         idi_a_supprimer = result['idi'] if result else None
         
-        # ÉTAPE 2 : Supprimer le compte de connexion (Utilisateur_Intervenant)
         cursor.execute("DELETE FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?", (username,))
         
-        # ÉTAPE 3 : Supprimer la fiche intervenant 
         if idi_a_supprimer:
             cursor.execute("DELETE FROM Intervenants WHERE idi = ?", (idi_a_supprimer,))
 
-        # ÉTAPE 4 : Supprimer la fiche PC 
         if idi_a_supprimer:
             cursor.execute("DELETE FROM PossedeCompetence WHERE idi = ?", (idi_a_supprimer,)) 
 
-        # ÉTAPE 5 : Valider les changements
         db.commit()
         
-        # Déconnexion et retour à l'accueil
         session.clear()
         flash("Votre compte a été supprimé définitivement.", "success")
         return redirect(url_for('Connexion'))
@@ -1033,12 +987,9 @@ def supprimer_compte():
 def normalize_text(text):
     if not text:
         return ""
-    # on enlève toutes les majuscules
     text = text.lower()
-    # on passe en NFD puis suppression des marques ( é = e + accent)
     normalized = unicodedata.normalize('NFD', text)
     
-    # On filtre pour ne garder que le caractère de base
     text_sans_accents = "".join(char for char in normalized if unicodedata.category(char) != 'Mn')
     return text_sans_accents
 
@@ -1046,7 +997,6 @@ def normalize_text(text):
     
 @app.route('/Intervenants/<nomcomplet>')
 def Inter_profil(nomcomplet=None):
-    # 1. Sécurité sur le format de l'URL
     try:
         [name, surname] = nomcomplet.split('.')
     except ValueError:
@@ -1055,14 +1005,9 @@ def Inter_profil(nomcomplet=None):
     db = get_db()
     c = db.cursor()
     
-    # 2. On prépare les noms pour la recherche
     name_search = name
     surname_search = surname
 
-    # 3. LA REQUÊTE SQL AVEC ALIAS ET LEFT JOIN
-    # I  = Intervenants
-    # PC = PossedeCompetence
-    # C  = Competences
     sql = """
     SELECT
         I.idi,
@@ -1085,11 +1030,9 @@ def Inter_profil(nomcomplet=None):
     c.execute(sql, (name_search, surname_search))
     rows = c.fetchall()
 
-    # 4. Vérification : Si la liste est vide, c'est que la personne n'existe vraiment pas
     if not rows:
        return render_template("error_intervenant.html", message="Intervenant non trouvé")
 
-    # 5. On récupère les infos de base (sur la première ligne)
     id_intervenant = rows[0]['idi']
     nom_affiche = normalize_text(rows[0]['nom'])
     prenom_affiche = normalize_text(rows[0]['prenom'])
@@ -1099,11 +1042,8 @@ def Inter_profil(nomcomplet=None):
     email_utilisateur = rows[0]['email_utilisateur']
     role = rows[0]['role']
     
-    # 6. On boucle pour récupérer les compétences (si elles existent)
     competences = []
     for row in rows:
-        # Grâce au LEFT JOIN, 'competence' sera None si l'admin n'en a pas.
-        # On ne l'ajoute à la liste que si ce n'est pas None.
         if row["competence"]: 
             competences.append({
                 "nom": row["competence"],
@@ -1126,7 +1066,6 @@ def Inter_profil(nomcomplet=None):
 
 @app.route('/Clients/<nomcomplet>')
 def Client_profil(nomcomplet=None):
-    # 1. Sécurité sur le format de l'URL
     try:
         [name, surname] = nomcomplet.split('.')
     except ValueError:
@@ -1135,13 +1074,9 @@ def Client_profil(nomcomplet=None):
     db = get_db()
     c = db.cursor()
     
-    # 2. On prépare les noms pour la recherche
     name_search = normalize_text(name) 
     surname_search = normalize_text(surname)
 
-    # 3. LA REQUÊTE SQL AVEC ALIAS ET LEFT JOIN
-    # C  = Clients
-    # P = Projets
     sql = """
     SELECT 
         C.idc,
@@ -1162,11 +1097,9 @@ def Client_profil(nomcomplet=None):
     c.execute(sql, (name_search, surname_search))
     rows = c.fetchall()
 
-    # 4. Vérification : Si la liste est vide, c'est que la personne n'existe vraiment pas
     if not rows:
        return render_template("error_client.html", message1="Client non trouvé", message2="Nous n'avons pas encore travaillé avec cette personne, vérifiez peut-être l'orthographe. ")
 
-    # 5. On récupère les infos de base (sur la première ligne)
     id_clients = rows[0]['idc']
     nom_affiche = rows[0]['nom']
     prenom_affiche = rows[0]['prenom']
@@ -1176,11 +1109,8 @@ def Client_profil(nomcomplet=None):
     email=rows[0]['email']
 
     
-    # 6. On boucle pour récupérer les compétences (si elles existent)
     projets = []
     for row in rows:
-        # Grâce au LEFT JOIN, 'competence' sera None si l'admin n'en a pas.
-        # On ne l'ajoute à la liste que si ce n'est pas None.
         if row["idp"]: 
             projets.append({
                 "idp": row["idp"],
@@ -1241,7 +1171,6 @@ def Client_profil(nomcomplet=None):
 @app.route('/Inscription', methods=['GET', 'POST'])
 def Inscription():
     if request.method == 'POST':
-        # Récupération sécurisée des données
         username = request.form.get('nom_utilisateur')
         email = request.form.get('email')
         password = request.form.get('mot_de_passe')
@@ -1251,45 +1180,34 @@ def Inscription():
         liste_competences = request.form.getlist('competence[]')
         liste_niveaux = request.form.getlist('niveau[]')
 
-        # --- Vérification 1 : Champs non vides ---
         if not all([username, email, password, confirm_password, prenom, nom]):
             erreur = "Veuillez remplir tous les champs obligatoires."
             return render_template('Inscription.html', erreur=erreur)
 
-        # --- Vérification 2 : Mots de passe correspondants ---
         if password != confirm_password:
             erreur = "Les mots de passe ne correspondent pas."
             return render_template('Inscription.html', erreur=erreur)
 
-        # Si nous arrivons ici, les données sont complètes et les mots de passe correspondent.
         
-        # 3. Vérification de l'existence de l'utilisateur (Prochaine étape !)
         db = get_db()
         c = db.cursor()
         
         sql_check = "SELECT COUNT(*) FROM Utilisateur_Intervenant WHERE nom_utilisateur = ?"
         c.execute(sql_check, (username,))
         
-        # Récupère le compte (le résultat est un tuple, ex: (1,))
         count = c.fetchone()[0]
         
         if count > 0:
-            # L'utilisateur existe déjà !
             erreur = f"Le nom d'utilisateur '{username}' est déjà pris."
             return render_template('Inscription.html', erreur=erreur)
 
-        # Si nous arrivons ici, le nom d'utilisateur est unique.
         
-        # 4. Hachage du mot de passe avant stockage
         hashed_password = generate_password_hash(password)
 
-        # 5. Insertion dans la BDD
         try:
             db = get_db()
             cursor = db.cursor()
             
-            # --- 5A. Insertion dans Intervenants (Profil Personnel) ---
-            # Récupérer l'idi généré
             date_inscription = datetime.now().strftime('%d/%m/%Y')
             sql_intervenant = """
                 INSERT INTO Intervenants (nom, prenom, date_inscription) 
@@ -1300,16 +1218,12 @@ def Inscription():
 
             for competence_nom, niveau_val in zip(liste_competences, liste_niveaux):
             
-                # Nettoyage des données (enlever les espaces inutiles)
                 competence_clean = competence_nom.strip()
                 
-                # Sécurité : On ignore les lignes vides (si l'utilisateur a cliqué sur + sans remplir)
                 if not competence_clean:
                     continue 
 
-                # --- 5B. Insertion dans Competences (LOGIQUE INTÉGRÉE DANS LA BOUCLE) ---
                 
-                # On vérifie si la compétence existe déjà
                 sql_check_comp = "SELECT idcomp FROM Competences WHERE competence = ?"
                 cursor.execute(sql_check_comp, (competence_clean,))
                 comp_result = cursor.fetchone()
@@ -1317,12 +1231,10 @@ def Inscription():
                 if comp_result:
                     idcomp = comp_result[0]
                 else:
-                    # Si elle n'existe pas, on l'insère
                     sql_comp = "INSERT INTO Competences (competence) VALUES (?)"
                     cursor.execute(sql_comp, (competence_clean,))
                     idcomp = cursor.lastrowid
                 
-                # --- 5C. Insertion dans PossedeCompetence (Lien) ---
                 
                 sql_possede = """
                     INSERT INTO PossedeCompetence (idi, idcomp, niveau) 
@@ -1331,55 +1243,43 @@ def Inscription():
 
                 cursor.execute(sql_possede, (idi, idcomp, niveau_val))
 
-            # --- 5D. Insertion dans Utilisateur_Intervenant (Compte de Connexion) ---
             
             sql_utilisateur = """
                 INSERT INTO Utilisateur_Intervenant 
                 (mdp_haché, idi, nom_utilisateur, pdp_url, email_utilisateur, fonction, status) 
                 VALUES (?, ?, ?, ?, ?, 'user', 0)
             """
-            # Valeurs par défaut : pdp_url est vide au départ
             pdp_default = ''
             cursor.execute(sql_utilisateur, (hashed_password, idi, username, pdp_default, email))
 
             db.commit() 
 
         except sqlite3.Error as e:
-            # En cas d'erreur de BDD, on annule tout
             erreur = f"Erreur de base de données lors de l'inscription : {e}"
             return render_template('Inscription.html', erreur=erreur)
 
-        # 6. Redirection après succès
-        # Après une inscription réussie, redirigez l'utilisateur vers la page de connexion
         return redirect(url_for('Connexion'))
         
-    # Si la méthode est GET, on affiche le formulaire
     return render_template('Inscription.html', titre_page_actuelle="Inscription")
 
 
 @app.route('/export_client', methods=['POST'])
 def export_client():
-    # 1. On récupère l'ID directement depuis le formulaire
     client_id = request.form.get('client_id')
 
-    # Sécurité : Si aucun ID n'est envoyé, on recharge la page
     if not client_id:
         return redirect(url_for('Import_Export'))
 
-    # 2. Connexion BDD
     db = get_db()
     cursor = db.cursor()
     
-    # 3. Requête SQL
     sql = "SELECT * FROM Clients WHERE idc = ?"
     cursor.execute(sql, (client_id,)) 
     client_data = cursor.fetchone() 
     
-    # Si le client n'existe pas
     if not client_data:
         return "Erreur : Client non trouvé.", 404
 
-    # 4. Mise en forme CSV (Identique à avant)
     headers = client_data.keys()
     values = list(client_data) 
     
@@ -1387,7 +1287,6 @@ def export_client():
     csv_data = ','.join([str(v) for v in values])
     csv_content = f"{csv_headers}\n{csv_data}"
 
-    # 5. Envoi direct du fichier
     return Response(
         csv_content,
         mimetype="text/csv",
@@ -1396,23 +1295,17 @@ def export_client():
 
 @app.route('/import_clients', methods=['POST'])
 def import_clients():
-    # 1. Vérification que le fichier est présent
     if 'csv_file' not in request.files:
         return redirect(url_for('Import_Export'))
     
     file = request.files['csv_file']
     
-    # 2. Vérification que le nom de fichier n'est pas vide
     if file.filename == '':
         return redirect(url_for('Import_Export'))
 
     if file:
-        # 3. Transformation du fichier binaire en fichier texte pour le module CSV
-        # On utilise io.TextIOWrapper pour décoder les bytes en string (UTF-8)
         stream = io.TextIOWrapper(file.stream._file, "utf8", newline=None)
         
-        # 4. Lecture du CSV en mode "Dictionnaire"
-        # Cela permet d'appeler les colonnes par leur nom (ex: row['nom']) peu importe l'ordre
         csv_input = csv.DictReader(stream)
         
         db = get_db()
@@ -1422,30 +1315,24 @@ def import_clients():
             nb_ajouts = 0
             nb_doublons = 0
 
-            # On prépare la requête d'insertion (AVEC l'idc cette fois)
-            # Puisqu'on vérifie l'ID, on doit aussi l'insérer pour garder la cohérence
             sql_insert = """
                 INSERT INTO Clients (idc, nom, prenom, email, telephone, secteur, dernier_contact, nom_entreprise) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """
 
             for row in csv_input:
-                # 1. On récupère l'IDC du fichier CSV
                 id_client = row['idc']
                 
-                # 2. VÉRIFICATION : Est-ce que cet IDC existe déjà dans la base ?
                 sql_verif = "SELECT idc FROM Clients WHERE idc = ?"
                 cursor.execute(sql_verif, (id_client,))
                 existe = cursor.fetchone()
 
                 if existe:
-                    # 3. CAS DOUBLON : L'ID existe déjà, on ignore cette ligne
                     nb_doublons += 1
                     continue 
                 
-                # 4. CAS NOUVEAU : On insère la ligne (en forçant l'IDC du fichier)
                 cursor.execute(sql_insert, (
-                    row['idc'],  # On insère l'ID du fichier
+                    row['idc'], 
                     row['nom'], 
                     row['prenom'], 
                     row['email'], 
@@ -1491,7 +1378,6 @@ def supprimer_client(id_clients):
         cursor.execute("DELETE FROM Historique WHERE idc = ?", (id_clients,))
         cursor.execute("DELETE FROM Clients WHERE idc = ?", (id_clients,))
         
-        # Valider les changements
         db.commit()
         flash("Le compte client a été supprimé définitivement.", "success")
         return redirect(url_for('Clients'))
@@ -1514,7 +1400,6 @@ def upload_client(id_clients):
     c = db.cursor()
     
     try:
-        # 1. Récupération des infos utilisateur
         sql = "SELECT C.nom, C.prenom, C.email, C.telephone, C.secteur, C.dernier_contact, C.nom_entreprise, H.date, H.interaction_text, P.etat, P.budget, P.deb, P.fin, P.titre_projet FROM Clients C LEFT JOIN Projets P ON P.idc = C.idc LEFT JOIN Historique H ON H.idc = C.idc WHERE C.idc = ?"
         c.execute(sql, (id_clients,))
         rows = c.fetchall()
@@ -1523,7 +1408,6 @@ def upload_client(id_clients):
 
         if rows:
             first_row = rows[0]
-            # Agrégation des compétences
             liste_historique = []
             for row in rows:
                 if row['date']:
@@ -1541,7 +1425,6 @@ def upload_client(id_clients):
                         "deb": row['deb'],
                         "fin": row['fin'],
                     })
-            # 2. Création du dictionnaire de données
             donnees = {
                 "profil_client": {
                     "nom": first_row['nom'],
@@ -1559,10 +1442,8 @@ def upload_client(id_clients):
                 "date_export": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             
-            # 3. Conversion en JSON
             json_str = json.dumps(donnees, indent=4, ensure_ascii=False)
             
-            # 4. Création de la réponse "Fichier à télécharger"
             return Response(
                 json_str,
                 mimetype="application/json",
@@ -1587,16 +1468,12 @@ def supprimer_intervenant(id_intervenant):
     cursor = db.cursor()
     
     try:
-        # --- ÉTAPE 1 : VÉRIFICATION (Est-ce mon propre compte ?) ---
-        # On regarde à quel nom d'utilisateur appartient cet ID intervenant
         sql_check = "SELECT nom_utilisateur FROM Utilisateur_Intervenant WHERE idi = ?"
         cursor.execute(sql_check, (id_intervenant,))
         result = cursor.fetchone()
         
-        # On prépare un "drapeau" (flag) pour savoir si on devra déconnecter à la fin
         c_est_mon_compte = False
         if result:
-            # Si le nom d'utilisateur lié à cet ID est le même que celui dans la session actuelle
             if result['nom_utilisateur'] == session.get('username'):
                 c_est_mon_compte = True
 
@@ -1609,23 +1486,19 @@ def supprimer_intervenant(id_intervenant):
 
         db.commit()
         
-        # --- ÉTAPE 3 : LOGIQUE DE REDIRECTION ---
         if c_est_mon_compte:
-            # Si j'ai supprimé mon propre compte, je vide la session et je vais au login
             session.clear()
             flash("Votre compte a été supprimé avec succès. Au revoir !", "info")
-            return redirect(url_for('Connexion')) # Assurez-vous que la route s'appelle bien 'Connexion' ou 'login'
+            return redirect(url_for('Connexion')) 
         else:
-            # Si c'est un admin qui supprime un autre collègue, on reste sur la liste
             flash("Le compte intervenant a été supprimé définitivement.", "success")
-            return redirect(url_for('Intervenants')) # Ou 'Accueil' selon votre préférence
+            return redirect(url_for('Intervenants')) 
         
     except Exception as e:
         db.rollback()
         print(f"Erreur SQL : {e}")
         flash(f"Erreur lors de la suppression : {e}", "error")
-        return redirect(url_for('Intervenants')) # Redirection de sécurité en cas d'erreur  
-    
+        return redirect(url_for('Intervenants')) 
 @app.route('/upload_intervenant/<int:id_intervenant>', methods=['POST'])
 def upload_intervenant(id_intervenant):
     if 'logged_in' not in session:
@@ -1639,7 +1512,6 @@ def upload_intervenant(id_intervenant):
     c = db.cursor()
     
     try:
-        # 1. Récupération des infos utilisateur
         sql = "SELECT UI.nom_utilisateur, UI.email_utilisateur, UI.pdp_url, I.role, I.prenom, I.nom, PC.niveau, C.competence FROM Utilisateur_Intervenant UI LEFT JOIN Intervenants I ON UI.idi = I.idi LEFT JOIN PossedeCompetence PC ON I.idi = PC.idi LEFT JOIN Competences C ON PC.idcomp = C.idcomp WHERE I.idi = ?"
         c.execute(sql, (id_intervenant,))
         rows = c.fetchall()
@@ -1648,7 +1520,6 @@ def upload_intervenant(id_intervenant):
 
         if rows:
             first_row = rows[0]
-            # Agrégation des compétences
             liste_competences = []
             for row in rows:
                 if row['competence']:
@@ -1656,7 +1527,6 @@ def upload_intervenant(id_intervenant):
                         "competence": row['competence'],
                         "niveau": row['niveau']
                     })
-            # 2. Création du dictionnaire de données
             donnees = {
                 "profil": {
                     "nom_utilisateur": first_row['nom_utilisateur'],
@@ -1672,10 +1542,8 @@ def upload_intervenant(id_intervenant):
                 "date_export": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             
-            # 3. Conversion en JSON
             json_str = json.dumps(donnees, indent=4, ensure_ascii=False)
             
-            # 4. Création de la réponse "Fichier à télécharger"
             return Response(
                 json_str,
                 mimetype="application/json",
@@ -1706,12 +1574,9 @@ def recherche_secteur_client():
         db = get_db()
         c = db.cursor()
         
-        # 1. Préparation de la valeur de recherche pour la fonction LIKE
     
         search_secteur = f"%{secteur}%"
 
-        # 2. La Requête SQL avec le Placeholder Sécurisé (?)
-        # La requête est sécurisée contre l'injection SQL
         sql = """
         SELECT
             nom, prenom
@@ -1721,7 +1586,6 @@ def recherche_secteur_client():
             secteur LIKE ?; 
         """
         
-        # 3. Exécution de la Requête PRÉPARÉE
         c.execute(sql, (search_secteur,)) 
         
         results = c.fetchall()
@@ -1745,7 +1609,6 @@ def recherche_secteur_client():
 
 @app.route('/export_mission/<int:id_projet>', methods=['POST'])
 def export_mission(id_projet):
-    # 1. On récupère l'ID des projets finis
     db = get_db()
     cursor = db.cursor()
     try:
@@ -1771,15 +1634,12 @@ def export_mission(id_projet):
         cursor.execute(sql, (id_projet,))
         projets_data = cursor.fetchall()
         
-        # 2. Mise en forme CSV
         if not projets_data:
             return redirect(url_for('Missions_réalisées'))
         
-        # Préparer les en-têtes
         headers = projets_data[0].keys()
         csv_headers = ','.join(headers)
         
-        # Préparer les lignes de données
         csv_lines = []
         for projet in projets_data:
             values = [str(projet[h]) for h in headers]
@@ -1787,7 +1647,6 @@ def export_mission(id_projet):
         
         csv_content = f"{csv_headers}\n" + "\n".join(csv_lines)
         
-        # 3. Envoi direct du fichier
         return Response(
             csv_content,
             mimetype="text/csv",
@@ -1798,10 +1657,9 @@ def export_mission(id_projet):
 
 @app.route('/admin/utilisateurs_en_attente')
 def admin_validation():
-    # On récupère le nom de l'utilisateur connecté
     username = session.get('username')
     if not username:
-        return redirect(url_for('Connexion')) # Si pas connecté, on renvoie au login
+        return redirect(url_for('Connexion')) 
     
     db = get_db()
     cursor = db.cursor()
@@ -1835,8 +1693,6 @@ def refuser_utilisateur(id):
         return redirect(url_for('Connexion'))
         
     db = get_db()
-    # Si on refuse, on supprime carrément la demande d'inscription
-    # On doit aussi supprimer l'intervenant lié
     cursor = db.cursor()
     cursor.execute("SELECT idi FROM Utilisateur_Intervenant WHERE idu = ?", (id,))
     result = cursor.fetchone()
@@ -1852,18 +1708,15 @@ def refuser_utilisateur(id):
 
 @app.route('/admin/definir_role/<int:id_intervenant>', methods=['POST'])
 def definir_role(id_intervenant):
-    # 1. SÉCURITÉ : Seul l'admin peut faire ça
     if session.get('fonction') != 'admin':
         flash("Action non autorisée.", "error")
         return redirect(url_for('profil_intervenant', id=id_intervenant))
     
-    # 2. Récupération du nouveau rôle depuis le formulaire
     nouveau_role = request.form.get('role_metier')
     
     db = get_db()
     cursor = db.cursor()
     try:
-        # On met à jour la colonne 'role' de la table Intervenants
         db.execute("UPDATE Intervenants SET role = ? WHERE idi = ?", (nouveau_role, id_intervenant))
         db.commit()
         flash(f"Le rôle a été modifié en : {nouveau_role}", "success")
@@ -1871,7 +1724,6 @@ def definir_role(id_intervenant):
         row = cursor.fetchone()
         
         if row:
-            # On reconstruit le format "Nom.Prenom" attendu par ta route
             nom_complet_url = f"{row['nom']}.{row['prenom']}"
             return redirect(url_for('Inter_profil', nomcomplet=nom_complet_url))
         
@@ -1889,7 +1741,6 @@ def carte_clients():
     db = get_db()
     cursor = db.cursor()
     
-    # On récupère uniquement les clients qui ont une latitude et une longitude définies
     sql = """
     SELECT nom, prenom, nom_entreprise, adresse, lattitude, longitude 
     FROM Clients 
@@ -1912,13 +1763,11 @@ def carte_clients():
 
 @app.route('/ajouter_client', methods=['GET', 'POST'])
 def ajouter_client():
-    # 1. SÉCURITÉ : On vérifie si c'est un admin
     if session.get('fonction') != 'admin':
         flash("Accès refusé. Vous devez être administrateur.", "error")
-        return redirect(url_for('Clients')) # Ou Accueil
+        return redirect(url_for('Clients')) 
 
     if request.method == 'POST':
-        # 2. Récupération des données du formulaire
         nom = request.form.get('nom')
         prenom = request.form.get('prenom')
         entreprise = request.form.get('entreprise')
@@ -1927,13 +1776,10 @@ def ajouter_client():
         telephone = request.form.get('telephone')
         adresse = request.form.get('adresse')
         
-        # 3. GÉOCODAGE AUTOMATIQUE (Pour la carte)
-        # On utilise la fonction qu'on a créée précédemment
         lat, lon = None, None
         if adresse:
             lat, lon = geocode_adresse(adresse)
         
-        # 4. Enregistrement en Base de Données
         try:
             db = get_db()
             sql = """
@@ -1950,7 +1796,6 @@ def ajouter_client():
             flash(f"Erreur lors de l'ajout : {e}", "error")
             return redirect(url_for('ajouter_client'))
 
-    # Si c'est un GET, on affiche juste le formulaire
     return render_template('ajouter_client.html', titre_page_actuelle="Ajouter client")
 
 @app.route('/ajouter_documents', methods=['GET', 'POST'])

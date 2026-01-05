@@ -28,9 +28,8 @@ header {
     align-items: center;
     justify-content: space-between;
     
-    /* C'est ici qu'on corrige : on s'assure que le padding est bien géré */
     padding: 0 30px; /* Plus d'espace sur les côtés */
-    box-sizing: border-box; /* INDISPENSABLE : empêche le padding d'agrandir la largeur totale */
+    box-sizing: border-box; 
     
     z-index: 2000;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -43,15 +42,12 @@ body {
     
     /* GESTION DE LA HAUTEUR */
     min-height: 100vh;      /* Prend toute la hauteur de l'écran */
-    display: flex;          /* Pour le Sticky Footer */
+    display: flex;          
     flex-direction: column; /* Vertical */
     
-    /* GESTION DU HEADER FIXE */
-    /* On utilise margin-top sur le main plutôt que padding-top ici 
-       pour éviter les soucis de scrollbar verticale inutile */
+    
     padding: 0; 
     
-    /* Sécurité supplémentaire contre le scroll horizontal */
     overflow-x: hidden; 
     width: 100%;
 }
@@ -86,8 +82,7 @@ body {
 }
 
 main {
-    /* C'est ici qu'on pousse le contenu vers le bas pour compenser le header fixe */
-    margin-top: 90px; /* 70px header + 20px espace */
+    margin-top: 90px; 
     margin-bottom: 30px;
     margin-left: auto;
     margin-right: auto;
@@ -99,7 +94,7 @@ main {
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     
-    flex: 1; /* Pousse le footer en bas */
+    flex: 1;
 }
 
 /* GAUCHE */
@@ -112,7 +107,6 @@ main {
 
 .logo { height: 40px; width: auto; }
 
-/* HAMBURGER (Design des barres) */
 .hamburger-btn {
     cursor: pointer;
     display: flex;
@@ -129,7 +123,6 @@ main {
     transition: 0.3s;
 }
 
-/* Animation Hamburger -> Croix quand coché */
 #toggle-sidebar:checked ~ header .hamburger-btn span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
 #toggle-sidebar:checked ~ header .hamburger-btn span:nth-child(2) { opacity: 0; }
 #toggle-sidebar:checked ~ header .hamburger-btn span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
@@ -164,11 +157,10 @@ main {
     position: relative;
 }
 
-/* 1. Style du bouton Connexion */
 .btn-connexion {
     color: white;
     text-decoration: none;
-    border: 1px solid white; /* Bordure blanche fine */
+    border: 1px solid white; 
     padding: 8px 15px;
     border-radius: 4px;
     font-weight: 500;
@@ -177,8 +169,8 @@ main {
 }
 
 .btn-connexion:hover {
-    background-color: white; /* Devient blanc au survol */
-    color: #2c3e50; /* Le texte devient bleu */
+    background-color: white; 
+    color: #2c3e50; 
 }
 
 .login-page {
@@ -197,9 +189,8 @@ main {
     gap: 15px;   /* espace entre chaque élément */
 }
 
-/* 2. Conteneur Profil (pour ancrer le menu déroulant) */
 .profile-container {
-    position: relative; /* Indispensable pour que le menu se place par rapport à ça */
+    position: relative; 
     display: flex;
     align-items: center;
 }
@@ -218,9 +209,8 @@ main {
     border-color: white;
 }
 
-/* 3. Le Menu Déroulant Profil */
 .profile-dropdown {
-    display: none; /* Caché par défaut */
+    display: none; 
     position: absolute;
     top: 55px; /* Juste en dessous de l'image */
     right: 0; /* Aligné à droite */
@@ -258,15 +248,14 @@ main {
     left: 0;
     width: 250px;
     height: calc(100vh - 70px); /* Prend tout le reste de la hauteur */
-    background-color: #34495e; /* Un peu plus clair que le header */
-    transform: translateX(-100%); /* Caché par défaut à gauche */
+    background-color: #34495e; 
+    transform: translateX(-100%); 
     transition: transform 0.3s ease-in-out;
     z-index: 1900;
-    overflow-y: auto; /* Scroll si menu trop long */
+    overflow-y: auto; 
     padding-top: 20px;
 }
 
-/* MAGIE : Quand la checkbox est cochée, la sidebar rentre */
 #toggle-sidebar:checked ~ .sidebar {
     transform: translateX(0);
 }
@@ -283,10 +272,9 @@ main {
 }
 .sidebar a:hover { background-color: #2c3e50; border-left: 4px solid #1abc9c; }
 
-/* Sous-menu (Style "Tiroir") */
 .sidebar-submenu {
-    display: none; /* Caché par JS au début */
-    background-color: #233342; /* Fond foncé pour l'intérieur */
+    display: none; 
+    background-color: #233342; 
 }
 .sidebar-submenu a {
     padding-left: 50px;
@@ -304,7 +292,7 @@ main {
         position: relative;
         min-height: 500px; /* Espace pour les cartes */
     }
-/* STYLE DU CONTENEUR DES CARTES */
+
 .card-container {
     position: relative;
     margin-top: 20px;
@@ -351,7 +339,7 @@ main {
     height: 100%;
     width: 100%;
     text-align: center;
-    color: white; /* Force le texte en blanc */
+    color: white; 
 }
 
 /* Le nom de l'entreprise */
@@ -375,12 +363,12 @@ main {
 
 /* La boîte contenant le score et le rang */
 .tinder-stats-box {
-    background-color: rgba(0, 0, 0, 0.2); /* Fond sombre transparent */
+    background-color: rgba(0, 0, 0, 0.2); 
     padding: 10px 15px;
     border-radius: 8px;
     width: 90%;
     max-width: 250px;
-    margin-top: auto; /* Pousse légèrement vers le bas si besoin */
+    margin-top: auto; 
 }
 
 /* Ligne Rang et Score */
@@ -397,32 +385,30 @@ main {
     font-size: 0.85rem;
     font-style: italic;
     opacity: 0.9;
-    white-space: nowrap;      /* Force sur une ligne... */
-    overflow: hidden;         /* ...et cache si ça dépasse */
-    text-overflow: ellipsis;  /* ...avec des "..." à la fin */
+    white-space: nowrap;    
+    overflow: hidden;         
+    text-overflow: ellipsis;  
 }
 
 .action-text {
     position: absolute;
     top: 55%;                /* Aligné verticalement au niveau des cartes */
     transform: translateY(-50%);
-    font-family: inherit;    /* Utilise la police du site */
+    font-family: inherit;    
     font-weight: bold;
-    font-size: 1.5rem;       /* Taille adaptée pour être lisible */
+    font-size: 1.5rem;       
     z-index: 10;             /* Pour rester au-dessus du décor */
     white-space: nowrap;
 }
 
-/* Positionnement à gauche (Rouge) */
 .left-text {
-    left: 10%;               /* Ajuste selon la largeur de ton écran */
-    color: #ff4b4b;          /* Un rouge plus moderne */
+    left: 10%;              
+    color: #ff4b4b;        
 }
 
-/* Positionnement à droite (Vert) */
 .right-text {
-    right: 10%;              /* Ajuste selon la largeur de ton écran */
-    color: #27ae60;          /* Le même vert que tes boutons valider */
+    right: 10%;             
+    color: #27ae60;         
 }
 
 .tinderboard {
@@ -466,13 +452,13 @@ main {
 }
 
 .stats-table .annuler-like:hover {
-    background-color: #d43f3f; /* Assombrit légèrement au survol */
+    background-color: #d43f3f; 
 }
 
 /* Centre tout le contenu des cellules verticalement */
 .stats-table td {
     vertical-align: middle;
-    text-align: center; /* Optionnel : centre aussi le texte horizontalement */
+    text-align: center;
 }
 .stats-table td:last-child {
     width: 120px;            /* Largeur fixe pour la colonne action */
@@ -485,7 +471,7 @@ main {
     align-items: center;
     justify-content: center;
     padding: 6px 12px;
-    font-size: 0.85rem;      /* Plus petit pour mieux s'intégrer */
+    font-size: 0.85rem;      
     margin: 0;               /* Supprime les décalages */
     border-radius: 4px;
     background-color: #ff4b4b;
@@ -600,13 +586,13 @@ main {
 
 /* --- PIED DE PAGE (FOOTER) --- */
 footer {
-    background-color: #333; /* Gris foncé */
+    background-color: #333; 
     color: white;
     text-align: center;
     padding: 20px;
     width: 100%;
     margin-top: 40px; /* Espace pour ne pas coller au contenu */
-    border-top: 4px solid #2c3e50; /* Petite bordure décorative rappelant le header */
+    border-top: 4px solid #2c3e50; 
 }
 
 footer p {
@@ -615,7 +601,7 @@ footer p {
 }
 
 footer a {
-    color: #bdc3c7; /* Gris clair pour les liens */
+    color: #bdc3c7;
     text-decoration: none;
     font-weight: bold;
     margin: 0 10px;
@@ -623,7 +609,7 @@ footer a {
 }
 
 footer a:hover {
-    color: #1abc9c; /* Vert turquoise au survol */
+    color: #1abc9c; 
 }
 
 /* --Page Details Projet-- */
@@ -1284,8 +1270,8 @@ form > .mon-bouton {
 }
 
 .form-group label {
-    width: 200px;       /* Ajuste cette valeur selon la longueur de tes textes */
-    flex-shrink: 0;     /* Empêche le label de rétrécir */
+    width: 200px;     
+    flex-shrink: 0;    
 }
 
 .form-group input, 
@@ -1305,11 +1291,11 @@ form > .mon-bouton {
 }
 
 .competence-row input {
-    flex: 2; /* Le champ nom est plus large */
+    flex: 2;
 }
 
 .competence-row select {
-    flex: 1; /* Le champ niveau est plus petit */
+    flex: 1; 
 }
 
 .sous-titre-section-inscription {
@@ -1318,7 +1304,7 @@ form > .mon-bouton {
     color: #2c3e50;
     padding: 0 10px;
     margin-bottom: 15px;
-    border-bottom: none; /* On laisse le fieldset gérer la bordure */
+    border-bottom: none; 
 }
 
 fieldset {
@@ -1674,9 +1660,9 @@ letter-spacing: -0.5px
 
 
 .conteneur-flex {
-    display: flex;          /* Met les éléments côte à côte */
-    align-items: center;    /* Centre verticalement (très utile !) */
-    gap: 20px;              /* Crée un espace entre l'image et le texte */
+    display: flex;         
+    align-items: center;    
+    gap: 20px;             
      list-style: none;
     margin-bottom: 12px;
     padding: 10px;
@@ -1687,10 +1673,10 @@ letter-spacing: -0.5px
 }
 
 .logo_partenaires {
-    width: 150px;           /* Fixe une taille à ton image */
-    height: auto;           /* Garde les proportions */
-    object-fit: cover;      /* Si l'image est carrée, ça évite qu'elle soit écrasée */
-    flex-shrink: 0;         /* IMPORTANT : Empêche l'image de rétrécir si le texte est trop long */
+    width: 150px;           
+    height: auto;          
+    object-fit: cover;      
+    flex-shrink: 0;        
 }
 
 .information_partenaires{

@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // On met tout dans un bloc qui ne s'exécute que si le container existe
 const tinderContainer = document.getElementById("card-container");
 
-if (tinderContainer) { // <--- C'est cette ligne qui empêche le crash sur les autres pages !
+if (tinderContainer) { 
     let isDragging = false;
     let startX = 0;
     let currentCard = null;
@@ -239,7 +239,6 @@ if (tinderContainer) { // <--- C'est cette ligne qui empêche le crash sur les a
         .then(response => response.json())
         .then(data => {
             console.log("Swipe enregistré", data);
-            // Si c'est un like, on recharge la page pour voir le tableau se remplir !
             if (action === 'like' && data.status === 'success') {
                 setTimeout(() => location.reload(), 500);
             }
@@ -257,7 +256,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // On vérifie si le formulaire existe sur la page actuelle avant de continuer
     if (searchForm) {
 
-        // Fonction utilitaire (interne à ce bloc)
         function normalizeTextJS(text) {
             if (!text) return '';
             return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -284,13 +282,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // --- Logique pour la recherche de Client ---
     
-    // Assurez-vous que l'ID du formulaire dans clients.html est bien "searchForm"
     const searchFormClient = document.getElementById("searchFormClient"); 
 
     // On vérifie si le formulaire existe sur la page actuelle avant de continuer
     if (searchFormClient) {
 
-        // Fonction utilitaire (interne à ce bloc)
         function normalizeTextJS(text) {
             if (!text) return '';
             // Supprime les accents et met en minuscule pour une URL propre
@@ -300,7 +296,6 @@ document.addEventListener('DOMContentLoaded', function() {
         searchFormClient.addEventListener("submit", function(e) {
             e.preventDefault(); // On bloque l'envoi classique
             
-            // On utilise 'this' (qui est le formulaire) pour accéder aux champs par leur attribut 'name'
             const nom_input = this.nom.value.trim();
             const prenom_input = this.prenom.value.trim();
 
@@ -308,7 +303,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const prenom_url = normalizeTextJS(prenom_input);
 
             if(nom_url && prenom_url){
-                // SEULE LIGNE MODIFIÉE on pointe vers /Clients/
                 window.location.href = `/Clients/${encodeURIComponent(nom_url)}.${encodeURIComponent(prenom_url)}`;
             }
         });
@@ -363,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (formSecteur) {
         formSecteur.addEventListener('submit', function(event) {
             event.preventDefault(); // Empêche le rechargement
-            console.log("Formulaire secteur soumis via JS !"); // Debug
+            console.log("Formulaire secteur soumis via JS !"); 
 
             const secteurInput = document.getElementById('secteur-input');
             if (secteurInput) {
@@ -376,7 +370,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Ces fonctions peuvent rester en dehors car ce sont des définitions, pas des exécutions
 function fetchClientProfiles(secteur) {
     const encodedSecteur = encodeURIComponent(secteur);
     const url = `/api/recherche/clients?secteur=${encodedSecteur}`;
@@ -416,10 +409,10 @@ function afficherResultats(profils) {
         
         // Nettoyage pour obtenir le nom affichable
         const parts = link.split('/');
-        const nom_lien = parts[parts.length - 1]; // ex: dupont.jean
+        const nom_lien = parts[parts.length - 1]; 
     
         a.href = link; 
-        a.textContent = nom_lien.replace('.', ' '); // Optionnel : rend le texte plus joli (DUPONT JEAN)
+        a.textContent = nom_lien.replace('.', ' '); 
         a.target = "_blank";
         
         li.appendChild(a);

@@ -3,10 +3,8 @@
 {% block content %}
 <div class="stats-container">
 
-    <!-- TITRE -->
     <h1>Statistiques</h1>
 
-    <!-- FILTRES -->
     <form class="stats-filters" action="{{ url_for('Stats') }}" method="get">
         
         <label class="texte-bleufoncé">Voir :</label>
@@ -37,7 +35,6 @@
         </a>
     </form>
 
-    <!-- KPIs -->
     <div class="kpi-cards">
         <div class="kpi">
             <span>Nombre de clients</span>
@@ -49,19 +46,16 @@
         </div>
     </div>
 
-    <!-- COURBE -->
     <section class="linechart-box">
         <h2>Courbe du nombre de projets par mois</h2>
         <canvas id="lineChart"></canvas>
     </section>
 
-    <!-- PIE CHART -->
     <section class="piechart-box">
         <h2>Répartition par secteur</h2>
         <canvas id="pieChart"></canvas>
     </section>
 
-    <!-- TABLEAU -->
     <table class="stats-table">
         <thead>
             <tr>
@@ -87,18 +81,15 @@
 
 </div>
 
-<!-- ========== SCRIPTS CHARTS ========== -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     
-    /* --- DONNÉES PYTHON -> JS --- */
     const monthlyLabels = JSON.parse('{{ monthly_labels|tojson }}');
     const monthlyProjects = JSON.parse('{{ monthly_projects|tojson }}');
 
     const sectorLabels = JSON.parse('{{ sector_labels|tojson }}');
     const sectorValues = JSON.parse('{{ sector_values|tojson }}');
 
-    /* --- LINE CHART --- */
     new Chart(
         document.getElementById('lineChart'),
         {
@@ -115,7 +106,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     );
 
-    /* --- PIE CHART --- */
     new Chart(
         document.getElementById('pieChart'),
         {

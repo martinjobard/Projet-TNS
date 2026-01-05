@@ -4,8 +4,6 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      # C'est la magie : on lie le fichier de ton ordi à celui du conteneur
-      # Remplace 'gestion_projets_test.db' par le vrai nom de ta BDD principale
       - ./gestion_projets_test.db:/app/gestion_projets_test.db
     environment:
-      - FLASK_DEBUG=1 # Optionnel : active le mode debug
+      - FLASK_DEBUG=1 
