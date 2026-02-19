@@ -361,10 +361,10 @@ Projet académique - Tous droits réservés
 
 ## 👤 Auteurs
 
-**Martin** - Etudiant en école d'ingénieur informatique, promo 2028 Telecom Nancy
-**Anaelle** - Etudiante en école d'ingénieur informatique, promo 2028 Telecom Nancy
-**Mathilde** - Etudiante en école d'ingénieur informatique, promo 2028 Telecom Nancy
-**Moran** - Etudiant en école d'ingénieur informatique, promo 2028 Telecom Nancy
+- **Martin** - Etudiant en école d'ingénieur informatique, promo 2028 Telecom Nancy
+- **Anaelle** - Etudiante en école d'ingénieur informatique, promo 2028 Telecom Nancy
+- **Mathilde** - Etudiante en école d'ingénieur informatique, promo 2028 Telecom Nancy
+- **Moran** - Etudiant en école d'ingénieur informatique, promo 2028 Telecom Nancy
 
 ---
 
