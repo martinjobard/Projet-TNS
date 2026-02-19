@@ -359,9 +359,12 @@ Projet académique - Tous droits réservés
 
 ---
 
-## 👤 Auteur
+## 👤 Auteurs
 
-**Martin** - Soutenance finale 2026
+**Martin** - Etudiant en école d'ingénieur informatique, promo 2028 Telecom Nancy
+**Anaelle** - Etudiante en école d'ingénieur informatique, promo 2028 Telecom Nancy
+**Mathilde** - Etudiante en école d'ingénieur informatique, promo 2028 Telecom Nancy
+**Moran** - Etudiant en école d'ingénieur informatique, promo 2028 Telecom Nancy
 
 ---
 
